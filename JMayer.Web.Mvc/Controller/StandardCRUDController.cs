@@ -22,12 +22,12 @@ namespace JMayer.Web.Mvc.Controllers
         /// <summary>
         /// The data layer the controller will interact with.
         /// </summary>
-        private Data.Database.DataLayer.IDataLayer<T> _dataLayer;
+        private readonly Data.Database.DataLayer.IDataLayer<T> _dataLayer;
 
         /// <summary>
         /// The logger the controller will interact with.
         /// </summary>
-        private ILogger _logger;
+        private readonly ILogger _logger;
 
         /// <summary>
         /// The name of the data object.
@@ -41,8 +41,30 @@ namespace JMayer.Web.Mvc.Controllers
         /// <param name="logger">The logger the controller will interact with.</param>
         public StandardCRUDController(Data.Database.DataLayer.IDataLayer<T> dataLayer, ILogger logger)
         {
+            ArgumentNullException.ThrowIfNull(dataLayer);
+            ArgumentNullException.ThrowIfNull(logger);
+
             _dataLayer = dataLayer;
             _logger = logger;
+        }
+
+        /// <summary>
+        /// The method returns the count using the data layer.
+        /// </summary>
+        /// <returns>The count.</returns>
+        [HttpGet("Count")]
+        public async Task<IActionResult> CountAsync()
+        {
+            try
+            {
+                int count = await _dataLayer.CountAsync();
+                return Ok(count);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to return the count for the {Type} data objects.", _dataObjectTypeName);
+                return StatusCode((int)HttpStatusCode.InternalServerError);
+            }
         }
 
         /// <summary>
@@ -56,18 +78,18 @@ namespace JMayer.Web.Mvc.Controllers
             try
             {
                 dataObject = await _dataLayer.CreateAsync(dataObject);
-                _logger.LogInformation($"The {_dataObjectTypeName} was successfully created.");
+                _logger.LogInformation("The {Type} was successfully created.", _dataObjectTypeName);
                 return Ok(dataObject);
             }
             catch (DataObjectValidationException ex)
             {
                 ServerSideValidationResult serverSideValidationResult = new(ex.ValidationResults);
-                _logger.LogWarning(ex, $"Failed to create the {_dataObjectTypeName} because of a server-side validation error.");
+                _logger.LogWarning(ex, "Failed to create the {Type} because of a server-side validation error.", _dataObjectTypeName);
                 return BadRequest(serverSideValidationResult);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Failed to create the {_dataObjectTypeName}.");
+                _logger.LogError(ex, "Failed to create the {Type}.", _dataObjectTypeName);
                 return StatusCode((int)HttpStatusCode.InternalServerError);
             }
         }
@@ -87,14 +109,14 @@ namespace JMayer.Web.Mvc.Controllers
                 if (dataObject != null)
                 {
                     await _dataLayer.DeleteAsync(dataObject);
-                    _logger.LogInformation($"The {integerID} for the {_dataObjectTypeName} was successfully deleted.");
+                    _logger.LogInformation("The {ID} for the {Type} was successfully deleted.", integerID, _dataObjectTypeName);
                 }
                 
                 return Ok();
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Failed to delete the {integerID} {_dataObjectTypeName}.");
+                _logger.LogError(ex, "Failed to delete the {ID} {Type}.", integerID, _dataObjectTypeName);
                 return StatusCode((int)HttpStatusCode.InternalServerError);
             }
         }
@@ -114,14 +136,14 @@ namespace JMayer.Web.Mvc.Controllers
                 if (dataObject != null)
                 {
                     await _dataLayer.DeleteAsync(dataObject);
-                    _logger.LogInformation($"The {stringID} for the {_dataObjectTypeName} was successfully deleted.");
+                    _logger.LogInformation("The {ID} for the {Type} was successfully deleted.", stringID, _dataObjectTypeName);
                 }
 
                 return Ok();
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Failed to delete the {stringID} {_dataObjectTypeName}.");
+                _logger.LogError(ex, "Failed to delete the {ID} {Type}.", stringID, _dataObjectTypeName);
                 return StatusCode((int)HttpStatusCode.InternalServerError);
             }
         }
@@ -140,7 +162,7 @@ namespace JMayer.Web.Mvc.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Failed to return all the {_dataObjectTypeName} data objects.");
+                _logger.LogError(ex, "Failed to return all the {Type} data objects.", _dataObjectTypeName);
                 return StatusCode((int)HttpStatusCode.InternalServerError);
             }
         }
@@ -159,7 +181,7 @@ namespace JMayer.Web.Mvc.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Failed to return the first {_dataObjectTypeName} data object.");
+                _logger.LogError(ex, "Failed to return the first {Type} data object.", _dataObjectTypeName);
                 return StatusCode((int)HttpStatusCode.InternalServerError);
             }
         }
@@ -179,7 +201,7 @@ namespace JMayer.Web.Mvc.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Failed to return the {integerID} {_dataObjectTypeName} data object.");
+                _logger.LogError(ex, "Failed to return the {ID} {Type} data object.", integerID, _dataObjectTypeName);
                 return StatusCode((int)HttpStatusCode.InternalServerError);
             }
         }
@@ -199,7 +221,7 @@ namespace JMayer.Web.Mvc.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Failed to return the {stringID} {_dataObjectTypeName} data object.");
+                _logger.LogError(ex, "Failed to return the {ID} {Type} data object.", stringID, _dataObjectTypeName);
                 return StatusCode((int)HttpStatusCode.InternalServerError);
             }
         }
@@ -214,23 +236,23 @@ namespace JMayer.Web.Mvc.Controllers
             try
             {
                 dataObject = await _dataLayer.UpdateAsync(dataObject);
-                _logger.LogInformation($"The {_dataObjectTypeName} was successfully updated.");
+                _logger.LogInformation("The {Type} was successfully updated.", _dataObjectTypeName);
                 return Ok(dataObject);
             }
             catch (DataObjectUpdateConflictException ex)
             {
-                _logger.LogWarning(ex, $"Failed to update {_dataObjectTypeName} because the data was considered old.");
+                _logger.LogWarning(ex, "Failed to update {Type} because the data was considered old.", _dataObjectTypeName);
                 return Conflict();
             }
             catch (DataObjectValidationException ex)
             {
                 ServerSideValidationResult serverSideValidationResult = new(ex.ValidationResults);
-                _logger.LogWarning(ex, $"Failed to update the {_dataObjectTypeName} because of a server-side validation error.");
+                _logger.LogWarning(ex, "Failed to update the {Type} because of a server-side validation error.", _dataObjectTypeName);
                 return BadRequest(serverSideValidationResult);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Failed to update the {_dataObjectTypeName}.");
+                _logger.LogError(ex, "Failed to update the {Type}.", _dataObjectTypeName);
                 return StatusCode((int)HttpStatusCode.InternalServerError);
             }
         }
@@ -246,12 +268,12 @@ namespace JMayer.Web.Mvc.Controllers
             {
                 List<ValidationResult> validationResults = await _dataLayer.ValidateAsync(dataObject);
                 ServerSideValidationResult serverSideValidationResult = new(validationResults);
-                _logger.LogInformation($"The {_dataObjectTypeName} was successfully validated.");
+                _logger.LogInformation("The {Type} was successfully validated.", _dataObjectTypeName);
                 return Ok(serverSideValidationResult);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Failed to validate the {_dataObjectTypeName}.");
+                _logger.LogError(ex, "Failed to validate the {Type}.", _dataObjectTypeName);
                 return StatusCode((int)HttpStatusCode.InternalServerError);
             }
         }
