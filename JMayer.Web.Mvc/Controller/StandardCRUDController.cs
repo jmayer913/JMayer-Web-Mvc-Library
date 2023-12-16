@@ -17,12 +17,12 @@ namespace JMayer.Web.Mvc.Controllers
     [Route("api/[controller]")]
     public class StandardCRUDController<T, U> : ControllerBase 
         where T : DataObject
-        where U : Data.Database.DataLayer.IDataLayer<T>
+        where U : Data.Database.DataLayer.IStandardCRUDDataLayer<T>
     {
         /// <summary>
         /// The data layer the controller will interact with.
         /// </summary>
-        private readonly Data.Database.DataLayer.IDataLayer<T> _dataLayer;
+        private readonly Data.Database.DataLayer.IStandardCRUDDataLayer<T> _dataLayer;
 
         /// <summary>
         /// The logger the controller will interact with.
@@ -39,7 +39,7 @@ namespace JMayer.Web.Mvc.Controllers
         /// </summary>
         /// <param name="dataLayer">The data layer the controller will interact with.</param>
         /// <param name="logger">The logger the controller will interact with.</param>
-        public StandardCRUDController(Data.Database.DataLayer.IDataLayer<T> dataLayer, ILogger logger)
+        public StandardCRUDController(Data.Database.DataLayer.IStandardCRUDDataLayer<T> dataLayer, ILogger logger)
         {
             ArgumentNullException.ThrowIfNull(dataLayer);
             ArgumentNullException.ThrowIfNull(logger);

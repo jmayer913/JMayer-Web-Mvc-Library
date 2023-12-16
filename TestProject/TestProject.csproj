@@ -26,7 +26,6 @@
 
   <ItemGroup>
     <Folder Include="Data\" />
-    <Folder Include="Database\" />
   </ItemGroup>
 
   <ItemGroup>

@@ -40,7 +40,7 @@ public class StandardCRUDControllerUnitTest
     [Fact]
     public async Task CountAsyncOkResponse()
     {
-        SimpleListDataLayer dataLayer = new();
+        SimpleMemoryDataLayer dataLayer = new();
         _ = await dataLayer.CreateAsync(new SimpleDataObject());
 
         SimpleCRUDController simpleCRUDController = new(dataLayer, CreateConsoleLogger());
@@ -61,7 +61,7 @@ public class StandardCRUDControllerUnitTest
     [Fact]
     public async Task CreateAsyncBadRequestResponse()
     {
-        SimpleListDataLayer dataLayer = new();
+        SimpleMemoryDataLayer dataLayer = new();
         SimpleCRUDController simpleCRUDController = new(dataLayer, CreateConsoleLogger());
         IActionResult actionResult = await simpleCRUDController.CreateAsync(new SimpleDataObject() { Value = 9999 });
 
@@ -80,7 +80,7 @@ public class StandardCRUDControllerUnitTest
     [Fact]
     public async Task CreateAsyncInternalErrorResponse()
     {
-        SimpleCRUDController simpleCRUDController = new(new SimpleListDataLayer(), CreateConsoleLogger());
+        SimpleCRUDController simpleCRUDController = new(new SimpleMemoryDataLayer(), CreateConsoleLogger());
         IActionResult actionResult = await simpleCRUDController.CreateAsync(null);
 
         Assert.True
@@ -98,7 +98,7 @@ public class StandardCRUDControllerUnitTest
     public async Task CreateAsyncOkResponse()
     {
         SimpleDataObject originalDataObject = new() { Value = 10 };
-        SimpleListDataLayer dataLayer = new();
+        SimpleMemoryDataLayer dataLayer = new();
         SimpleCRUDController simpleCRUDController = new(dataLayer, CreateConsoleLogger());
         IActionResult actionResult = await simpleCRUDController.CreateAsync(originalDataObject);
 
@@ -136,7 +136,7 @@ public class StandardCRUDControllerUnitTest
     [Fact]
     public async Task DeleteAsyncOkResponse()
     {
-        SimpleListDataLayer dataLayer = new();
+        SimpleMemoryDataLayer dataLayer = new();
         SimpleDataObject dataObject = await dataLayer.CreateAsync(new SimpleDataObject());
 
         SimpleCRUDController simpleCRUDController = new(dataLayer, CreateConsoleLogger());
@@ -163,7 +163,7 @@ public class StandardCRUDControllerUnitTest
     [Fact]
     public async Task GetAllAsyncOkResponse()
     {
-        SimpleListDataLayer dataLayer = new();
+        SimpleMemoryDataLayer dataLayer = new();
 
         _ = await dataLayer.CreateAsync(new SimpleDataObject() { Value = 10 });
         _ = await dataLayer.CreateAsync(new SimpleDataObject() { Value = 20 });
@@ -204,7 +204,7 @@ public class StandardCRUDControllerUnitTest
     [Fact]
     public async Task GetSingleAsyncOkResponse()
     {
-        SimpleListDataLayer dataLayer = new();
+        SimpleMemoryDataLayer dataLayer = new();
         _ = await dataLayer.CreateAsync(new SimpleDataObject());
 
         SimpleCRUDController simpleCRUDController = new(dataLayer, CreateConsoleLogger());
@@ -235,7 +235,7 @@ public class StandardCRUDControllerUnitTest
     [Fact]
     public async Task GetSingleAsyncWithIntegerIDOkResponse()
     {
-        SimpleListDataLayer dataLayer = new();
+        SimpleMemoryDataLayer dataLayer = new();
         _ = await dataLayer.CreateAsync([ new SimpleDataObject(), new SimpleDataObject() ]);
 
         SimpleCRUDController simpleCRUDController = new(dataLayer, CreateConsoleLogger());
@@ -256,7 +256,7 @@ public class StandardCRUDControllerUnitTest
     [Fact]
     public async Task UpdateAsyncBadRequestResponse()
     {
-        SimpleListDataLayer dataLayer = new();
+        SimpleMemoryDataLayer dataLayer = new();
         SimpleDataObject originalDataObject = await dataLayer.CreateAsync(new SimpleDataObject());
 
         originalDataObject.Value = 9999;
@@ -289,7 +289,7 @@ public class StandardCRUDControllerUnitTest
     [Fact]
     public async Task UpdateAsyncInternalErrorResponse()
     {
-        SimpleCRUDController simpleCRUDController = new(new SimpleListDataLayer(), CreateConsoleLogger());
+        SimpleCRUDController simpleCRUDController = new(new SimpleMemoryDataLayer(), CreateConsoleLogger());
         IActionResult actionResult = await simpleCRUDController.UpdateAsync(null);
 
         Assert.True
@@ -306,7 +306,7 @@ public class StandardCRUDControllerUnitTest
     [Fact]
     public async Task UpdateAsyncOkResponse()
     {
-        SimpleListDataLayer dataLayer = new();
+        SimpleMemoryDataLayer dataLayer = new();
         SimpleDataObject originalDataObject = await dataLayer.CreateAsync(new SimpleDataObject());
 
         originalDataObject.Value = 10;
