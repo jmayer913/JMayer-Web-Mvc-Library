@@ -126,7 +126,7 @@ namespace JMayer.Web.Mvc.Controllers
         /// </summary>
         /// <param name="stringID">The id for the data object.</param>
         /// <returns>An IActionResult object.</returns>
-        [HttpDelete("{stringID:string}")]
+        [HttpDelete("{stringID}")]
         public async Task<IActionResult> DeleteAsync(string stringID)
         {
             try
@@ -211,7 +211,7 @@ namespace JMayer.Web.Mvc.Controllers
         /// </summary>
         /// <param name="stringID">The id to search for.</param>
         /// <returns>A data object.</returns>
-        [HttpGet("Single/{stringID:string}")]
+        [HttpGet("Single/{stringID}")]
         public async Task<IActionResult> GetSingleAsync(string stringID)
         {
             try
