@@ -231,6 +231,7 @@ namespace JMayer.Web.Mvc.Controllers
         /// </summary>
         /// <param name="dataObject">The data object to update.</param>
         /// <returns>The updated data object.</returns>
+        [HttpPut]
         public virtual async Task<IActionResult> UpdateAsync([FromBody] T dataObject)
         {
             try
@@ -262,6 +263,7 @@ namespace JMayer.Web.Mvc.Controllers
         /// </summary>
         /// <param name="dataObject">The data object to validated.</param>
         /// <returns>The validation result.</returns>
+        [HttpPost("Validate")]
         public virtual async Task<IActionResult> ValidateAsync([FromBody] T dataObject)
         {
             try
