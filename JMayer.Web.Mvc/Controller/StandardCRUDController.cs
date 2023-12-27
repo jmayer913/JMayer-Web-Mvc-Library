@@ -53,7 +53,7 @@ namespace JMayer.Web.Mvc.Controllers
         /// </summary>
         /// <returns>The count.</returns>
         [HttpGet("Count")]
-        public async Task<IActionResult> CountAsync()
+        public virtual async Task<IActionResult> CountAsync()
         {
             try
             {
@@ -73,7 +73,7 @@ namespace JMayer.Web.Mvc.Controllers
         /// <param name="dataObject">The data object.</param>
         /// <returns>The created data object.</returns>
         [HttpPost]
-        public async Task<IActionResult> CreateAsync([FromBody] T dataObject)
+        public virtual async Task<IActionResult> CreateAsync([FromBody] T dataObject)
         {
             try
             {
@@ -100,7 +100,7 @@ namespace JMayer.Web.Mvc.Controllers
         /// <param name="integerID">The id for the data object.</param>
         /// <returns>An IActionResult object.</returns>
         [HttpDelete("{integerID:long}")]
-        public async Task<IActionResult> DeleteAsync(long integerID)
+        public virtual async Task<IActionResult> DeleteAsync(long integerID)
         {
             try
             {
@@ -127,7 +127,7 @@ namespace JMayer.Web.Mvc.Controllers
         /// <param name="stringID">The id for the data object.</param>
         /// <returns>An IActionResult object.</returns>
         [HttpDelete("{stringID}")]
-        public async Task<IActionResult> DeleteAsync(string stringID)
+        public virtual async Task<IActionResult> DeleteAsync(string stringID)
         {
             try
             {
@@ -153,7 +153,7 @@ namespace JMayer.Web.Mvc.Controllers
         /// </summary>
         /// <returns>A list of data objects.</returns>
         [HttpGet("All")]
-        public async Task<IActionResult> GetAllAsync()
+        public virtual async Task<IActionResult> GetAllAsync()
         {
             try
             {
@@ -172,7 +172,7 @@ namespace JMayer.Web.Mvc.Controllers
         /// </summary>
         /// <returns>A data object.</returns>
         [HttpGet("Single")]
-        public async Task<IActionResult> GetSingleAsync()
+        public virtual async Task<IActionResult> GetSingleAsync()
         {
             try
             {
@@ -192,7 +192,7 @@ namespace JMayer.Web.Mvc.Controllers
         /// <param name="integerID">The id to search for.</param>
         /// <returns>A data object.</returns>
         [HttpGet("Single/{integerID:long}")]
-        public async Task<IActionResult> GetSingleAsync(long integerID)
+        public virtual async Task<IActionResult> GetSingleAsync(long integerID)
         {
             try
             {
@@ -212,7 +212,7 @@ namespace JMayer.Web.Mvc.Controllers
         /// <param name="stringID">The id to search for.</param>
         /// <returns>A data object.</returns>
         [HttpGet("Single/{stringID}")]
-        public async Task<IActionResult> GetSingleAsync(string stringID)
+        public virtual async Task<IActionResult> GetSingleAsync(string stringID)
         {
             try
             {
@@ -231,7 +231,7 @@ namespace JMayer.Web.Mvc.Controllers
         /// </summary>
         /// <param name="dataObject">The data object to update.</param>
         /// <returns>The updated data object.</returns>
-        public async Task<IActionResult> UpdateAsync([FromBody] T dataObject)
+        public virtual async Task<IActionResult> UpdateAsync([FromBody] T dataObject)
         {
             try
             {
@@ -262,7 +262,7 @@ namespace JMayer.Web.Mvc.Controllers
         /// </summary>
         /// <param name="dataObject">The data object to validated.</param>
         /// <returns>The validation result.</returns>
-        public async Task<IActionResult> ValidateAsync([FromBody] T dataObject)
+        public virtual async Task<IActionResult> ValidateAsync([FromBody] T dataObject)
         {
             try
             {
