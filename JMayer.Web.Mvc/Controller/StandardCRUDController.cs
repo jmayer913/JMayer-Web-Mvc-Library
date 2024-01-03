@@ -22,17 +22,17 @@ namespace JMayer.Web.Mvc.Controllers
         /// <summary>
         /// The data layer the controller will interact with.
         /// </summary>
-        private readonly Data.Database.DataLayer.IStandardCRUDDataLayer<T> _dataLayer;
+        protected readonly Data.Database.DataLayer.IStandardCRUDDataLayer<T> _dataLayer;
 
         /// <summary>
         /// The logger the controller will interact with.
         /// </summary>
-        private readonly ILogger _logger;
+        protected readonly ILogger _logger;
 
         /// <summary>
         /// The name of the data object.
         /// </summary>
-        private readonly string _dataObjectTypeName = typeof(T).Name;
+        protected readonly string _dataObjectTypeName = typeof(T).Name;
 
         /// <summary>
         /// The dependency injection constructor.
