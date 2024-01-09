@@ -11,10 +11,6 @@ namespace TestProject.Controller;
 /// </summary>
 internal class SimpleCRUDController : StandardCRUDController<SimpleDataObject, SimpleMemoryDataLayer>
 {
-    /// <summary>
-    /// The dependency injection constructor.
-    /// </summary>
-    /// <param name="dataLayer">The data layer the controller will interact with.</param>
-    /// <param name="logger">The logger the controller will interact with.</param>
+    /// <inheritdoc/>
     public SimpleCRUDController(IStandardCRUDDataLayer<SimpleDataObject> dataLayer, ILogger logger) : base(dataLayer, logger) { }
 }

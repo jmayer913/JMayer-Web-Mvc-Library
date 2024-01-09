@@ -1,4 +1,5 @@
-﻿using JMayer.Data.HTTP.DataLayer;
+﻿using JMayer.Data.Data.Query;
+using JMayer.Data.HTTP.DataLayer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Net;
@@ -184,6 +185,46 @@ public class StandardCRUDControllerUnitTest
             actionResult is OkObjectResult okObjectResult //Confirm the correct action is returned.
             && okObjectResult.Value is List<SimpleDataObject> list //Confirm the action is responding with a list of data objects.
             && list.Count == 10 //Confirm the list matches the amount created.
+        );
+    }
+
+    /// <summary>
+    /// The method confirms the StandardCRUDContoller.GetPageAsync() returns a 500 (Interal Server Error) response when an exception is thrown by the data layer.
+    /// </summary>
+    /// <returns>A Task object for the async.</returns>
+    [Fact]
+    public async Task GetPageAsyncInternalErrorResponse()
+    {
+        throw new NotImplementedException("Cannot test this. There isn't an easy way to force an exception in the SimpleListDataLayer.");
+    }
+
+    /// <summary>
+    /// The method confirms the StandardCRUDContoller.GetPageAsync() returns a 200 (OK) response when ran successfully.
+    /// </summary>
+    /// <returns>A Task object for the async.</returns>
+    [Fact]
+    public async Task GetPageAsyncOkResponse()
+    {
+        SimpleMemoryDataLayer dataLayer = new();
+
+        for (int index = 1; index <= 100; index++)
+        {
+            _ = await dataLayer.CreateAsync(new SimpleDataObject() { Value = index });
+        }
+
+        QueryDefinition queryDefinition = new()
+        {
+            Skip = 0,
+            Take = 20,
+        };
+        SimpleCRUDController simpleCRUDController = new(dataLayer, CreateConsoleLogger());
+        IActionResult actionResult = await simpleCRUDController.GetPageAsync(queryDefinition);
+
+        Assert.True
+        (
+            actionResult is OkObjectResult okObjectResult //Confirm the correct action is returned.
+            && okObjectResult.Value is List<SimpleDataObject> list //Confirm the action is responding with a list of data objects.
+            && list.Count == queryDefinition.Take //Confirm the list matches the amount created.
         );
     }
 
