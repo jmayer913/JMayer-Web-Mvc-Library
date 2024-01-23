@@ -110,8 +110,9 @@ public class UserEditableControllerUnitTest
         Assert.True
         (
             actionResult is OkObjectResult okObjectResult //Confirm the correct action is returned.
-            && okObjectResult.Value is List<ListView> list //Confirm the action is responding with a list of list views.
-            && list.Count == queryDefinition.Take //Confirm the list matches the amount created.
+            && okObjectResult.Value is PagedList<ListView> list //Confirm the action is responding with a list of list views.
+            && list.DataObjects.Count == queryDefinition.Take //Confirm the list matches the amount taken.
+            && list.TotalRecords == 100 //Confirm the list matches the amount created.
         );
     }
 

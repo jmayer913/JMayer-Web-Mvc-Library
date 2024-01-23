@@ -55,7 +55,7 @@ public class UserEditableController<T, U> : StandardCRUDController<T, U>
     {
         try
         {
-            List<ListView> listViews = await ((IUserEditableDataLayer<T>)DataLayer).GetPageListViewAsync(queryDefinition);
+            PagedList<ListView> listViews = await ((IUserEditableDataLayer<T>)DataLayer).GetPageListViewAsync(queryDefinition);
             return Ok(listViews);
         }
         catch (Exception ex)

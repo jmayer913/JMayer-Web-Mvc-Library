@@ -1,4 +1,5 @@
-﻿using JMayer.Data.Data.Query;
+﻿using JMayer.Data.Data;
+using JMayer.Data.Data.Query;
 using JMayer.Data.HTTP.DataLayer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -223,8 +224,9 @@ public class StandardCRUDControllerUnitTest
         Assert.True
         (
             actionResult is OkObjectResult okObjectResult //Confirm the correct action is returned.
-            && okObjectResult.Value is List<SimpleDataObject> list //Confirm the action is responding with a list of data objects.
-            && list.Count == queryDefinition.Take //Confirm the list matches the amount created.
+            && okObjectResult.Value is PagedList<SimpleDataObject> list //Confirm the action is responding with a list of data objects.
+            && list.DataObjects.Count == queryDefinition.Take //Confirm the list matches the amount taken.
+            && list.TotalRecords == 100 //Confirm the list matches the amount created.
         );
     }
 

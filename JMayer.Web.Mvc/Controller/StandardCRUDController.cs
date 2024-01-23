@@ -178,7 +178,7 @@ public class StandardCRUDController<T, U> : ControllerBase
     {
         try
         {
-            List<T> dataObjects = await DataLayer.GetPageAsync(queryDefinition);
+            PagedList<T> dataObjects = await DataLayer.GetPageAsync(queryDefinition);
             return Ok(dataObjects);
         }
         catch (Exception ex)
