@@ -165,7 +165,7 @@ public class SubUserEditableController<T, U> : UserEditableController<T, U>
     /// <param name="ownerIntegerId">The owner ID to filter for.</param>
     /// <param name="queryDefinition">Defines how the data should be queried; includes filtering, paging and sorting.</param>
     /// <returns>A list of list views.</returns>
-    [HttpGet("Page/{ownerIntegerId:long}")]
+    [HttpGet("Page/ListView/{ownerIntegerId:long}")]
     public virtual async Task<IActionResult> GetPageListViewAsync(long ownerIntegerId, [FromQuery] QueryDefinition queryDefinition)
     {
         try
@@ -194,7 +194,7 @@ public class SubUserEditableController<T, U> : UserEditableController<T, U>
     /// <param name="ownerStringId">The owner ID to filter for.</param>
     /// <param name="queryDefinition">Defines how the data should be queried; includes filtering, paging and sorting.</param>
     /// <returns>A list of list views.</returns>
-    [HttpGet("Page/{ownerStringId}")]
+    [HttpGet("Page/ListView/{ownerStringId}")]
     public virtual async Task<IActionResult> GetPageListViewAsync(string ownerStringId, [FromQuery] QueryDefinition queryDefinition)
     {
         try
