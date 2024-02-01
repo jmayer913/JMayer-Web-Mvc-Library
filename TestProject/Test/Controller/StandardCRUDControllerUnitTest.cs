@@ -8,8 +8,6 @@ using TestProject.Controller;
 using TestProject.Data;
 using TestProject.Database;
 
-#warning Right now, I've created a console logger just so the test don't fail. Need to come up with a better solution.
-
 namespace TestProject.Test.Controller;
 
 /// <summary>
