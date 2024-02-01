@@ -6,6 +6,6 @@ namespace TestProject.Database;
 /// <summary>
 /// The class manages CRUD interactions with a list memory storage for the simple data object.
 /// </summary>
-internal class SimpleMemoryDataLayer : MemoryDataLayer<SimpleDataObject>
+public class SimpleMemoryDataLayer : MemoryDataLayer<SimpleDataObject>
 {
 }

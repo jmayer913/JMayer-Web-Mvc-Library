@@ -31,7 +31,7 @@ public class SubUserEditableController<T, U> : UserEditableController<T, U>
     {
         try
         {
-            List<T> dataObjects = await DataLayer.GetAllAsync(obj => obj.Integer64ID == ownerIntegerId);
+            List<T> dataObjects = await DataLayer.GetAllAsync(obj => obj.OwnerInteger64ID == ownerIntegerId);
             return Ok(dataObjects);
         }
         catch (Exception ex)
@@ -51,7 +51,7 @@ public class SubUserEditableController<T, U> : UserEditableController<T, U>
     {
         try
         {
-            List<T> dataObjects = await DataLayer.GetAllAsync(obj => obj.StringID == ownerStringId);
+            List<T> dataObjects = await DataLayer.GetAllAsync(obj => obj.OwnerStringID == ownerStringId);
             return Ok(dataObjects);
         }
         catch (Exception ex)
@@ -71,7 +71,7 @@ public class SubUserEditableController<T, U> : UserEditableController<T, U>
     {
         try
         {
-            List<ListView> dataObjects = await ((IUserEditableDataLayer<T>)DataLayer).GetAllListViewAsync(obj => obj.Integer64ID == ownerIntegerId);
+            List<ListView> dataObjects = await ((IUserEditableDataLayer<T>)DataLayer).GetAllListViewAsync(obj => obj.OwnerInteger64ID == ownerIntegerId);
             return Ok(dataObjects);
         }
         catch (Exception ex)
@@ -91,7 +91,7 @@ public class SubUserEditableController<T, U> : UserEditableController<T, U>
     {
         try
         {
-            List<ListView> dataObjects = await ((IUserEditableDataLayer<T>)DataLayer).GetAllListViewAsync(obj => obj.StringID == ownerStringId);
+            List<ListView> dataObjects = await ((IUserEditableDataLayer<T>)DataLayer).GetAllListViewAsync(obj => obj.OwnerStringID == ownerStringId);
             return Ok(dataObjects);
         }
         catch (Exception ex)

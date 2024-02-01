@@ -4,9 +4,9 @@ using System.ComponentModel.DataAnnotations;
 namespace TestProject.Data;
 
 /// <summary>
-/// The represents a very simple user editable data object to be used for testing.
+/// The represents a very simple sub user editable data object to be used for testing.
 /// </summary>
-public class SimpleUserEditableDataObject : UserEditableDataObject
+public class SimpleSubUserEditableDataObject : SubUserEditableDataObject
 {
     /// <summary>
     /// The property gets/sets a value associated with the simple user editable data object.
@@ -15,17 +15,17 @@ public class SimpleUserEditableDataObject : UserEditableDataObject
     public int Value { get; set; }
 
     /// <inheritdoc/>
-    public SimpleUserEditableDataObject() : base() { }
+    public SimpleSubUserEditableDataObject() : base() { }
 
     /// <inheritdoc/>
-    public SimpleUserEditableDataObject(SimpleUserEditableDataObject copy) : base(copy) { }
+    public SimpleSubUserEditableDataObject(SimpleSubUserEditableDataObject copy) : base(copy) { }
 
     /// <inheritdoc/>
     public override void MapProperties(DataObject dataObject)
     {
         base.MapProperties(dataObject);
 
-        if (dataObject is SimpleUserEditableDataObject simpleConfigurationDataObject)
+        if (dataObject is SimpleSubUserEditableDataObject simpleConfigurationDataObject)
         {
             Value = simpleConfigurationDataObject.Value;
         }

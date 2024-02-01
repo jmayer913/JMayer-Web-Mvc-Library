@@ -6,7 +6,7 @@ namespace TestProject.Data;
 /// <summary>
 /// The represents a very simple data object to be used for testing.
 /// </summary>
-internal class SimpleDataObject : DataObject
+public class SimpleDataObject : DataObject
 {
     /// <summary>
     /// The property gets/sets a value associated with the simple data object.
@@ -14,21 +14,13 @@ internal class SimpleDataObject : DataObject
     [Range(0, 100)]
     public int Value { get; set; }
 
-    /// <summary>
-    /// The default constructor.
-    /// </summary>
-    public SimpleDataObject() { }
+    /// <inheritdoc/>
+    public SimpleDataObject() : base() { }
 
-    /// <summary>
-    /// The copy constructor.
-    /// </summary>
-    /// <param name="copy">The copy.</param>
-    public SimpleDataObject(SimpleDataObject copy) => MapProperties(copy);
+    /// <inheritdoc/>
+    public SimpleDataObject(SimpleDataObject copy) : base(copy) { }
 
-    /// <summary>
-    /// The method maps a SimpleDataObject to this object.
-    /// </summary>
-    /// <param name="dataObject">The data object.</param>
+    /// <inheritdoc/>
     public override void MapProperties(DataObject dataObject)
     {
         base.MapProperties(dataObject);
