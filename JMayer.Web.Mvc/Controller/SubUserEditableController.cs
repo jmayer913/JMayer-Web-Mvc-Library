@@ -145,7 +145,7 @@ public class SubUserEditableController<T, U> : UserEditableController<T, U>
             queryDefinition.FilterDefinitions.Insert(0, new FilterDefinition()
             {
                 FilterOn = nameof(SubUserEditableDataObject.OwnerStringID),
-                Operator = FilterDefinition.EqualsOperator,
+                Operator = FilterDefinition.StringEqualsOperator,
                 Value = ownerStringId.ToString(),
             });
 
@@ -203,7 +203,7 @@ public class SubUserEditableController<T, U> : UserEditableController<T, U>
             queryDefinition.FilterDefinitions.Insert(0, new FilterDefinition()
             {
                 FilterOn = nameof(SubUserEditableDataObject.OwnerStringID),
-                Operator = FilterDefinition.EqualsOperator,
+                Operator = FilterDefinition.StringEqualsOperator,
                 Value = ownerStringId.ToString(),
             });
 

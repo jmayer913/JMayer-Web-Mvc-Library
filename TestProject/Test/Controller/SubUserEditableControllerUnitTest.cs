@@ -5,6 +5,7 @@ using TestProject.Controller;
 using TestProject.Data;
 using TestProject.Database;
 using Microsoft.Extensions.Logging;
+using System.Net;
 
 namespace TestProject.Test.Controller;
 
@@ -22,6 +23,9 @@ namespace TestProject.Test.Controller;
 /// SubUserEditableController class inherits from the UserEditableController. Because of this,
 /// only new and overriden methods in the SubUserEditableController are tested because
 /// the UserEditableControllerUnitTest already tests the UserEditableController.
+/// 
+/// Not all negative responses can be tested and adding a property to force a certain response
+/// is risky so if there's missing fact/theory that's why.
 /// </remarks>
 public class SubUserEditableControllerUnitTest
 {
@@ -32,16 +36,6 @@ public class SubUserEditableControllerUnitTest
     private static ILogger CreateConsoleLogger()
     {
         return LoggerFactory.Create(logging => logging.AddConsole()).CreateLogger<SimpleCRUDController>();
-    }
-
-    /// <summary>
-    /// The method confirms the SubUserEditableContoller.GetAllAsync() returns a 500 (Interal Server Error) response when an exception is thrown by the data layer.
-    /// </summary>
-    /// <returns>A Task object for the async.</returns>
-    [Fact]
-    public async Task GetAllAsyncInternalErrorResponse()
-    {
-        throw new NotImplementedException("Cannot test this. There isn't an easy way to force an exception in the SimpleSubUserEditableMemoryDataLayer.");
     }
 
     /// <summary>
@@ -84,16 +78,6 @@ public class SubUserEditableControllerUnitTest
             && okObjectResult.Value is List<SimpleSubUserEditableDataObject> list //Confirm the action is responding with a list of data objects.
             && list.Count == 10 //Confirm the list matches the amount created.
         );
-    }
-
-    /// <summary>
-    /// The method confirms the SubUserEditableContoller.GetAllListViewAsync() returns a 500 (Interal Server Error) response when an exception is thrown by the data layer.
-    /// </summary>
-    /// <returns>A Task object for the async.</returns>
-    [Fact]
-    public async Task GetAllListViewAsyncInternalErrorResponse()
-    {
-        throw new NotImplementedException("Cannot test this. There isn't an easy way to force an exception in the SimpleSubUserEditableMemoryDataLayer.");
     }
 
     /// <summary>
@@ -145,7 +129,14 @@ public class SubUserEditableControllerUnitTest
     [Fact]
     public async Task GetPageAsyncInternalErrorResponse()
     {
-        throw new NotImplementedException("Cannot test this. There isn't an easy way to force an exception in the SimpleSubUserEditableMemoryDataLayer.");
+        SimpleSubUserEditableController simpleCRUDController = new(new SimpleSubUserEditableMemoryDataLayer(), CreateConsoleLogger());
+        IActionResult actionResult = await simpleCRUDController.GetPageAsync(null);
+
+        Assert.True
+        (
+            actionResult is StatusCodeResult statusCodeResult //Confirm the correct action is returned.
+            && statusCodeResult.StatusCode == (int)HttpStatusCode.InternalServerError //Confirm the correct action is returned.
+        );
     }
 
     /// <summary>
@@ -191,7 +182,14 @@ public class SubUserEditableControllerUnitTest
     [Fact]
     public async Task GetPageListViewAsyncInternalErrorResponse()
     {
-        throw new NotImplementedException("Cannot test this. There isn't an easy way to force an exception in the SimpleSubUserEditableMemoryDataLayer.");
+        SimpleSubUserEditableController simpleCRUDController = new(new SimpleSubUserEditableMemoryDataLayer(), CreateConsoleLogger());
+        IActionResult actionResult = await simpleCRUDController.GetPageListViewAsync(null);
+
+        Assert.True
+        (
+            actionResult is StatusCodeResult statusCodeResult //Confirm the correct action is returned.
+            && statusCodeResult.StatusCode == (int)HttpStatusCode.InternalServerError //Confirm the correct action is returned.
+        );
     }
 
     /// <summary>

@@ -40,6 +40,7 @@ public class StandardCRUDController<T, U> : ControllerBase
     /// </summary>
     /// <param name="dataLayer">The data layer the controller will interact with.</param>
     /// <param name="logger">The logger the controller will interact with.</param>
+    /// <exception cref="ArgumentNullException">Thrown if the dataLayer or logger parameter is null.</exception>
     public StandardCRUDController(Data.Database.DataLayer.IStandardCRUDDataLayer<T> dataLayer, ILogger logger)
     {
         ArgumentNullException.ThrowIfNull(dataLayer);

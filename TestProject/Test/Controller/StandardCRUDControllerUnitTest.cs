@@ -20,19 +20,13 @@ namespace TestProject.Test.Controller;
 /// 
 /// The memory data layer is used and that utilizes an integer ID so the two string ID methods 
 /// (DeleteAsync() and SingleAsync()) are not tested.
+/// 
+/// 
+/// Not all negative responses can be tested and adding a property to force a certain response
+/// is risky so if there's missing fact/theory that's why.
 /// </remarks>
 public class StandardCRUDControllerUnitTest
 {
-    /// <summary>
-    /// The method confirms the StandardCRUDContoller.CountAsync() returns a 500 (Interal Server Error) response when an exception is thrown by the data layer.
-    /// </summary>
-    /// <returns>A Task object for the async.</returns>
-    [Fact]
-    public async Task CountAsyncInternalErrorResponse()
-    {
-        throw new NotImplementedException("Cannot test this. There isn't an easy way to force an exception in the SimpleListDataLayer.");
-    }
-
     /// <summary>
     /// The method confirms the StandardCRUDContoller.CountAsync() returns a 200 (OK) response when ran successfully.
     /// </summary>
@@ -120,16 +114,6 @@ public class StandardCRUDControllerUnitTest
     }
 
     /// <summary>
-    /// The method confirms the StandardCRUDContoller.DeleteAsync() returns a 500 (Interal Server Error) response when an exception is thrown by the data layer.
-    /// </summary>
-    /// <returns>A Task object for the async.</returns>
-    [Fact]
-    public async Task DeleteAsyncInternalErrorResponse()
-    {
-        throw new NotImplementedException("Cannot test this. There isn't an easy way to force an exception in the SimpleListDataLayer.");
-    }
-
-    /// <summary>
     /// The method confirms the StandardCRUDContoller.DeleteAsync() returns a 200 (OK) response when ran successfully.
     /// </summary>
     /// <returns>A Task object for the async.</returns>
@@ -144,16 +128,6 @@ public class StandardCRUDControllerUnitTest
 
         //Confirm the correct action is returned.
         Assert.IsType<OkResult>(actionResult);
-    }
-
-    /// <summary>
-    /// The method confirms the StandardCRUDContoller.GetAllAsync() returns a 500 (Interal Server Error) response when an exception is thrown by the data layer.
-    /// </summary>
-    /// <returns>A Task object for the async.</returns>
-    [Fact]
-    public async Task GetAllAsyncInternalErrorResponse()
-    {
-        throw new NotImplementedException("Cannot test this. There isn't an easy way to force an exception in the SimpleListDataLayer.");
     }
 
     /// <summary>
@@ -194,7 +168,14 @@ public class StandardCRUDControllerUnitTest
     [Fact]
     public async Task GetPageAsyncInternalErrorResponse()
     {
-        throw new NotImplementedException("Cannot test this. There isn't an easy way to force an exception in the SimpleListDataLayer.");
+        SimpleCRUDController simpleCRUDController = new(new SimpleMemoryDataLayer(), CreateConsoleLogger());
+        IActionResult actionResult = await simpleCRUDController.GetPageAsync(null);
+
+        Assert.True
+        (
+            actionResult is StatusCodeResult statusCodeResult //Confirm the correct action is returned.
+            && statusCodeResult.StatusCode == (int)HttpStatusCode.InternalServerError //Confirm the correct action is returned.
+        );
     }
 
     /// <summary>
@@ -229,16 +210,6 @@ public class StandardCRUDControllerUnitTest
     }
 
     /// <summary>
-    /// The method confirms the StandardCRUDContoller.GetSingleAsync() returns a 500 (Interal Server Error) response when an exception is thrown by the data layer.
-    /// </summary>
-    /// <returns>A Task object for the async.</returns>
-    [Fact]
-    public async Task GetSingleAsyncInternalErrorResponse()
-    {
-        throw new NotImplementedException("Cannot test this. There isn't an easy way to force an exception in the SimpleListDataLayer.");
-    }
-
-    /// <summary>
     /// The method confirms the StandardCRUDContoller.GetSingleAsync() returns a 200 (OK) response when ran successfully.
     /// </summary>
     /// <returns>A Task object for the async.</returns>
@@ -257,16 +228,6 @@ public class StandardCRUDControllerUnitTest
             && okObjectResult.Value is SimpleDataObject dataObject //Confirm the action is responding with a data objects.
             && dataObject.Integer64ID == 1 //Confirm the action is responding with the correct data object.
         );
-    }
-
-    /// <summary>
-    /// The method confirms the StandardCRUDContoller.GetSingleAsync() returns a 500 (Interal Server Error) response when an exception is thrown by the data layer.
-    /// </summary>
-    /// <returns>A Task object for the async.</returns>
-    [Fact]
-    public async Task GetSingleAsyncWithIntegerIDInternalErrorResponse()
-    {
-        throw new NotImplementedException("Cannot test this. There isn't an easy way to force an exception in the SimpleListDataLayer.");
     }
 
     /// <summary>
@@ -311,16 +272,6 @@ public class StandardCRUDControllerUnitTest
             && badRequestObjectResult.Value is ServerSideValidationResult serverSideValidationResult //Confirm the action is responding with a validation result.
             && !serverSideValidationResult.IsSuccess //Confirm the action is responding with a non-successful validation result.
         );
-    }
-
-    /// <summary>
-    /// The method confirms the StandardCRUDContoller.UpdateAsync() returns a 409 (Conflict) response when the data object is old.
-    /// </summary>
-    /// <returns>A Task object for the async.</returns>
-    [Fact]
-    public async Task UpdateAsyncConflictResponse()
-    {
-        throw new NotImplementedException("Cannot test this with a SimpleListDataLayer.");
     }
 
     /// <summary>

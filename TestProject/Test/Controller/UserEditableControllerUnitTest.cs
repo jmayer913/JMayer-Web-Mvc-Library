@@ -2,6 +2,7 @@
 using JMayer.Data.Data.Query;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using System.Net;
 using TestProject.Controller;
 using TestProject.Data;
 using TestProject.Database;
@@ -22,6 +23,9 @@ namespace TestProject.Test.Controller;
 /// UserEditableController class inherits from the StandardCRUDController. Because of this,
 /// only new and overriden methods in the UserEditableController are tested because
 /// the StandardCRUDControllerUnitTest already tests the StandardCRUDController.
+/// 
+/// Not all negative responses can be tested and adding a property to force a certain response
+/// is risky so if there's missing fact/theory that's why.
 /// </remarks>
 public class UserEditableControllerUnitTest
 {
@@ -32,16 +36,6 @@ public class UserEditableControllerUnitTest
     private static ILogger CreateConsoleLogger()
     {
         return LoggerFactory.Create(logging => logging.AddConsole()).CreateLogger<SimpleUserEditableController>();
-    }
-
-    /// <summary>
-    /// The method confirms the UserEditableContoller.GetAllListViewAsync() returns a 500 (Interal Server Error) response when an exception is thrown by the data layer.
-    /// </summary>
-    /// <returns>A Task object for the async.</returns>
-    [Fact]
-    public async Task GetAllListViewAsyncInternalErrorResponse()
-    {
-        throw new NotImplementedException("Cannot test this. There isn't an easy way to force an exception in the SimpleUserEditableMemoryDataLayer.");
     }
 
     /// <summary>
@@ -82,7 +76,14 @@ public class UserEditableControllerUnitTest
     [Fact]
     public async Task GetPageListViewAsyncInternalErrorResponse()
     {
-        throw new NotImplementedException("Cannot test this. There isn't an easy way to force an exception in the SimpleUserEditableMemoryDataLayer.");
+        SimpleUserEditableController simpleCRUDController = new(new SimpleUserEditableMemoryDataLayer(), CreateConsoleLogger());
+        IActionResult actionResult = await simpleCRUDController.GetPageListViewAsync(null);
+
+        Assert.True
+        (
+            actionResult is StatusCodeResult statusCodeResult //Confirm the correct action is returned.
+            && statusCodeResult.StatusCode == (int)HttpStatusCode.InternalServerError //Confirm the correct action is returned.
+        );
     }
 
     /// <summary>
