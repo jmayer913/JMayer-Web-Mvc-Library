@@ -121,7 +121,7 @@ public class SubUserEditableControllerUnitTest
     /// </summary>
     /// <returns>A Task object for the async.</returns>
     [Fact]
-    public async Task GetPageAsyncOkResponse()
+    public async Task VerifyGetPageOkResponse()
     {
         SimpleSubUserEditableMemoryDataLayer dataLayer = new();
         await PopulateDataObjects(dataLayer, OwnerOne);
@@ -158,7 +158,7 @@ public class SubUserEditableControllerUnitTest
     /// </summary>
     /// <returns>A Task object for the async.</returns>
     [Fact]
-    public async Task GetPageListViewAsyncOkResponse()
+    public async Task VerifyGetPageListViewOkResponse()
     {
         SimpleSubUserEditableMemoryDataLayer dataLayer = new();
         await PopulateDataObjects(dataLayer, OwnerOne);
