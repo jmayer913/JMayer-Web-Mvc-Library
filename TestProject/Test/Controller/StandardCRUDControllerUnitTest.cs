@@ -21,88 +21,25 @@ namespace TestProject.Test.Controller;
 /// The memory data layer is used and that utilizes an integer ID so the two string ID methods 
 /// (DeleteAsync() and SingleAsync()) are not tested.
 /// 
-/// 
 /// Not all negative responses can be tested and adding a property to force a certain response
 /// is risky so if there's missing fact/theory that's why.
 /// </remarks>
 public class StandardCRUDControllerUnitTest
 {
     /// <summary>
-    /// The method confirms the StandardCRUDContoller.CountAsync() returns a 200 (OK) response when ran successfully.
+    /// The constant for the default value.
     /// </summary>
-    /// <returns>A Task object for the async.</returns>
-    [Fact]
-    public async Task CountAsyncOkResponse()
-    {
-        SimpleMemoryDataLayer dataLayer = new();
-        _ = await dataLayer.CreateAsync(new SimpleDataObject());
-
-        SimpleCRUDController simpleCRUDController = new(dataLayer, CreateConsoleLogger());
-        IActionResult actionResult = await simpleCRUDController.CountAsync();
-
-        Assert.True
-        (
-            actionResult is OkObjectResult okObjectResult //Confirm the correct action is returned.
-            && okObjectResult.Value is int value //Confirm the action is responding with an integer value.
-            && value == 1 //Confirm its the correct count.
-        );
-    }
+    private const int DefaultValue = 1;
 
     /// <summary>
-    /// The method confirms the StandardCRUDContoller.CreateAsync() returns a 400 (Bad Request) response when the data object is not valid.
+    /// The constant for the maximum records.
     /// </summary>
-    /// <returns>A Task object for the async.</returns>
-    [Fact]
-    public async Task CreateAsyncBadRequestResponse()
-    {
-        SimpleMemoryDataLayer dataLayer = new();
-        SimpleCRUDController simpleCRUDController = new(dataLayer, CreateConsoleLogger());
-        IActionResult actionResult = await simpleCRUDController.CreateAsync(new SimpleDataObject() { Value = 9999 });
-
-        Assert.True
-        (
-            actionResult is BadRequestObjectResult badRequestObjectResult //Confirm the correct action is returned.
-            && badRequestObjectResult.Value is ServerSideValidationResult serverSideValidationResult //Confirm the action is responding with a validation result.
-            && !serverSideValidationResult.IsSuccess //Confirm the action is responding with a non-successful validation result.
-        );
-    }
+    private const int MaxRecords = 100;
 
     /// <summary>
-    /// The method confirms the StandardCRUDContoller.CreateAsync() returns a 500 (Interal Server Error) response when an exception is thrown by the data layer.
+    /// The constant for the invalid value.
     /// </summary>
-    /// <returns>A Task object for the async.</returns>
-    [Fact]
-    public async Task CreateAsyncInternalErrorResponse()
-    {
-        SimpleCRUDController simpleCRUDController = new(new SimpleMemoryDataLayer(), CreateConsoleLogger());
-        IActionResult actionResult = await simpleCRUDController.CreateAsync(null);
-
-        Assert.True
-        (
-            actionResult is StatusCodeResult statusCodeResult //Confirm the correct action is returned.
-            && statusCodeResult.StatusCode == (int)HttpStatusCode.InternalServerError //Confirm the correct action is returned.
-        );
-    }
-
-    /// <summary>
-    /// The method confirms the StandardCRUDContoller.CreateAsync() returns a 200 (OK) response when ran successfully.
-    /// </summary>
-    /// <returns>A Task object for the async.</returns>
-    [Fact]
-    public async Task CreateAsyncOkResponse()
-    {
-        SimpleDataObject originalDataObject = new() { Value = 10 };
-        SimpleMemoryDataLayer dataLayer = new();
-        SimpleCRUDController simpleCRUDController = new(dataLayer, CreateConsoleLogger());
-        IActionResult actionResult = await simpleCRUDController.CreateAsync(originalDataObject);
-
-        Assert.True
-        (
-            actionResult is OkObjectResult okObjectResult //Confirm the correct action is returned.
-            && okObjectResult.Value is SimpleDataObject returnedDataObject //Confirm the action is responding with a data object.
-            && returnedDataObject.Integer64ID == 1 && returnedDataObject.Value == originalDataObject.Value //Confirm the action is responding with the created data object.
-        );
-    }
+    private const int InvalidValue = 9999;
 
     /// <summary>
     /// The method returns a console logger.
@@ -114,83 +51,140 @@ public class StandardCRUDControllerUnitTest
     }
 
     /// <summary>
-    /// The method confirms the StandardCRUDContoller.DeleteAsync() returns a 200 (OK) response when ran successfully.
+    /// The method populates data objects in a datalayer with values that increment by 1.
+    /// </summary>
+    /// <param name="dataLayer">The data layer to populate</param>
+    /// <returns>A Task object for the async.</returns>
+    private static async Task PopulateDataObjects(SimpleMemoryDataLayer dataLayer)
+    {
+        for (int index = 1; index <= MaxRecords; index++)
+        {
+            _ = await dataLayer.CreateAsync(new SimpleDataObject() { Value = index });
+        }
+    }
+
+    /// <summary>
+    /// The method verifies the StandardCRUDContoller.CountAsync() returns a 200 (OK) response when ran successfully.
     /// </summary>
     /// <returns>A Task object for the async.</returns>
     [Fact]
-    public async Task DeleteAsyncOkResponse()
+    public async Task VerifyCountOkResponse()
+    {
+        SimpleMemoryDataLayer dataLayer = new();
+        _ = await dataLayer.CreateAsync(new SimpleDataObject());
+
+        SimpleCRUDController simpleCRUDController = new(dataLayer, CreateConsoleLogger());
+        IActionResult actionResult = await simpleCRUDController.CountAsync();
+
+        Assert.IsType<OkObjectResult>(actionResult); //Confirm the correct action is returned.
+        Assert.IsType<long>(((OkObjectResult)actionResult).Value); //Confirm the action is responding with an integer value.
+    }
+
+    /// <summary>
+    /// The method verifies the StandardCRUDContoller.CreateAsync() returns a 400 (Bad Request) response when the data object is not valid.
+    /// </summary>
+    /// <returns>A Task object for the async.</returns>
+    [Fact]
+    public async Task VerifyCreateBadRequestResponse()
+    {
+        SimpleMemoryDataLayer dataLayer = new();
+        SimpleCRUDController simpleCRUDController = new(dataLayer, CreateConsoleLogger());
+        IActionResult actionResult = await simpleCRUDController.CreateAsync(new SimpleDataObject() { Value = InvalidValue });
+
+        Assert.IsType<BadRequestObjectResult>(actionResult); //Confirm the correct action is returned.
+        Assert.IsType<ServerSideValidationResult>(((BadRequestObjectResult)actionResult).Value); //Confirm the action is responding with a validation result.
+        Assert.False(((ServerSideValidationResult)((BadRequestObjectResult)actionResult).Value).IsSuccess); //Confirm the action is responding with a non-successful validation result.
+    }
+
+    /// <summary>
+    /// The method verifies the StandardCRUDContoller.CreateAsync() returns a 500 (Interal Server Error) response when an exception is thrown by the data layer.
+    /// </summary>
+    /// <returns>A Task object for the async.</returns>
+    [Fact]
+    public async Task VerifyCreateInternalErrorResponse()
+    {
+        SimpleCRUDController simpleCRUDController = new(new SimpleMemoryDataLayer(), CreateConsoleLogger());
+        IActionResult actionResult = await simpleCRUDController.CreateAsync(null);
+
+        Assert.IsType<StatusCodeResult>(actionResult); //Confirm the correct action is returned.
+        Assert.Equal((int)HttpStatusCode.InternalServerError, ((StatusCodeResult)actionResult).StatusCode); //Confirm the correct HTTP status code is returned.
+    }
+
+    /// <summary>
+    /// The method verifies the StandardCRUDContoller.CreateAsync() returns a 200 (OK) response when ran successfully.
+    /// </summary>
+    /// <returns>A Task object for the async.</returns>
+    [Fact]
+    public async Task VerifyCreateOkResponse()
+    {
+        SimpleDataObject originalDataObject = new() { Value = DefaultValue };
+        SimpleMemoryDataLayer dataLayer = new();
+        SimpleCRUDController simpleCRUDController = new(dataLayer, CreateConsoleLogger());
+        IActionResult actionResult = await simpleCRUDController.CreateAsync(originalDataObject);
+
+        Assert.IsType<OkObjectResult>(actionResult); //Confirm the correct action is returned.
+        Assert.IsType<SimpleDataObject>(((OkObjectResult)actionResult).Value); //Confirm the action is responding with a data object.
+        Assert.Equal(originalDataObject.Value, ((SimpleDataObject)((OkObjectResult)actionResult).Value).Value); //Confirm the action is responding with the created data object.
+    }
+
+    /// <summary>
+    /// The method verifies the StandardCRUDContoller.DeleteAsync() returns a 200 (OK) response when ran successfully.
+    /// </summary>
+    /// <returns>A Task object for the async.</returns>
+    [Fact]
+    public async Task VerifyDeleteOkResponse()
     {
         SimpleMemoryDataLayer dataLayer = new();
         SimpleDataObject dataObject = await dataLayer.CreateAsync(new SimpleDataObject());
 
         SimpleCRUDController simpleCRUDController = new(dataLayer, CreateConsoleLogger());
-        IActionResult actionResult = await simpleCRUDController.DeleteAsync(dataObject?.Integer64ID ?? 0);
+        IActionResult actionResult = await simpleCRUDController.DeleteAsync(dataObject.Integer64ID);
 
         //Confirm the correct action is returned.
         Assert.IsType<OkResult>(actionResult);
     }
 
     /// <summary>
-    /// The method confirms the StandardCRUDContoller.GetAllAsync() returns a 200 (OK) response when ran successfully.
+    /// The method verifies the StandardCRUDContoller.GetAllAsync() returns a 200 (OK) response when ran successfully.
     /// </summary>
     /// <returns>A Task object for the async.</returns>
     [Fact]
-    public async Task GetAllAsyncOkResponse()
+    public async Task VerifyGetAllOkResponse()
     {
         SimpleMemoryDataLayer dataLayer = new();
-
-        _ = await dataLayer.CreateAsync(new SimpleDataObject() { Value = 10 });
-        _ = await dataLayer.CreateAsync(new SimpleDataObject() { Value = 20 });
-        _ = await dataLayer.CreateAsync(new SimpleDataObject() { Value = 30 });
-        _ = await dataLayer.CreateAsync(new SimpleDataObject() { Value = 40 });
-        _ = await dataLayer.CreateAsync(new SimpleDataObject() { Value = 50 });
-        _ = await dataLayer.CreateAsync(new SimpleDataObject() { Value = 60 });
-        _ = await dataLayer.CreateAsync(new SimpleDataObject() { Value = 70 });
-        _ = await dataLayer.CreateAsync(new SimpleDataObject() { Value = 80 });
-        _ = await dataLayer.CreateAsync(new SimpleDataObject() { Value = 90 });
-        _ = await dataLayer.CreateAsync(new SimpleDataObject() { Value = 100 });
+        await PopulateDataObjects(dataLayer);
 
         SimpleCRUDController simpleCRUDController = new(dataLayer, CreateConsoleLogger());
         IActionResult actionResult = await simpleCRUDController.GetAllAsync();
 
-        Assert.True
-        (
-            actionResult is OkObjectResult okObjectResult //Confirm the correct action is returned.
-            && okObjectResult.Value is List<SimpleDataObject> list //Confirm the action is responding with a list of data objects.
-            && list.Count == 10 //Confirm the list matches the amount created.
-        );
+        Assert.IsType<OkObjectResult>(actionResult); //Confirm the correct action is returned.
+        Assert.IsType<List<SimpleDataObject>>(((OkObjectResult)actionResult).Value); //Confirm the action is responding with a list of data objects.
     }
 
     /// <summary>
-    /// The method confirms the StandardCRUDContoller.GetPageAsync() returns a 500 (Interal Server Error) response when an exception is thrown by the data layer.
+    /// The method verifies the StandardCRUDContoller.GetPageAsync() returns a 500 (Interal Server Error) response when an exception is thrown by the data layer.
     /// </summary>
     /// <returns>A Task object for the async.</returns>
     [Fact]
-    public async Task GetPageAsyncInternalErrorResponse()
+    public async Task VerifyGetPageInternalErrorResponse()
     {
         SimpleCRUDController simpleCRUDController = new(new SimpleMemoryDataLayer(), CreateConsoleLogger());
         IActionResult actionResult = await simpleCRUDController.GetPageAsync(null);
 
-        Assert.True
-        (
-            actionResult is StatusCodeResult statusCodeResult //Confirm the correct action is returned.
-            && statusCodeResult.StatusCode == (int)HttpStatusCode.InternalServerError //Confirm the correct action is returned.
-        );
+        Assert.IsType<StatusCodeResult>(actionResult); //Confirm the correct action is returned.
+        Assert.Equal((int)HttpStatusCode.InternalServerError, ((StatusCodeResult)actionResult).StatusCode); //Confirm the correct HTTP status code is returned.
     }
 
     /// <summary>
-    /// The method confirms the StandardCRUDContoller.GetPageAsync() returns a 200 (OK) response when ran successfully.
+    /// The method verifies the StandardCRUDContoller.GetPageAsync() returns a 200 (OK) response when ran successfully.
     /// </summary>
     /// <returns>A Task object for the async.</returns>
     [Fact]
-    public async Task GetPageAsyncOkResponse()
+    public async Task VerifyGetPageOkResponse()
     {
         SimpleMemoryDataLayer dataLayer = new();
 
-        for (int index = 1; index <= 100; index++)
-        {
-            _ = await dataLayer.CreateAsync(new SimpleDataObject() { Value = index });
-        }
+        await PopulateDataObjects(dataLayer);
 
         QueryDefinition queryDefinition = new()
         {
@@ -200,21 +194,16 @@ public class StandardCRUDControllerUnitTest
         SimpleCRUDController simpleCRUDController = new(dataLayer, CreateConsoleLogger());
         IActionResult actionResult = await simpleCRUDController.GetPageAsync(queryDefinition);
 
-        Assert.True
-        (
-            actionResult is OkObjectResult okObjectResult //Confirm the correct action is returned.
-            && okObjectResult.Value is PagedList<SimpleDataObject> list //Confirm the action is responding with a list of data objects.
-            && list.DataObjects.Count == queryDefinition.Take //Confirm the list matches the amount taken.
-            && list.TotalRecords == 100 //Confirm the list matches the amount created.
-        );
+        Assert.IsType<OkObjectResult>(actionResult); //Confirm the correct action is returned.
+        Assert.IsType<PagedList<SimpleDataObject>>(((OkObjectResult)actionResult).Value); //Confirm the action is responding with a paged list of data objects.
     }
 
     /// <summary>
-    /// The method confirms the StandardCRUDContoller.GetSingleAsync() returns a 200 (OK) response when ran successfully.
+    /// The method verifies the StandardCRUDContoller.GetSingleAsync() returns a 200 (OK) response when ran successfully.
     /// </summary>
     /// <returns>A Task object for the async.</returns>
     [Fact]
-    public async Task GetSingleAsyncOkResponse()
+    public async Task VerifyGetSingleOkResponse()
     {
         SimpleMemoryDataLayer dataLayer = new();
         _ = await dataLayer.CreateAsync(new SimpleDataObject());
@@ -222,12 +211,8 @@ public class StandardCRUDControllerUnitTest
         SimpleCRUDController simpleCRUDController = new(dataLayer, CreateConsoleLogger());
         IActionResult actionResult = await simpleCRUDController.GetSingleAsync();
 
-        Assert.True
-        (
-            actionResult is OkObjectResult okObjectResult //Confirm the correct action is returned.
-            && okObjectResult.Value is SimpleDataObject dataObject //Confirm the action is responding with a data objects.
-            && dataObject.Integer64ID == 1 //Confirm the action is responding with the correct data object.
-        );
+        Assert.IsType<OkObjectResult>(actionResult); //Confirm the correct action is returned.
+        Assert.IsType<SimpleDataObject>(((OkObjectResult)actionResult).Value); //Confirm the action is responding with a data object.
     }
 
     /// <summary>
@@ -235,7 +220,7 @@ public class StandardCRUDControllerUnitTest
     /// </summary>
     /// <returns>A Task object for the async.</returns>
     [Fact]
-    public async Task GetSingleAsyncWithIntegerIDOkResponse()
+    public async Task VerifyGetSingleOkResponseForId()
     {
         SimpleMemoryDataLayer dataLayer = new();
         _ = await dataLayer.CreateAsync([ new SimpleDataObject(), new SimpleDataObject() ]);
@@ -243,74 +228,62 @@ public class StandardCRUDControllerUnitTest
         SimpleCRUDController simpleCRUDController = new(dataLayer, CreateConsoleLogger());
         IActionResult actionResult = await simpleCRUDController.GetSingleAsync(2);
 
-        Assert.True
-        (
-            actionResult is OkObjectResult okObjectResult //Confirm the correct action is returned.
-            && okObjectResult.Value is SimpleDataObject dataObject //Confirm the action is responding with a data objects.
-            && dataObject.Integer64ID == 2 //Confirm the action is responding with the correct data object.
-        );
+        Assert.IsType<OkObjectResult>(actionResult); //Confirm the correct action is returned.
+        Assert.IsType<SimpleDataObject>(((OkObjectResult)actionResult).Value); //Confirm the action is responding with a data object.
     }
 
     /// <summary>
-    /// The method confirms the StandardCRUDContoller.UpdateAsync() returns a 400 (Bad Request) response when the data object is not valid.
+    /// The method verifies the StandardCRUDContoller.UpdateAsync() returns a 400 (Bad Request) response when the data object is not valid.
     /// </summary>
     /// <returns>A Task object for the async.</returns>
     [Fact]
-    public async Task UpdateAsyncBadRequestResponse()
+    public async Task VerifyUpdateBadRequestResponse()
     {
         SimpleMemoryDataLayer dataLayer = new();
         SimpleDataObject originalDataObject = await dataLayer.CreateAsync(new SimpleDataObject());
 
-        originalDataObject.Value = 9999;
+        originalDataObject.Value = InvalidValue;
 
         SimpleCRUDController simpleCRUDController = new(dataLayer, CreateConsoleLogger());
         IActionResult actionResult = await simpleCRUDController.UpdateAsync(originalDataObject);
 
-        Assert.True
-        (
-            actionResult is BadRequestObjectResult badRequestObjectResult //Confirm the correct action is returned.
-            && badRequestObjectResult.Value is ServerSideValidationResult serverSideValidationResult //Confirm the action is responding with a validation result.
-            && !serverSideValidationResult.IsSuccess //Confirm the action is responding with a non-successful validation result.
-        );
+        Assert.IsType<BadRequestObjectResult>(actionResult); //Confirm the correct action is returned.
+        Assert.IsType<ServerSideValidationResult>(((BadRequestObjectResult)actionResult).Value); //Confirm the action is responding with a validation result.
+        Assert.False(((ServerSideValidationResult)((BadRequestObjectResult)actionResult).Value).IsSuccess); //Confirm the action is responding with a non-successful validation result.
     }
 
     /// <summary>
-    /// The method confirms the StandardCRUDContoller.UpdateAsync() returns a 500 (Interal Server Error) response when an exception is thrown by the data layer.
+    /// The method verifies the StandardCRUDContoller.UpdateAsync() returns a 500 (Interal Server Error) response when an exception is thrown by the data layer.
     /// </summary>
     /// <returns>A Task object for the async.</returns>
     [Fact]
-    public async Task UpdateAsyncInternalErrorResponse()
+    public async Task VerifyUpdateInternalErrorResponse()
     {
         SimpleCRUDController simpleCRUDController = new(new SimpleMemoryDataLayer(), CreateConsoleLogger());
         IActionResult actionResult = await simpleCRUDController.UpdateAsync(null);
 
-        Assert.True
-        (
-            actionResult is StatusCodeResult statusCodeResult //Confirm the correct action is returned.
-            && statusCodeResult.StatusCode == (int)HttpStatusCode.InternalServerError //Confirm the correct action is returned.
-        );
+        Assert.IsType<StatusCodeResult>(actionResult); //Confirm the correct action is returned.
+        Assert.Equal((int)HttpStatusCode.InternalServerError, ((StatusCodeResult)actionResult).StatusCode); //Confirm the correct HTTP status code is returned.
     }
 
     /// <summary>
-    /// The method confirms the StandardCRUDContoller.UpdateAsync() returns a 200 (OK) response when ran successfully.
+    /// The method verifies the StandardCRUDContoller.UpdateAsync() returns a 200 (OK) response when ran successfully.
     /// </summary>
     /// <returns>A Task object for the async.</returns>
     [Fact]
-    public async Task UpdateAsyncOkResponse()
+    public async Task VerifyUpdateOkResponse()
     {
         SimpleMemoryDataLayer dataLayer = new();
         SimpleDataObject originalDataObject = await dataLayer.CreateAsync(new SimpleDataObject());
 
-        originalDataObject.Value = 10;
+        originalDataObject.Value = DefaultValue;
 
         SimpleCRUDController simpleCRUDController = new(dataLayer, CreateConsoleLogger());
         IActionResult actionResult = await simpleCRUDController.UpdateAsync(originalDataObject);
 
-        Assert.True
-        (
-            actionResult is OkObjectResult okObjectResult //Confirm the correct action is returned.
-            && okObjectResult.Value is SimpleDataObject returnedDataObject //Confirm the action is responding with a data object.
-            && returnedDataObject.Integer64ID == 1 && returnedDataObject.Value == originalDataObject.Value //Confirm the action is responding with the updated data object.
-        );
+        Assert.IsType<OkObjectResult>(actionResult); //Confirm the correct action is returned.
+        Assert.IsType<SimpleDataObject>(((OkObjectResult)actionResult).Value); //Confirm the action is responding with a data object.
+        Assert.Equal(originalDataObject.Integer64ID, ((SimpleDataObject)((OkObjectResult)actionResult).Value).Integer64ID); //Confirm the action is responding with the updated data object.
+        Assert.Equal(originalDataObject.Value, ((SimpleDataObject)((OkObjectResult)actionResult).Value).Value); //Confirm the action is responding with the updated data object.
     }
 }
