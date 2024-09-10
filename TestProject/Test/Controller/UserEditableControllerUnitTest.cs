@@ -48,7 +48,7 @@ public class UserEditableControllerUnitTest
     /// </summary>
     /// <param name="dataLayer">The data layer to populate</param>
     /// <returns>A Task object for the async.</returns>
-    private static async Task PopulateDataObjects(SimpleUserEditableMemoryDataLayer dataLayer)
+    private static async Task PopulateDataObjects(SimpleUserEditableDataLayer dataLayer)
     {
         for (int index = 1; index <= MaxRecords; index++)
         {
@@ -63,7 +63,7 @@ public class UserEditableControllerUnitTest
     [Fact]
     public async Task VerifyGetAllListViewOkResponse()
     {
-        SimpleUserEditableMemoryDataLayer dataLayer = new();
+        SimpleUserEditableDataLayer dataLayer = new();
         await PopulateDataObjects(dataLayer);
 
         SimpleUserEditableController controller = new(dataLayer, CreateConsoleLogger());
@@ -80,7 +80,7 @@ public class UserEditableControllerUnitTest
     [Fact]
     public async Task VerifyGetPageListViewInternalErrorResponse()
     {
-        SimpleUserEditableController simpleCRUDController = new(new SimpleUserEditableMemoryDataLayer(), CreateConsoleLogger());
+        SimpleUserEditableController simpleCRUDController = new(new SimpleUserEditableDataLayer(), CreateConsoleLogger());
         IActionResult actionResult = await simpleCRUDController.GetPageListViewAsync(null);
 
         Assert.IsType<StatusCodeResult>(actionResult); //Confirm the correct action is returned.
@@ -94,7 +94,7 @@ public class UserEditableControllerUnitTest
     [Fact]
     public async Task VerifyGetPageListViewOkResponse()
     {
-        SimpleUserEditableMemoryDataLayer dataLayer = new();
+        SimpleUserEditableDataLayer dataLayer = new();
         await PopulateDataObjects(dataLayer);
 
         QueryDefinition queryDefinition = new()
@@ -116,7 +116,7 @@ public class UserEditableControllerUnitTest
     [Fact]
     public async Task VerifyUpdateConflictResponse()
     {
-        SimpleUserEditableMemoryDataLayer dataLayer = new();
+        SimpleUserEditableDataLayer dataLayer = new();
         SimpleUserEditableDataObject dataObject = await dataLayer.CreateAsync(new SimpleUserEditableDataObject() { Name = "10", Value = 10 });
         await dataLayer.UpdateAsync(new SimpleUserEditableDataObject(dataObject)
         {

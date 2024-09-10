@@ -9,7 +9,7 @@ namespace TestProject.Controller;
 /// <summary>
 /// The class manages HTTP requests for CRUD operations associated with the simple user editable data object and simple user editable memory data layer.
 /// </summary>
-internal class SimpleUserEditableController : UserEditableController<SimpleUserEditableDataObject, SimpleUserEditableMemoryDataLayer>
+internal class SimpleUserEditableController : UserEditableController<SimpleUserEditableDataObject, SimpleUserEditableDataLayer>
 {
     /// <inheritdoc/>
     public SimpleUserEditableController(IUserEditableDataLayer<SimpleUserEditableDataObject> dataLayer, ILogger logger) : base(dataLayer, logger) { }

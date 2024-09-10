@@ -58,7 +58,7 @@ public class SubUserEditableControllerUnitTest
     /// </summary>
     /// <param name="dataLayer">The data layer to populate</param>
     /// <returns>A Task object for the async.</returns>
-    private static async Task PopulateDataObjects(SimpleSubUserEditableMemoryDataLayer dataLayer, long ownerID)
+    private static async Task PopulateDataObjects(SimpleSubUserEditableDataLayer dataLayer, long ownerID)
     {
         for (int index = 1; index <= MaxRecords; index++)
         {
@@ -73,7 +73,7 @@ public class SubUserEditableControllerUnitTest
     [Fact]
     public async Task VerifyGetAllOkResponse()
     {
-        SimpleSubUserEditableMemoryDataLayer dataLayer = new();
+        SimpleSubUserEditableDataLayer dataLayer = new();
         await PopulateDataObjects(dataLayer, OwnerOne);
         await PopulateDataObjects(dataLayer, OwnerTwo);
 
@@ -91,7 +91,7 @@ public class SubUserEditableControllerUnitTest
     [Fact]
     public async Task VerifyGetAllListViewOkResponse()
     {
-        SimpleSubUserEditableMemoryDataLayer dataLayer = new();
+        SimpleSubUserEditableDataLayer dataLayer = new();
         await PopulateDataObjects(dataLayer, OwnerOne);
         await PopulateDataObjects(dataLayer, OwnerTwo);
 
@@ -109,7 +109,7 @@ public class SubUserEditableControllerUnitTest
     [Fact]
     public async Task VerifyGetPageInternalErrorResponse()
     {
-        SimpleSubUserEditableController simpleCRUDController = new(new SimpleSubUserEditableMemoryDataLayer(), CreateConsoleLogger());
+        SimpleSubUserEditableController simpleCRUDController = new(new SimpleSubUserEditableDataLayer(), CreateConsoleLogger());
         IActionResult actionResult = await simpleCRUDController.GetPageAsync(null);
 
         Assert.IsType<StatusCodeResult>(actionResult); //Confirm the correct action is returned.
@@ -123,7 +123,7 @@ public class SubUserEditableControllerUnitTest
     [Fact]
     public async Task VerifyGetPageOkResponse()
     {
-        SimpleSubUserEditableMemoryDataLayer dataLayer = new();
+        SimpleSubUserEditableDataLayer dataLayer = new();
         await PopulateDataObjects(dataLayer, OwnerOne);
         await PopulateDataObjects(dataLayer, OwnerTwo);
 
@@ -146,7 +146,7 @@ public class SubUserEditableControllerUnitTest
     [Fact]
     public async Task VerifyGetPageListViewInternalErrorResponse()
     {
-        SimpleSubUserEditableController simpleCRUDController = new(new SimpleSubUserEditableMemoryDataLayer(), CreateConsoleLogger());
+        SimpleSubUserEditableController simpleCRUDController = new(new SimpleSubUserEditableDataLayer(), CreateConsoleLogger());
         IActionResult actionResult = await simpleCRUDController.GetPageListViewAsync(null);
 
         Assert.IsType<StatusCodeResult>(actionResult); //Confirm the correct action is returned.
@@ -160,7 +160,7 @@ public class SubUserEditableControllerUnitTest
     [Fact]
     public async Task VerifyGetPageListViewOkResponse()
     {
-        SimpleSubUserEditableMemoryDataLayer dataLayer = new();
+        SimpleSubUserEditableDataLayer dataLayer = new();
         await PopulateDataObjects(dataLayer, OwnerOne);
         await PopulateDataObjects(dataLayer, OwnerTwo);
 
