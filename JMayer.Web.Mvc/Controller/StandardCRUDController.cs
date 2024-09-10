@@ -59,7 +59,7 @@ public class StandardCRUDController<T, U> : ControllerBase
     {
         try
         {
-            int count = await DataLayer.CountAsync();
+            long count = await DataLayer.CountAsync();
             return Ok(count);
         }
         catch (Exception ex)

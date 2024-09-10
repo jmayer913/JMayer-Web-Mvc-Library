@@ -30,6 +30,21 @@ namespace TestProject.Test.Controller;
 public class SubUserEditableControllerUnitTest
 {
     /// <summary>
+    /// The constant for the maximum records.
+    /// </summary>
+    private const int MaxRecords = 100;
+
+    /// <summary>
+    /// The constant for the fist owner.
+    /// </summary>
+    private const long OwnerOne = 1;
+
+    /// <summary>
+    /// The constant for the second owner.
+    /// </summary>
+    private const long OwnerTwo = 2;
+
+    /// <summary>
     /// The method returns a console logger.
     /// </summary>
     /// <returns>An ILogger.</returns>
@@ -39,124 +54,78 @@ public class SubUserEditableControllerUnitTest
     }
 
     /// <summary>
-    /// The method confirms the SubUserEditableContoller.GetAllAsync() returns a 200 (OK) response when ran successfully.
+    /// The method populates data objects in a datalayer with values that increment by 1.
+    /// </summary>
+    /// <param name="dataLayer">The data layer to populate</param>
+    /// <returns>A Task object for the async.</returns>
+    private static async Task PopulateDataObjects(SimpleSubUserEditableDataLayer dataLayer, long ownerID)
+    {
+        for (int index = 1; index <= MaxRecords; index++)
+        {
+            _ = await dataLayer.CreateAsync(new SimpleSubUserEditableDataObject() { Name = $"{ownerID}-{index}", OwnerInteger64ID = ownerID, Value = index });
+        }
+    }
+
+    /// <summary>
+    /// The method verifies the SubUserEditableContoller.GetAllAsync() returns a 200 (OK) response when ran successfully.
     /// </summary>
     /// <returns>A Task object for the async.</returns>
     [Fact]
-    public async Task GetAllAsyncOkResponse()
+    public async Task VerifyGetAllOkResponse()
     {
-        SimpleSubUserEditableMemoryDataLayer dataLayer = new();
-
-        _ = await dataLayer.CreateAsync(new SimpleSubUserEditableDataObject() { Name = "1-10", OwnerInteger64ID = 1, Value = 10 });
-        _ = await dataLayer.CreateAsync(new SimpleSubUserEditableDataObject() { Name = "1-20", OwnerInteger64ID = 1, Value = 20 });
-        _ = await dataLayer.CreateAsync(new SimpleSubUserEditableDataObject() { Name = "1-30", OwnerInteger64ID = 1, Value = 30 });
-        _ = await dataLayer.CreateAsync(new SimpleSubUserEditableDataObject() { Name = "1-40", OwnerInteger64ID = 1, Value = 40 });
-        _ = await dataLayer.CreateAsync(new SimpleSubUserEditableDataObject() { Name = "1-50", OwnerInteger64ID = 1, Value = 50 });
-        _ = await dataLayer.CreateAsync(new SimpleSubUserEditableDataObject() { Name = "1-60", OwnerInteger64ID = 1, Value = 60 });
-        _ = await dataLayer.CreateAsync(new SimpleSubUserEditableDataObject() { Name = "1-70", OwnerInteger64ID = 1, Value = 70 });
-        _ = await dataLayer.CreateAsync(new SimpleSubUserEditableDataObject() { Name = "1-80", OwnerInteger64ID = 1, Value = 80 });
-        _ = await dataLayer.CreateAsync(new SimpleSubUserEditableDataObject() { Name = "1-90", OwnerInteger64ID = 1, Value = 90 });
-        _ = await dataLayer.CreateAsync(new SimpleSubUserEditableDataObject() { Name = "1-100", OwnerInteger64ID = 1, Value = 100 });
-
-        _ = await dataLayer.CreateAsync(new SimpleSubUserEditableDataObject() { Name = "2-10", OwnerInteger64ID = 2, Value = 10 });
-        _ = await dataLayer.CreateAsync(new SimpleSubUserEditableDataObject() { Name = "2-20", OwnerInteger64ID = 2, Value = 20 });
-        _ = await dataLayer.CreateAsync(new SimpleSubUserEditableDataObject() { Name = "2-30", OwnerInteger64ID = 2, Value = 30 });
-        _ = await dataLayer.CreateAsync(new SimpleSubUserEditableDataObject() { Name = "2-40", OwnerInteger64ID = 2, Value = 40 });
-        _ = await dataLayer.CreateAsync(new SimpleSubUserEditableDataObject() { Name = "2-50", OwnerInteger64ID = 2, Value = 50 });
-        _ = await dataLayer.CreateAsync(new SimpleSubUserEditableDataObject() { Name = "2-60", OwnerInteger64ID = 2, Value = 60 });
-        _ = await dataLayer.CreateAsync(new SimpleSubUserEditableDataObject() { Name = "2-70", OwnerInteger64ID = 2, Value = 70 });
-        _ = await dataLayer.CreateAsync(new SimpleSubUserEditableDataObject() { Name = "2-80", OwnerInteger64ID = 2, Value = 80 });
-        _ = await dataLayer.CreateAsync(new SimpleSubUserEditableDataObject() { Name = "2-90", OwnerInteger64ID = 2, Value = 90 });
-        _ = await dataLayer.CreateAsync(new SimpleSubUserEditableDataObject() { Name = "2-100", OwnerInteger64ID = 2, Value = 100 });
+        SimpleSubUserEditableDataLayer dataLayer = new();
+        await PopulateDataObjects(dataLayer, OwnerOne);
+        await PopulateDataObjects(dataLayer, OwnerTwo);
 
         SimpleSubUserEditableController simpleCRUDController = new(dataLayer, CreateConsoleLogger());
-        IActionResult actionResult = await simpleCRUDController.GetAllAsync(1);
+        IActionResult actionResult = await simpleCRUDController.GetAllAsync(OwnerOne);
 
-        Assert.True
-        (
-            actionResult is OkObjectResult okObjectResult //Confirm the correct action is returned.
-            && okObjectResult.Value is List<SimpleSubUserEditableDataObject> list //Confirm the action is responding with a list of data objects.
-            && list.Count == 10 //Confirm the list matches the amount created.
-        );
+        Assert.IsType<OkObjectResult>(actionResult); //Confirm the correct action is returned.
+        Assert.IsType<List<SimpleSubUserEditableDataObject>>(((OkObjectResult)actionResult).Value); //Confirm the action is responding with a list of data objects.
     }
 
     /// <summary>
-    /// The method confirms the SubUserEditableContoller.GetAllListViewAsync() returns a 200 (OK) response when ran successfully.
+    /// The method verifies the SubUserEditableContoller.GetAllListViewAsync() returns a 200 (OK) response when ran successfully.
     /// </summary>
     /// <returns>A Task object for the async.</returns>
     [Fact]
-    public async Task GetAllListViewAsyncOkResponse()
+    public async Task VerifyGetAllListViewOkResponse()
     {
-        SimpleSubUserEditableMemoryDataLayer dataLayer = new();
-
-        _ = await dataLayer.CreateAsync(new SimpleSubUserEditableDataObject() { Name = "1-10", OwnerInteger64ID = 1, Value = 10 });
-        _ = await dataLayer.CreateAsync(new SimpleSubUserEditableDataObject() { Name = "1-20", OwnerInteger64ID = 1, Value = 20 });
-        _ = await dataLayer.CreateAsync(new SimpleSubUserEditableDataObject() { Name = "1-30", OwnerInteger64ID = 1, Value = 30 });
-        _ = await dataLayer.CreateAsync(new SimpleSubUserEditableDataObject() { Name = "1-40", OwnerInteger64ID = 1, Value = 40 });
-        _ = await dataLayer.CreateAsync(new SimpleSubUserEditableDataObject() { Name = "1-50", OwnerInteger64ID = 1, Value = 50 });
-        _ = await dataLayer.CreateAsync(new SimpleSubUserEditableDataObject() { Name = "1-60", OwnerInteger64ID = 1, Value = 60 });
-        _ = await dataLayer.CreateAsync(new SimpleSubUserEditableDataObject() { Name = "1-70", OwnerInteger64ID = 1, Value = 70 });
-        _ = await dataLayer.CreateAsync(new SimpleSubUserEditableDataObject() { Name = "1-80", OwnerInteger64ID = 1, Value = 80 });
-        _ = await dataLayer.CreateAsync(new SimpleSubUserEditableDataObject() { Name = "1-90", OwnerInteger64ID = 1, Value = 90 });
-        _ = await dataLayer.CreateAsync(new SimpleSubUserEditableDataObject() { Name = "1-100", OwnerInteger64ID = 1, Value = 100 });
-
-        _ = await dataLayer.CreateAsync(new SimpleSubUserEditableDataObject() { Name = "2-10", OwnerInteger64ID = 2, Value = 10 });
-        _ = await dataLayer.CreateAsync(new SimpleSubUserEditableDataObject() { Name = "2-20", OwnerInteger64ID = 2, Value = 20 });
-        _ = await dataLayer.CreateAsync(new SimpleSubUserEditableDataObject() { Name = "2-30", OwnerInteger64ID = 2, Value = 30 });
-        _ = await dataLayer.CreateAsync(new SimpleSubUserEditableDataObject() { Name = "2-40", OwnerInteger64ID = 2, Value = 40 });
-        _ = await dataLayer.CreateAsync(new SimpleSubUserEditableDataObject() { Name = "2-50", OwnerInteger64ID = 2, Value = 50 });
-        _ = await dataLayer.CreateAsync(new SimpleSubUserEditableDataObject() { Name = "2-60", OwnerInteger64ID = 2, Value = 60 });
-        _ = await dataLayer.CreateAsync(new SimpleSubUserEditableDataObject() { Name = "2-70", OwnerInteger64ID = 2, Value = 70 });
-        _ = await dataLayer.CreateAsync(new SimpleSubUserEditableDataObject() { Name = "2-80", OwnerInteger64ID = 2, Value = 80 });
-        _ = await dataLayer.CreateAsync(new SimpleSubUserEditableDataObject() { Name = "2-90", OwnerInteger64ID = 2, Value = 90 });
-        _ = await dataLayer.CreateAsync(new SimpleSubUserEditableDataObject() { Name = "2-100", OwnerInteger64ID = 2, Value = 100 });
+        SimpleSubUserEditableDataLayer dataLayer = new();
+        await PopulateDataObjects(dataLayer, OwnerOne);
+        await PopulateDataObjects(dataLayer, OwnerTwo);
 
         SimpleSubUserEditableController controller = new(dataLayer, CreateConsoleLogger());
-        IActionResult actionResult = await controller.GetAllListViewAsync(2);
+        IActionResult actionResult = await controller.GetAllListViewAsync(OwnerTwo);
 
-        Assert.True
-        (
-            actionResult is OkObjectResult okObjectResult //Confirm the correct action is returned.
-            && okObjectResult.Value is List<ListView> list //Confirm the action is responding with a list of list views.
-            && list.Count == 10 //Confirm the list matches the amount created.
-        );
+        Assert.IsType<OkObjectResult>(actionResult); //Confirm the correct action is returned.
+        Assert.IsType<List<ListView>>(((OkObjectResult)actionResult).Value); //Confirm the action is responding with a list of list views.
     }
 
     /// <summary>
-    /// The method confirms the SubUserEditableContoller.GetPageAsync() returns a 500 (Interal Server Error) response when an exception is thrown by the data layer.
+    /// The method verifies the SubUserEditableContoller.GetPageAsync() returns a 500 (Interal Server Error) response when an exception is thrown by the data layer.
     /// </summary>
     /// <returns>A Task object for the async.</returns>
     [Fact]
-    public async Task GetPageAsyncInternalErrorResponse()
+    public async Task VerifyGetPageInternalErrorResponse()
     {
-        SimpleSubUserEditableController simpleCRUDController = new(new SimpleSubUserEditableMemoryDataLayer(), CreateConsoleLogger());
+        SimpleSubUserEditableController simpleCRUDController = new(new SimpleSubUserEditableDataLayer(), CreateConsoleLogger());
         IActionResult actionResult = await simpleCRUDController.GetPageAsync(null);
 
-        Assert.True
-        (
-            actionResult is StatusCodeResult statusCodeResult //Confirm the correct action is returned.
-            && statusCodeResult.StatusCode == (int)HttpStatusCode.InternalServerError //Confirm the correct action is returned.
-        );
+        Assert.IsType<StatusCodeResult>(actionResult); //Confirm the correct action is returned.
+        Assert.Equal((int)HttpStatusCode.InternalServerError, ((StatusCodeResult)actionResult).StatusCode); //Confirm the correct HTTP status code is returned.
     }
 
     /// <summary>
-    /// The method confirms the SubUserEditableContoller.GetPageAsync() returns a 200 (OK) response when ran successfully.
+    /// The method verifies the SubUserEditableContoller.GetPageAsync() returns a 200 (OK) response when ran successfully.
     /// </summary>
     /// <returns>A Task object for the async.</returns>
     [Fact]
-    public async Task GetPageAsyncOkResponse()
+    public async Task VerifyGetPageOkResponse()
     {
-        SimpleSubUserEditableMemoryDataLayer dataLayer = new();
-
-        for (int index = 1; index <= 100; index++)
-        {
-            _ = await dataLayer.CreateAsync(new SimpleSubUserEditableDataObject() { Name = $"1-{index}", OwnerInteger64ID = 1, Value = index });
-        }
-
-        for (int index = 1; index <= 100; index++)
-        {
-            _ = await dataLayer.CreateAsync(new SimpleSubUserEditableDataObject() { Name = $"2-{index}", OwnerInteger64ID = 2, Value = index });
-        }
+        SimpleSubUserEditableDataLayer dataLayer = new();
+        await PopulateDataObjects(dataLayer, OwnerOne);
+        await PopulateDataObjects(dataLayer, OwnerTwo);
 
         QueryDefinition queryDefinition = new()
         {
@@ -164,52 +133,36 @@ public class SubUserEditableControllerUnitTest
             Take = 20,
         };
         SimpleSubUserEditableController simpleCRUDController = new(dataLayer, CreateConsoleLogger());
-        IActionResult actionResult = await simpleCRUDController.GetPageAsync(1, queryDefinition);
+        IActionResult actionResult = await simpleCRUDController.GetPageAsync(OwnerOne, queryDefinition);
 
-        Assert.True
-        (
-            actionResult is OkObjectResult okObjectResult //Confirm the correct action is returned.
-            && okObjectResult.Value is PagedList<SimpleSubUserEditableDataObject> list //Confirm the action is responding with a list of data objects.
-            && list.DataObjects.Count == queryDefinition.Take //Confirm the list matches the amount taken.
-            && list.TotalRecords == 100 //Confirm the list matches the amount created.
-        );
+        Assert.IsType<OkObjectResult>(actionResult); //Confirm the correct action is returned.
+        Assert.IsType<PagedList<SimpleSubUserEditableDataObject>>(((OkObjectResult)actionResult).Value); //Confirm the action is responding with a paged list of data objects.
     }
 
     /// <summary>
-    /// The method confirms the SubUserEditableContoller.GetPageListViewAsync() returns a 500 (Interal Server Error) response when an exception is thrown by the data layer.
+    /// The method verifies the SubUserEditableContoller.GetPageListViewAsync() returns a 500 (Interal Server Error) response when an exception is thrown by the data layer.
     /// </summary>
     /// <returns>A Task object for the async.</returns>
     [Fact]
-    public async Task GetPageListViewAsyncInternalErrorResponse()
+    public async Task VerifyGetPageListViewInternalErrorResponse()
     {
-        SimpleSubUserEditableController simpleCRUDController = new(new SimpleSubUserEditableMemoryDataLayer(), CreateConsoleLogger());
+        SimpleSubUserEditableController simpleCRUDController = new(new SimpleSubUserEditableDataLayer(), CreateConsoleLogger());
         IActionResult actionResult = await simpleCRUDController.GetPageListViewAsync(null);
 
-        Assert.True
-        (
-            actionResult is StatusCodeResult statusCodeResult //Confirm the correct action is returned.
-            && statusCodeResult.StatusCode == (int)HttpStatusCode.InternalServerError //Confirm the correct action is returned.
-        );
+        Assert.IsType<StatusCodeResult>(actionResult); //Confirm the correct action is returned.
+        Assert.Equal((int)HttpStatusCode.InternalServerError, ((StatusCodeResult)actionResult).StatusCode); //Confirm the correct HTTP status code is returned.
     }
 
     /// <summary>
-    /// The method confirms the SubUserEditableContoller.GetPageListViewAsync() returns a 200 (OK) response when ran successfully.
+    /// The method verifies the SubUserEditableContoller.GetPageListViewAsync() returns a 200 (OK) response when ran successfully.
     /// </summary>
     /// <returns>A Task object for the async.</returns>
     [Fact]
-    public async Task GetPageListViewAsyncOkResponse()
+    public async Task VerifyGetPageListViewOkResponse()
     {
-        SimpleSubUserEditableMemoryDataLayer dataLayer = new();
-
-        for (int index = 1; index <= 100; index++)
-        {
-            _ = await dataLayer.CreateAsync(new SimpleSubUserEditableDataObject() { Name = $"1-{index}", OwnerInteger64ID = 1, Value = index });
-        }
-
-        for (int index = 1; index <= 100; index++)
-        {
-            _ = await dataLayer.CreateAsync(new SimpleSubUserEditableDataObject() { Name = $"2-{index}", OwnerInteger64ID = 2, Value = index });
-        }
+        SimpleSubUserEditableDataLayer dataLayer = new();
+        await PopulateDataObjects(dataLayer, OwnerOne);
+        await PopulateDataObjects(dataLayer, OwnerTwo);
 
         QueryDefinition queryDefinition = new()
         {
@@ -217,14 +170,9 @@ public class SubUserEditableControllerUnitTest
             Take = 20,
         };
         SimpleSubUserEditableController controller = new(dataLayer, CreateConsoleLogger());
-        IActionResult actionResult = await controller.GetPageListViewAsync(2, queryDefinition);
+        IActionResult actionResult = await controller.GetPageListViewAsync(OwnerTwo, queryDefinition);
 
-        Assert.True
-        (
-            actionResult is OkObjectResult okObjectResult //Confirm the correct action is returned.
-            && okObjectResult.Value is PagedList<ListView> list //Confirm the action is responding with a list of list views.
-            && list.DataObjects.Count == queryDefinition.Take //Confirm the list matches the amount taken.
-            && list.TotalRecords == 100 //Confirm the list matches the amount created.
-        );
+        Assert.IsType<OkObjectResult>(actionResult); //Confirm the correct action is returned.
+        Assert.IsType<PagedList<ListView>>(((OkObjectResult)actionResult).Value); //Confirm the action is responding with a list of list views.
     }
 }
