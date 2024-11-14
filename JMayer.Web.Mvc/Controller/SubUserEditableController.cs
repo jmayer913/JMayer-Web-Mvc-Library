@@ -8,7 +8,7 @@ using System.Net;
 namespace JMayer.Web.Mvc.Controller;
 
 /// <summary>
-/// The class manages HTTP requests for CRUD operations associated with a sub user editable data object & a data layer.
+/// The class manages HTTP requests for CRUD operations associated with a sub user editable data object and a data layer.
 /// </summary>
 /// <typeparam name="T">Must be a SubUserEditableDataObject since the data layer requires this.</typeparam>
 /// <typeparam name="U">Must be an IUserEditableDataLayer so the controller can interact with the collection/table associated with it.</typeparam>
@@ -37,7 +37,7 @@ public class SubUserEditableController<T, U> : UserEditableController<T, U>
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to return all the {Type} data objects for {OwnerID}.", DataObjectTypeName, ownerIntegerId);
-            return StatusCode((int)HttpStatusCode.InternalServerError);
+            return Problem();
         }
     }
 
@@ -57,7 +57,7 @@ public class SubUserEditableController<T, U> : UserEditableController<T, U>
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to return all the {Type} data objects for {OwnerID}.", DataObjectTypeName, ownerStringId);
-            return StatusCode((int)HttpStatusCode.InternalServerError);
+            return Problem();
         }
     }
 
@@ -77,7 +77,7 @@ public class SubUserEditableController<T, U> : UserEditableController<T, U>
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to return all the {Type} data objects as list views for {OwnerID}.", DataObjectTypeName, ownerIntegerId);
-            return StatusCode((int)HttpStatusCode.InternalServerError);
+            return Problem();
         }
     }
 
@@ -97,7 +97,7 @@ public class SubUserEditableController<T, U> : UserEditableController<T, U>
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to return all the {Type} data objects as list views for {OwnerID}.", DataObjectTypeName, ownerStringId);
-            return StatusCode((int)HttpStatusCode.InternalServerError);
+            return Problem();
         }
     }
 
@@ -126,7 +126,7 @@ public class SubUserEditableController<T, U> : UserEditableController<T, U>
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to return a page of the {Type} data objects for {OwnerID}.", DataObjectTypeName, ownerIntegerId);
-            return StatusCode((int)HttpStatusCode.InternalServerError);
+            return Problem();
         }
     }
 
@@ -155,7 +155,7 @@ public class SubUserEditableController<T, U> : UserEditableController<T, U>
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to return a page of the {Type} data objects for {OwnerID}.", DataObjectTypeName, ownerStringId);
-            return StatusCode((int)HttpStatusCode.InternalServerError);
+            return Problem();
         }
     }
 
@@ -184,7 +184,7 @@ public class SubUserEditableController<T, U> : UserEditableController<T, U>
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to return a page of the {Type} data objects as list views for {OwnerID}.", DataObjectTypeName, ownerIntegerId);
-            return StatusCode((int)HttpStatusCode.InternalServerError);
+            return Problem();
         }
     }
 
@@ -213,7 +213,7 @@ public class SubUserEditableController<T, U> : UserEditableController<T, U>
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to return a page of the {Type} data objects as list views for {OwnerID}.", DataObjectTypeName, ownerStringId);
-            return StatusCode((int)HttpStatusCode.InternalServerError);
+            return Problem();
         }
     }
 }
