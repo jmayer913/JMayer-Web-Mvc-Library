@@ -1,5 +1,5 @@
 ﻿using JMayer.Data.Database.DataLayer;
-using JMayer.Web.Mvc.Controllers;
+using JMayer.Web.Mvc.Controller;
 using Microsoft.Extensions.Logging;
 using TestProject.Data;
 using TestProject.Database;

@@ -1,15 +1,13 @@
 ﻿using JMayer.Data.Data;
 using JMayer.Data.Data.Query;
 using JMayer.Data.Database.DataLayer;
-using JMayer.Web.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using System.Net;
 
 namespace JMayer.Web.Mvc.Controller;
 
 /// <summary>
-/// The class manages HTTP requests for CRUD operations associated with an user editable data object & a data layer.
+/// The class manages HTTP requests for CRUD operations associated with an user editable data object and a data layer.
 /// </summary>
 /// <typeparam name="T">Must be a UserEditableDataObject since the data layer requires this.</typeparam>
 /// <typeparam name="U">Must be an IUserEditableDataLayer so the controller can interact with the collection/table associated with it.</typeparam>
@@ -41,7 +39,7 @@ public class UserEditableController<T, U> : StandardCRUDController<T, U>
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to return all the {Type} data objects as list views.", DataObjectTypeName);
-            return StatusCode((int)HttpStatusCode.InternalServerError);
+            return Problem();
         }
     }
 
@@ -61,7 +59,7 @@ public class UserEditableController<T, U> : StandardCRUDController<T, U>
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to return a page of {Type} data objects as list views.", DataObjectTypeName);
-            return StatusCode((int)HttpStatusCode.InternalServerError);
+            return Problem();
         }
     }
 }

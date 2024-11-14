@@ -7,10 +7,10 @@ using Microsoft.Extensions.Logging;
 using System.ComponentModel.DataAnnotations;
 using System.Net;
 
-namespace JMayer.Web.Mvc.Controllers;
+namespace JMayer.Web.Mvc.Controller;
 
 /// <summary>
-/// The class manages HTTP requests for CRUD operations associated with a data object & a data layer.
+/// The class manages HTTP requests for CRUD operations associated with a data object and a data layer.
 /// </summary>
 /// <typeparam name="T">Must be a DataObject since the data layer requires this.</typeparam>
 /// <typeparam name="U">Must be an IStandardCRUDDataLayer so the controller can interact with the collection/table associated with it.</typeparam>
@@ -92,7 +92,7 @@ public class StandardCRUDController<T, U> : ControllerBase
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to create the {Type}.", DataObjectTypeName);
-            return StatusCode((int)HttpStatusCode.InternalServerError);
+            return Problem();
         }
     }
 
@@ -116,10 +116,15 @@ public class StandardCRUDController<T, U> : ControllerBase
             
             return Ok();
         }
+        catch (DataObjectDeleteConflictException ex)
+        {
+            Logger.LogError(ex, "Failed to delete the {ID} {Type} because of a data conflict.", integerID, DataObjectTypeName);
+            return Conflict();
+        }
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to delete the {ID} {Type}.", integerID, DataObjectTypeName);
-            return StatusCode((int)HttpStatusCode.InternalServerError);
+            return Problem();
         }
     }
 
@@ -146,7 +151,7 @@ public class StandardCRUDController<T, U> : ControllerBase
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to delete the {ID} {Type}.", stringID, DataObjectTypeName);
-            return StatusCode((int)HttpStatusCode.InternalServerError);
+            return Problem();
         }
     }
 
@@ -165,7 +170,7 @@ public class StandardCRUDController<T, U> : ControllerBase
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to return all the {Type} data objects.", DataObjectTypeName);
-            return StatusCode((int)HttpStatusCode.InternalServerError);
+            return Problem();
         }
     }
 
@@ -185,7 +190,7 @@ public class StandardCRUDController<T, U> : ControllerBase
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to return a page of {Type} data objects.", DataObjectTypeName);
-            return StatusCode((int)HttpStatusCode.InternalServerError);
+            return Problem();
         }
     }
 
@@ -204,7 +209,7 @@ public class StandardCRUDController<T, U> : ControllerBase
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to return the first {Type} data object.", DataObjectTypeName);
-            return StatusCode((int)HttpStatusCode.InternalServerError);
+            return Problem();
         }
     }
 
@@ -224,7 +229,7 @@ public class StandardCRUDController<T, U> : ControllerBase
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to return the {ID} {Type} data object.", integerID, DataObjectTypeName);
-            return StatusCode((int)HttpStatusCode.InternalServerError);
+            return Problem();
         }
     }
 
@@ -244,7 +249,7 @@ public class StandardCRUDController<T, U> : ControllerBase
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to return the {ID} {Type} data object.", stringID, DataObjectTypeName);
-            return StatusCode((int)HttpStatusCode.InternalServerError);
+            return Problem();
         }
     }
 
@@ -276,7 +281,7 @@ public class StandardCRUDController<T, U> : ControllerBase
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to update the {Type}.", DataObjectTypeName);
-            return StatusCode((int)HttpStatusCode.InternalServerError);
+            return Problem();
         }
     }
 
@@ -298,7 +303,7 @@ public class StandardCRUDController<T, U> : ControllerBase
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to validate the {Type}.", DataObjectTypeName);
-            return StatusCode((int)HttpStatusCode.InternalServerError);
+            return Problem();
         }
     }
 }
