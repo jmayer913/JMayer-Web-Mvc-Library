@@ -1,5 +1,6 @@
 ﻿using JMayer.Data.Data;
 using JMayer.Data.Data.Query;
+using JMayer.Data.HTTP.DataLayer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Net;
@@ -83,8 +84,9 @@ public class UserEditableControllerUnitTest
         SimpleUserEditableController simpleCRUDController = new(new SimpleUserEditableDataLayer(), CreateConsoleLogger());
         IActionResult actionResult = await simpleCRUDController.GetPageListViewAsync(null);
 
-        Assert.IsType<StatusCodeResult>(actionResult); //Confirm the correct action is returned.
-        Assert.Equal((int)HttpStatusCode.InternalServerError, ((StatusCodeResult)actionResult).StatusCode); //Confirm the correct HTTP status code is returned.
+        Assert.IsType<ObjectResult>(actionResult); //Confirm the correct action is returned.
+        Assert.IsType<ProblemDetails>(((ObjectResult)actionResult).Value); //Confirm the action is responding with problem details.
+        Assert.Equal((int)HttpStatusCode.InternalServerError, ((ProblemDetails)((ObjectResult)actionResult).Value).Status); //Confirm the correct HTTP status code is returned.
     }
 
     /// <summary>

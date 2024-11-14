@@ -116,6 +116,11 @@ public class StandardCRUDController<T, U> : ControllerBase
             
             return Ok();
         }
+        catch (DataObjectDeleteConflictException ex)
+        {
+            Logger.LogError(ex, "Failed to delete the {ID} {Type} because of a data conflict.", integerID, DataObjectTypeName);
+            return Conflict();
+        }
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to delete the {ID} {Type}.", integerID, DataObjectTypeName);

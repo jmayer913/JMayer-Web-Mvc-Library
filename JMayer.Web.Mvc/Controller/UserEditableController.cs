@@ -1,10 +1,8 @@
 ﻿using JMayer.Data.Data;
 using JMayer.Data.Data.Query;
 using JMayer.Data.Database.DataLayer;
-using JMayer.Web.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using System.Net;
 
 namespace JMayer.Web.Mvc.Controller;
 

@@ -3,7 +3,6 @@ using JMayer.Data.Data.Query;
 using JMayer.Data.Database.DataLayer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using System.Net;
 
 namespace JMayer.Web.Mvc.Controller;
 

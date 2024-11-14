@@ -106,8 +106,9 @@ public class StandardCRUDControllerUnitTest
         SimpleCRUDController simpleCRUDController = new(new SimpleStandardCRUDDataLayer(), CreateConsoleLogger());
         IActionResult actionResult = await simpleCRUDController.CreateAsync(null);
 
-        Assert.IsType<StatusCodeResult>(actionResult); //Confirm the correct action is returned.
-        Assert.Equal((int)HttpStatusCode.InternalServerError, ((StatusCodeResult)actionResult).StatusCode); //Confirm the correct HTTP status code is returned.
+        Assert.IsType<ObjectResult>(actionResult); //Confirm the correct action is returned.
+        Assert.IsType<ProblemDetails>(((ObjectResult)actionResult).Value); //Confirm the action is responding with problem details.
+        Assert.Equal((int)HttpStatusCode.InternalServerError, ((ProblemDetails)((ObjectResult)actionResult).Value).Status); //Confirm the correct HTTP status code is returned.
     }
 
     /// <summary>
@@ -125,6 +126,22 @@ public class StandardCRUDControllerUnitTest
         Assert.IsType<OkObjectResult>(actionResult); //Confirm the correct action is returned.
         Assert.IsType<SimpleDataObject>(((OkObjectResult)actionResult).Value); //Confirm the action is responding with a data object.
         Assert.Equal(originalDataObject.Value, ((SimpleDataObject)((OkObjectResult)actionResult).Value).Value); //Confirm the action is responding with the created data object.
+    }
+
+    /// <summary>
+    /// The method verifies the StandardCRUDContoller.CreateAsync() returns a 400 (Bad Request) response when the data object is not valid.
+    /// </summary>
+    /// <returns>A Task object for the async.</returns>
+    [Fact]
+    public async Task VerifyDeleteConflictResponse()
+    {
+        SimpleStandardCRUDDataLayer dataLayer = new();
+        await PopulateDataObjects(dataLayer);
+
+        SimpleCRUDController simpleCRUDController = new(dataLayer, CreateConsoleLogger());
+        IActionResult actionResult = await simpleCRUDController.DeleteAsync(SimpleStandardCRUDDataLayer.DeleteConflictId);
+
+        Assert.IsType<ConflictResult>(actionResult); //Confirm the correct action is returned.
     }
 
     /// <summary>
@@ -171,8 +188,9 @@ public class StandardCRUDControllerUnitTest
         SimpleCRUDController simpleCRUDController = new(new SimpleStandardCRUDDataLayer(), CreateConsoleLogger());
         IActionResult actionResult = await simpleCRUDController.GetPageAsync(null);
 
-        Assert.IsType<StatusCodeResult>(actionResult); //Confirm the correct action is returned.
-        Assert.Equal((int)HttpStatusCode.InternalServerError, ((StatusCodeResult)actionResult).StatusCode); //Confirm the correct HTTP status code is returned.
+        Assert.IsType<ObjectResult>(actionResult); //Confirm the correct action is returned.
+        Assert.IsType<ProblemDetails>(((ObjectResult)actionResult).Value); //Confirm the action is responding with problem details.
+        Assert.Equal((int)HttpStatusCode.InternalServerError, ((ProblemDetails)((ObjectResult)actionResult).Value).Status); //Confirm the correct HTTP status code is returned.
     }
 
     /// <summary>
@@ -262,8 +280,9 @@ public class StandardCRUDControllerUnitTest
         SimpleCRUDController simpleCRUDController = new(new SimpleStandardCRUDDataLayer(), CreateConsoleLogger());
         IActionResult actionResult = await simpleCRUDController.UpdateAsync(null);
 
-        Assert.IsType<StatusCodeResult>(actionResult); //Confirm the correct action is returned.
-        Assert.Equal((int)HttpStatusCode.InternalServerError, ((StatusCodeResult)actionResult).StatusCode); //Confirm the correct HTTP status code is returned.
+        Assert.IsType<ObjectResult>(actionResult); //Confirm the correct action is returned.
+        Assert.IsType<ProblemDetails>(((ObjectResult)actionResult).Value); //Confirm the action is responding with problem details.
+        Assert.Equal((int)HttpStatusCode.InternalServerError, ((ProblemDetails)((ObjectResult)actionResult).Value).Status); //Confirm the correct HTTP status code is returned.
     }
 
     /// <summary>
