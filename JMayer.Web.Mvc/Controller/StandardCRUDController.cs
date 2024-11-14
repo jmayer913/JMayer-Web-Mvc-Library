@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 using System.ComponentModel.DataAnnotations;
 using System.Net;
 
-namespace JMayer.Web.Mvc.Controllers;
+namespace JMayer.Web.Mvc.Controller;
 
 /// <summary>
 /// The class manages HTTP requests for CRUD operations associated with a data object and a data layer.
