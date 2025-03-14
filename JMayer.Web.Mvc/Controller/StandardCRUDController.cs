@@ -7,6 +7,8 @@ using Microsoft.Extensions.Logging;
 using System.ComponentModel.DataAnnotations;
 using System.Net;
 
+#warning In the asp.net core mvc examples, it returns NotFound() when an id doesn't exist. I like it better than returning a null object for GetSingle() and it's better than returning a server error for Update().
+
 namespace JMayer.Web.Mvc.Controller;
 
 /// <summary>
