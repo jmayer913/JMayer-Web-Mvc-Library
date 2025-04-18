@@ -2,6 +2,7 @@
 using JMayer.Data.Database.DataLayer;
 using JMayer.Data.HTTP.DataLayer;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.Extensions.Logging;
 
 namespace JMayer.Web.Mvc.Controller;
@@ -197,7 +198,7 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
     {
         try
         {
-            return await Task.FromResult(new PartialViewResult
+            return await Task.FromResult(new PartialViewResult()
             {
                 ViewData = ViewData,
                 ViewName = $"_{DataObjectTypeName}AddPartial",
@@ -209,6 +210,66 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
             return Problem(detail: "Failed to find the Add Partial View.");
         }
     }
+
+    /// <summary>
+    /// The method returns the edit partial view.
+    /// </summary>
+    /// <param name="integerID">The id for the record.</param>
+    /// <returns>The partial view.</returns>
+    public virtual async Task<IActionResult> GetEditPartialAsync(long integerID)
+    {
+        try
+        {
+            T? dataObject = await DataLayer.GetSingleAsync(obj => obj.Integer64ID == integerID);
+
+            if (dataObject == null)
+            {
+                Logger.LogError("Failed to find the {ID} when fetching the Edit Partial View for the {Type}.", integerID, DataObjectTypeName);
+                return NotFound();
+            }
+
+            return await Task.FromResult(new PartialViewResult()
+            {
+                ViewData = new ViewDataDictionary<T>(ViewData, dataObject),
+                ViewName = $"_{DataObjectTypeName}EditPartial",
+            });
+        }
+        catch (Exception ex) 
+        {
+            Logger.LogError(ex, "Failed to return the Edit Partial View for the {Type}.", DataObjectTypeName);
+            return Problem(detail: "Failed to find the Edit View.");
+        }
+    }
+
+    ///// <summary>
+    ///// The method returns the edit partial view.
+    ///// </summary>
+    ///// <param name="stringID">The id for the record.</param>
+    ///// <returns>The partial view.</returns>
+    //public virtual async Task<IActionResult> GetEditPartialAsync(string stringID)
+    //{
+    //    try
+    //    {
+    //        T? dataObject = await DataLayer.GetSingleAsync(obj => obj.StringID == stringID);
+
+    //        if (dataObject == null)
+    //        {
+    //            Logger.LogError("Failed to find the {ID} when fetching the Edit Partial View for the {Type}.", stringID, DataObjectTypeName);
+    //            return NotFound();
+    //        }
+
+    //        return await Task.FromResult(new PartialViewResult()
+    //        {
+    //            ViewData = new ViewDataDictionary<T>(ViewData, dataObject),
+    //            ViewName = $"_{DataObjectTypeName}EditPartial",
+    //        });
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        Logger.LogError(ex, "Failed to return the Edit Partial View for the {Type}.", DataObjectTypeName);
+    //        return Problem(detail: "Failed to find the Edit View.");
+    //    }
+    //}
 
     /// <summary>
     /// The method returns the index view.
