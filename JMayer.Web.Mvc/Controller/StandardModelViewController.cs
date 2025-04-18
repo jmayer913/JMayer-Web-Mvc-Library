@@ -14,6 +14,16 @@ namespace JMayer.Web.Mvc.Controller;
 #warning I need to figure out server side validation.
 #warning I need to figure out how conflict is handled.
 
+
+#warning It looks like DevExpress, Syncfusion and Telerik have different controller setups.
+#warning At least with Syncfusion, the controller isn't very flexible. I can customized the names. Parameters seem pretty set in stone. It seems like all request types must be POST.
+#warning I'm wonder if I'll end up with a SyncFusion MVC standard controller.
+
+/// <summary>
+/// 
+/// </summary>
+/// <typeparam name="T"></typeparam>
+/// <typeparam name="U"></typeparam>
 public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Controller
     where T : DataObject
     where U : Data.Database.DataLayer.IStandardCRUDDataLayer<T>
@@ -48,148 +58,166 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
         Logger = logger;
     }
 
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public virtual async Task<IActionResult> CreateActionAsync(long? integerID, T dataObject)
+    //    [HttpPost]
+    //    //[ValidateAntiForgeryToken]
+    //    public virtual async Task<IActionResult> CreateAsync(T dataObject)
+    //    {
+    //        try
+    //        {
+    //            if (ModelState.IsValid)
+    //            {
+    //                await DataLayer.CreateAsync(dataObject);
+    //            }
+
+    //            return Json(dataObject);
+    //        }
+    //        catch (DataObjectValidationException ex)
+    //        {
+    //            ServerSideValidationResult serverSideValidationResult = new(ex.ValidationResults);
+    //            Logger.LogWarning(ex, "Failed to create the {Type} because of a server-side validation error.", DataObjectTypeName);
+    //            return BadRequest(serverSideValidationResult);
+    //        }
+    //        catch (Exception ex)
+    //        {
+    //            Logger.LogError(ex, "Failed to create the {Type}.", DataObjectTypeName);
+    //            return Problem();
+    //        }
+    //    }
+
+    //    [HttpPost]
+    //    //[HttpDelete]
+    //    //[ValidateAntiForgeryToken]
+    //    public virtual async Task<IActionResult> DeleteAsync(int key)
+    //    {
+    //        try
+    //        {
+    //            T? dataObject = await DataLayer.GetSingleAsync(obj => obj.Integer64ID == key);
+
+    //            if (dataObject != null)
+    //            {
+    //                await DataLayer.DeleteAsync(dataObject);
+    //            }
+
+    //            return Ok();
+    //        }
+    //        catch (DataObjectDeleteConflictException ex)
+    //        {
+    //            Logger.LogError(ex, "Failed to delete the {ID} {Type} because of a data conflict.", key, DataObjectTypeName);
+    //            return Conflict();
+    //        }
+    //        catch (Exception ex)
+    //        {
+    //            Logger.LogError(ex, "Failed to delete the {ID} {Type}.", key, DataObjectTypeName);
+    //            return Problem();
+    //        }
+    //    }
+
+    //    public virtual async Task<IActionResult> GetCreateViewAsync(long? integerID)
+    //    {
+    //        try
+    //        {
+    //#warning This might be wrong because the data object hasn't been created yet so there would be no id.
+
+    //            if (integerID == null)
+    //            {
+    //                return NotFound();
+    //            }
+
+    //            T? dataObject = await DataLayer.GetSingleAsync(obj => obj.Integer64ID == integerID);
+
+    //            if (dataObject == null)
+    //            {
+    //                return NotFound();
+    //            }
+
+    //            return View($"{DataObjectTypeName}Create", dataObject);
+    //        }
+    //        catch (Exception ex)
+    //        {
+    //            Logger.LogError(ex, "Failed to return the Create View for the {Type} using the {ID} ID.", DataObjectTypeName, integerID);
+    //            return Problem();
+    //        }
+    //    }
+
+    //    public virtual async Task<IActionResult> GetDeleteViewAsync(long? integerID)
+    //    {
+    //        try
+    //        {
+    //            if (integerID == null)
+    //            {
+    //                return NotFound();
+    //            }
+
+    //            T? dataObject = await DataLayer.GetSingleAsync(obj => obj.Integer64ID == integerID);
+
+    //            if (dataObject == null)
+    //            {
+    //                return NotFound();
+    //            }
+
+    //            return View($"{DataObjectTypeName}Delete", dataObject);
+    //        }
+    //        catch (Exception ex)
+    //        {
+    //            Logger.LogError(ex, "Failed to return the Delete View for the {Type} using the {ID} ID.", DataObjectTypeName, integerID);
+    //            return Problem();
+    //        }
+    //    }
+
+    //    public virtual async Task<IActionResult> GetEditViewAsync(long? integerID)
+    //    {
+    //        try
+    //        {
+    //            if (integerID == null)
+    //            {
+    //                return NotFound();
+    //            }
+
+    //            T? dataObject = await DataLayer.GetSingleAsync(obj => obj.Integer64ID == integerID);
+
+    //            if (dataObject == null)
+    //            {
+    //                return NotFound();
+    //            }
+
+    //            return View($"{DataObjectTypeName}Edit", dataObject);
+    //        }
+    //        catch (Exception ex)
+    //        {
+    //            Logger.LogError(ex, "Failed to return the Edit View for the {Type} using the {ID} ID.", DataObjectTypeName, integerID);
+    //            return Problem();
+    //        }
+    //    }
+
+    /// <summary>
+    /// The method returns the add partial view.
+    /// </summary>
+    /// <returns>The partial view.</returns>
+    public virtual async Task<IActionResult> GetAddPartialAsync()
     {
         try
         {
-            if (integerID != dataObject.Integer64ID)
+            return await Task.FromResult(new PartialViewResult
             {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                await DataLayer.CreateAsync(dataObject);
-                return RedirectToAction($"{DataObjectTypeName}Index");
-            }
-
-            return View(dataObject);
-        }
-        catch (DataObjectValidationException ex)
-        {
-            ServerSideValidationResult serverSideValidationResult = new(ex.ValidationResults);
-            Logger.LogWarning(ex, "Failed to create the {Type} because of a server-side validation error.", DataObjectTypeName);
-            return BadRequest(serverSideValidationResult);
+                ViewData = ViewData,
+                ViewName = $"_{DataObjectTypeName}AddPartial",
+            });
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Failed to create the {Type}.", DataObjectTypeName);
-            return Problem();
+            Logger.LogError(ex, "Failed to return the Add Partial View for the {Type}.", DataObjectTypeName);
+            return Problem(detail: "Failed to find the Add Partial View.");
         }
     }
 
-    [HttpDelete]
-    [ValidateAntiForgeryToken]
-    public virtual async Task<IActionResult> DeleteActionAsync(long integerID)
-    {
-        try
-        {
-            T? dataObject = await DataLayer.GetSingleAsync(obj => obj.Integer64ID == integerID);
-
-            if (dataObject != null)
-            {
-                await DataLayer.DeleteAsync(dataObject);
-            }
-
-            return RedirectToAction($"{DataObjectTypeName}Index");
-        }
-        catch (DataObjectDeleteConflictException ex)
-        {
-            Logger.LogError(ex, "Failed to delete the {ID} {Type} because of a data conflict.", integerID, DataObjectTypeName);
-            return Conflict();
-        }
-        catch (Exception ex)
-        {
-            Logger.LogError(ex, "Failed to delete the {ID} {Type}.", integerID, DataObjectTypeName);
-            return Problem();
-        }
-    }
-
-    public virtual async Task<IActionResult> GetCreateViewAsync(long? integerID)
-    {
-        try
-        {
-#warning This might be wrong because the data object hasn't been created yet so there would be no id.
-
-            if (integerID == null)
-            {
-                return NotFound();
-            }
-
-            T? dataObject = await DataLayer.GetSingleAsync(obj => obj.Integer64ID == integerID);
-
-            if (dataObject == null)
-            {
-                return NotFound();
-            }
-
-            return View($"{DataObjectTypeName}Create", dataObject);
-        }
-        catch (Exception ex)
-        {
-            Logger.LogError(ex, "Failed to return the Create View for the {Type} using the {ID} ID.", DataObjectTypeName, integerID);
-            return Problem();
-        }
-    }
-
-    public virtual async Task<IActionResult> GetDeleteViewAsync(long? integerID)
-    {
-        try
-        {
-            if (integerID == null)
-            {
-                return NotFound();
-            }
-
-            T? dataObject = await DataLayer.GetSingleAsync(obj => obj.Integer64ID == integerID);
-
-            if (dataObject == null)
-            {
-                return NotFound();
-            }
-
-            return View($"{DataObjectTypeName}Delete", dataObject);
-        }
-        catch (Exception ex)
-        {
-            Logger.LogError(ex, "Failed to return the Delete View for the {Type} using the {ID} ID.", DataObjectTypeName, integerID);
-            return Problem();
-        }
-    }
-
-    public virtual async Task<IActionResult> GetEditViewAsync(long? integerID)
-    {
-        try
-        {
-            if (integerID == null)
-            {
-                return NotFound();
-            }
-
-            T? dataObject = await DataLayer.GetSingleAsync(obj => obj.Integer64ID == integerID);
-
-            if (dataObject == null)
-            {
-                return NotFound();
-            }
-
-            return View($"{DataObjectTypeName}Edit", dataObject);
-        }
-        catch (Exception ex)
-        {
-            Logger.LogError(ex, "Failed to return the Edit View for the {Type} using the {ID} ID.", DataObjectTypeName, integerID);
-            return Problem();
-        }
-    }
-
+    /// <summary>
+    /// The method returns the index view.
+    /// </summary>
+    /// <returns>The index view.</returns>
     public virtual async Task<IActionResult> IndexAsync()
     {
         try
         {
-            //TO DO: This will need to handle filtering, paging & sorting.
-
             List<T>? dataObjects = await DataLayer.GetAllAsync();
             return View($"{DataObjectTypeName}Index", dataObjects);
         }
@@ -200,40 +228,40 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
         }
     }
 
-    [HttpPut]
-    [ValidateAntiForgeryToken]
-    public virtual async Task<IActionResult> UpdateActionAsync(long? integerID, T dataObject)
-    {
-        try
-        {
-            if (integerID != dataObject.Integer64ID)
-            {
-                return NotFound();
-            }
+    //[HttpPut]
+    ////[ValidateAntiForgeryToken]
+    //public virtual async Task<IActionResult> UpdateAsync(long? integerID, T dataObject)
+    //{
+    //    try
+    //    {
+    //        if (integerID != dataObject.Integer64ID)
+    //        {
+    //            return NotFound();
+    //        }
 
-            if (ModelState.IsValid)
-            {
-                await DataLayer.UpdateAsync(dataObject);
-                return RedirectToAction($"{DataObjectTypeName}Index");
-            }
+    //        if (ModelState.IsValid)
+    //        {
+    //            await DataLayer.UpdateAsync(dataObject);
+    //            return RedirectToAction($"{DataObjectTypeName}Index");
+    //        }
 
-            return View(dataObject);
-        }
-        catch (DataObjectUpdateConflictException ex)
-        {
-            Logger.LogWarning(ex, "Failed to update {Type} because the data was considered old.", DataObjectTypeName);
-            return Conflict();
-        }
-        catch (DataObjectValidationException ex)
-        {
-            ServerSideValidationResult serverSideValidationResult = new(ex.ValidationResults);
-            Logger.LogWarning(ex, "Failed to update the {Type} because of a server-side validation error.", DataObjectTypeName);
-            return BadRequest(serverSideValidationResult);
-        }
-        catch (Exception ex)
-        {
-            Logger.LogError(ex, "Failed to update the {Type}.", DataObjectTypeName);
-            return Problem();
-        }
-    }
+    //        return View(dataObject);
+    //    }
+    //    catch (DataObjectUpdateConflictException ex)
+    //    {
+    //        Logger.LogWarning(ex, "Failed to update {Type} because the data was considered old.", DataObjectTypeName);
+    //        return Conflict();
+    //    }
+    //    catch (DataObjectValidationException ex)
+    //    {
+    //        ServerSideValidationResult serverSideValidationResult = new(ex.ValidationResults);
+    //        Logger.LogWarning(ex, "Failed to update the {Type} because of a server-side validation error.", DataObjectTypeName);
+    //        return BadRequest(serverSideValidationResult);
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        Logger.LogError(ex, "Failed to update the {Type}.", DataObjectTypeName);
+    //        return Problem();
+    //    }
+    //}
 }
