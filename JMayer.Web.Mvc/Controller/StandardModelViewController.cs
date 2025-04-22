@@ -7,18 +7,13 @@ using Microsoft.Extensions.Logging;
 
 namespace JMayer.Web.Mvc.Controller;
 
-#warning I want to change the naming so fetching a view is named differently than an action.
-
-#warning I've defined some basic views the controller returns and now, I need to figure out if those should be the standard.
-#warning I need to figure out how this will work when the data object has a long and string id.
 #warning I need to figure out if a User Editable and Sub User Editable needs to exist.
-#warning I need to figure out server side validation.
-#warning I need to figure out how conflict is handled.
 
+#warning I need to figure out how this will work when the data object has a long and string id.
+#warning Can't seem to differentiate between int and string Ids. Using [HttpGet("GetEditPartial/{Integer64ID}:long")] and [HttpGet("GetEditPartial/{StringID}")] makes it where no method is found.
+#warning A form suggested having the parameter as a string and then have it decide if the integer or string verison needs to be called.
 
-#warning It looks like DevExpress, Syncfusion and Telerik have different controller setups.
-#warning At least with Syncfusion, the controller isn't very flexible. I can customized the names. Parameters seem pretty set in stone. It seems like all request types must be POST.
-#warning I'm wonder if I'll end up with a SyncFusion MVC standard controller.
+#warning I had to create a Syncfusion controller in the example project but at the very least, I believe I can have a standard for fetching views (index, add & edit; not sure if delete is needed).
 
 /// <summary>
 /// 
@@ -59,235 +54,59 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
         Logger = logger;
     }
 
-    //    [HttpPost]
-    //    //[ValidateAntiForgeryToken]
-    //    public virtual async Task<IActionResult> CreateAsync(T dataObject)
-    //    {
-    //        try
-    //        {
-    //            if (ModelState.IsValid)
-    //            {
-    //                await DataLayer.CreateAsync(dataObject);
-    //            }
-
-    //            return Json(dataObject);
-    //        }
-    //        catch (DataObjectValidationException ex)
-    //        {
-    //            ServerSideValidationResult serverSideValidationResult = new(ex.ValidationResults);
-    //            Logger.LogWarning(ex, "Failed to create the {Type} because of a server-side validation error.", DataObjectTypeName);
-    //            return BadRequest(serverSideValidationResult);
-    //        }
-    //        catch (Exception ex)
-    //        {
-    //            Logger.LogError(ex, "Failed to create the {Type}.", DataObjectTypeName);
-    //            return Problem();
-    //        }
-    //    }
-
-    //    [HttpPost]
-    //    //[HttpDelete]
-    //    //[ValidateAntiForgeryToken]
-    //    public virtual async Task<IActionResult> DeleteAsync(int key)
-    //    {
-    //        try
-    //        {
-    //            T? dataObject = await DataLayer.GetSingleAsync(obj => obj.Integer64ID == key);
-
-    //            if (dataObject != null)
-    //            {
-    //                await DataLayer.DeleteAsync(dataObject);
-    //            }
-
-    //            return Ok();
-    //        }
-    //        catch (DataObjectDeleteConflictException ex)
-    //        {
-    //            Logger.LogError(ex, "Failed to delete the {ID} {Type} because of a data conflict.", key, DataObjectTypeName);
-    //            return Conflict();
-    //        }
-    //        catch (Exception ex)
-    //        {
-    //            Logger.LogError(ex, "Failed to delete the {ID} {Type}.", key, DataObjectTypeName);
-    //            return Problem();
-    //        }
-    //    }
-
-    //    public virtual async Task<IActionResult> GetCreateViewAsync(long? integerID)
-    //    {
-    //        try
-    //        {
-    //#warning This might be wrong because the data object hasn't been created yet so there would be no id.
-
-    //            if (integerID == null)
-    //            {
-    //                return NotFound();
-    //            }
-
-    //            T? dataObject = await DataLayer.GetSingleAsync(obj => obj.Integer64ID == integerID);
-
-    //            if (dataObject == null)
-    //            {
-    //                return NotFound();
-    //            }
-
-    //            return View($"{DataObjectTypeName}Create", dataObject);
-    //        }
-    //        catch (Exception ex)
-    //        {
-    //            Logger.LogError(ex, "Failed to return the Create View for the {Type} using the {ID} ID.", DataObjectTypeName, integerID);
-    //            return Problem();
-    //        }
-    //    }
-
-    //    public virtual async Task<IActionResult> GetDeleteViewAsync(long? integerID)
-    //    {
-    //        try
-    //        {
-    //            if (integerID == null)
-    //            {
-    //                return NotFound();
-    //            }
-
-    //            T? dataObject = await DataLayer.GetSingleAsync(obj => obj.Integer64ID == integerID);
-
-    //            if (dataObject == null)
-    //            {
-    //                return NotFound();
-    //            }
-
-    //            return View($"{DataObjectTypeName}Delete", dataObject);
-    //        }
-    //        catch (Exception ex)
-    //        {
-    //            Logger.LogError(ex, "Failed to return the Delete View for the {Type} using the {ID} ID.", DataObjectTypeName, integerID);
-    //            return Problem();
-    //        }
-    //    }
-
-    //    public virtual async Task<IActionResult> GetEditViewAsync(long? integerID)
-    //    {
-    //        try
-    //        {
-    //            if (integerID == null)
-    //            {
-    //                return NotFound();
-    //            }
-
-    //            T? dataObject = await DataLayer.GetSingleAsync(obj => obj.Integer64ID == integerID);
-
-    //            if (dataObject == null)
-    //            {
-    //                return NotFound();
-    //            }
-
-    //            return View($"{DataObjectTypeName}Edit", dataObject);
-    //        }
-    //        catch (Exception ex)
-    //        {
-    //            Logger.LogError(ex, "Failed to return the Edit View for the {Type} using the {ID} ID.", DataObjectTypeName, integerID);
-    //            return Problem();
-    //        }
-    //    }
-
-    /// <summary>
-    /// The method returns the add partial view.
-    /// </summary>
-    /// <returns>The partial view.</returns>
-    public virtual async Task<IActionResult> GetAddPartialAsync()
-    {
-        try
-        {
-            return await Task.FromResult(new PartialViewResult()
-            {
-                ViewData = ViewData,
-                ViewName = $"_{DataObjectTypeName}AddPartial",
-            });
-        }
-        catch (Exception ex)
-        {
-            Logger.LogError(ex, "Failed to return the Add Partial View for the {Type}.", DataObjectTypeName);
-            return Problem(detail: "Failed to find the Add Partial View.");
-        }
-    }
-
-    /// <summary>
-    /// The method returns the edit partial view.
-    /// </summary>
-    /// <param name="integerID">The id for the record.</param>
-    /// <returns>The partial view.</returns>
-    public virtual async Task<IActionResult> GetEditPartialAsync(long integerID)
-    {
-        try
-        {
-            T? dataObject = await DataLayer.GetSingleAsync(obj => obj.Integer64ID == integerID);
-
-            if (dataObject == null)
-            {
-                Logger.LogError("Failed to find the {ID} when fetching the Edit Partial View for the {Type}.", integerID, DataObjectTypeName);
-                return NotFound();
-            }
-
-            return await Task.FromResult(new PartialViewResult()
-            {
-                ViewData = new ViewDataDictionary<T>(ViewData, dataObject),
-                ViewName = $"_{DataObjectTypeName}EditPartial",
-            });
-        }
-        catch (Exception ex) 
-        {
-            Logger.LogError(ex, "Failed to return the Edit Partial View for the {Type}.", DataObjectTypeName);
-            return Problem(detail: "Failed to find the Edit View.");
-        }
-    }
-
-    ///// <summary>
-    ///// The method returns the edit partial view.
-    ///// </summary>
-    ///// <param name="stringID">The id for the record.</param>
-    ///// <returns>The partial view.</returns>
-    //public virtual async Task<IActionResult> GetEditPartialAsync(string stringID)
+    //[HttpPost]
+    ////[ValidateAntiForgeryToken]
+    //public virtual async Task<IActionResult> CreateAsync(T dataObject)
     //{
     //    try
     //    {
-    //        T? dataObject = await DataLayer.GetSingleAsync(obj => obj.StringID == stringID);
-
-    //        if (dataObject == null)
+    //        if (ModelState.IsValid)
     //        {
-    //            Logger.LogError("Failed to find the {ID} when fetching the Edit Partial View for the {Type}.", stringID, DataObjectTypeName);
-    //            return NotFound();
+    //            await DataLayer.CreateAsync(dataObject);
     //        }
 
-    //        return await Task.FromResult(new PartialViewResult()
-    //        {
-    //            ViewData = new ViewDataDictionary<T>(ViewData, dataObject),
-    //            ViewName = $"_{DataObjectTypeName}EditPartial",
-    //        });
+    //        return Json(dataObject);
+    //    }
+    //    catch (DataObjectValidationException ex)
+    //    {
+    //        ServerSideValidationResult serverSideValidationResult = new(ex.ValidationResults);
+    //        Logger.LogWarning(ex, "Failed to create the {Type} because of a server-side validation error.", DataObjectTypeName);
+    //        return BadRequest(serverSideValidationResult);
     //    }
     //    catch (Exception ex)
     //    {
-    //        Logger.LogError(ex, "Failed to return the Edit Partial View for the {Type}.", DataObjectTypeName);
-    //        return Problem(detail: "Failed to find the Edit View.");
+    //        Logger.LogError(ex, "Failed to create the {Type}.", DataObjectTypeName);
+    //        return Problem();
     //    }
     //}
 
-    /// <summary>
-    /// The method returns the index view.
-    /// </summary>
-    /// <returns>The index view.</returns>
-    public virtual async Task<IActionResult> IndexAsync()
-    {
-        try
-        {
-            List<T>? dataObjects = await DataLayer.GetAllAsync();
-            return View($"{DataObjectTypeName}Index", dataObjects);
-        }
-        catch (Exception ex)
-        {
-            Logger.LogError(ex, "Failed to return the Index View for the {Type}.", DataObjectTypeName);
-            return Problem();
-        }
-    }
+    //[HttpPost]
+    ////[HttpDelete]
+    ////[ValidateAntiForgeryToken]
+    //public virtual async Task<IActionResult> DeleteAsync(int key)
+    //{
+    //    try
+    //    {
+    //        T? dataObject = await DataLayer.GetSingleAsync(obj => obj.Integer64ID == key);
+
+    //        if (dataObject != null)
+    //        {
+    //            await DataLayer.DeleteAsync(dataObject);
+    //        }
+
+    //        return Ok();
+    //    }
+    //    catch (DataObjectDeleteConflictException ex)
+    //    {
+    //        Logger.LogError(ex, "Failed to delete the {ID} {Type} because of a data conflict.", key, DataObjectTypeName);
+    //        return Conflict();
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        Logger.LogError(ex, "Failed to delete the {ID} {Type}.", key, DataObjectTypeName);
+    //        return Problem();
+    //    }
+    //}
 
     //[HttpPut]
     ////[ValidateAntiForgeryToken]
@@ -325,4 +144,172 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
     //        return Problem();
     //    }
     //}
+
+    /// <summary>
+    /// The method returns the add partial view.
+    /// </summary>
+    /// <returns>The add partial view.</returns>
+    public virtual async Task<IActionResult> GetAddPartialViewAsync()
+    {
+        try
+        {
+            PartialViewResult partialViewResult = PartialView($"_{DataObjectTypeName}AddPartial");
+            return await Task.FromResult(partialViewResult);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Failed to return the Add Partial View for the {Type}.", DataObjectTypeName);
+            return Problem(detail: "Failed to find the Add Partial View.");
+        }
+    }
+
+    /// <summary>
+    /// The method returns the add view.
+    /// </summary>
+    /// <returns>The add view.</returns>
+    public virtual async Task<IActionResult> GetAddViewAsync()
+    {
+        try
+        {
+            ViewResult viewResult = View($"{DataObjectTypeName}Add");
+            return await Task.FromResult(viewResult);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Failed to return the Add View for the {Type}.", DataObjectTypeName);
+            return Problem(detail: "Failed to find the Add View.");
+        }
+    }
+
+    /// <summary>
+    /// The method returns the edit partial view.
+    /// </summary>
+    /// <param name="integerID">The id for the record.</param>
+    /// <returns>The edit partial view.</returns>
+    //[HttpGet("GetEditPartial/{integerID}:long")]
+    public virtual async Task<IActionResult> GetEditPartialViewAsync(long integerID)
+    {
+        try
+        {
+            T? dataObject = await DataLayer.GetSingleAsync(obj => obj.Integer64ID == integerID);
+
+            if (dataObject == null)
+            {
+                Logger.LogError("Failed to find the {ID} when fetching the Edit Partial View for the {Type}.", integerID, DataObjectTypeName);
+                return NotFound();
+            }
+
+            return new PartialViewResult()
+            {
+                ViewData = new ViewDataDictionary<T>(ViewData, dataObject),
+                ViewName = $"_{DataObjectTypeName}EditPartial",
+            };
+        }
+        catch (Exception ex) 
+        {
+            Logger.LogError(ex, "Failed to return the Edit Partial View for the {Type}.", DataObjectTypeName);
+            return Problem(detail: "Failed to find the Edit View.");
+        }
+    }
+
+    ///// <summary>
+    ///// The method returns the edit partial view.
+    ///// </summary>
+    ///// <param name="stringID">The id for the record.</param>
+    ///// <returns>The edit partial view.</returns>
+    //[HttpGet("GetEditPartial/{stringID}")]
+    //public virtual async Task<IActionResult> GetEditPartialViewAsync(string stringID)
+    //{
+    //    try
+    //    {
+    //        T? dataObject = await DataLayer.GetSingleAsync(obj => obj.StringID == stringID);
+
+    //        if (dataObject == null)
+    //        {
+    //            Logger.LogError("Failed to find the {ID} when fetching the Edit Partial View for the {Type}.", stringID, DataObjectTypeName);
+    //            return NotFound();
+    //        }
+
+    //        return new PartialViewResult()
+    //        {
+    //            ViewData = new ViewDataDictionary<T>(ViewData, dataObject),
+    //            ViewName = $"_{DataObjectTypeName}EditPartial",
+    //        };
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        Logger.LogError(ex, "Failed to return the Edit Partial View for the {Type}.", DataObjectTypeName);
+    //        return Problem(detail: "Failed to find the Edit View.");
+    //    }
+    //}
+
+    /// <summary>
+    /// The method returns the edit view.
+    /// </summary>
+    /// <param name="integerID">The id for the record.</param>
+    /// <returns>The edit view.</returns>
+    public virtual async Task<IActionResult> GetEditViewAsync(long integerID)
+    {
+        try
+        {
+            T? dataObject = await DataLayer.GetSingleAsync(obj => obj.Integer64ID == integerID);
+
+            if (dataObject == null)
+            {
+                Logger.LogError("Failed to find the {ID} when fetching the Edit View for the {Type}.", integerID, DataObjectTypeName);
+                return NotFound();
+            }
+
+            return View($"{DataObjectTypeName}Edit", dataObject);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Failed to return the Edit View for the {Type} using the {ID} ID.", DataObjectTypeName, integerID);
+            return Problem(detail: "Failed to find the Edit View.");
+        }
+    }
+
+    ///// <summary>
+    ///// The method returns the edit view.
+    ///// </summary>
+    ///// <param name="stringID">The id for the record.</param>
+    ///// <returns>The edit view.</returns>
+    //public virtual async Task<IActionResult> GetEditViewAsync(string stringID)
+    //{
+    //    try
+    //    {
+    //        T? dataObject = await DataLayer.GetSingleAsync(obj => obj.StringID == stringID);
+
+    //        if (dataObject == null)
+    //        {
+    //            Logger.LogError("Failed to find the {ID} when fetching the Edit View for the {Type}.", stringID, DataObjectTypeName);
+    //            return NotFound();
+    //        }
+
+    //        return View($"{DataObjectTypeName}Edit", dataObject);
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        Logger.LogError(ex, "Failed to return the Edit View for the {Type} using the {ID} ID.", DataObjectTypeName, stringID);
+    //        return Problem(detail: "Failed to find the Edit View.");
+    //    }
+    //}
+
+    /// <summary>
+    /// The method returns the index view.
+    /// </summary>
+    /// <returns>The index view.</returns>
+    public virtual async Task<IActionResult> IndexAsync()
+    {
+        try
+        {
+            List<T>? dataObjects = await DataLayer.GetAllAsync();
+            return View($"{DataObjectTypeName}Index", dataObjects);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Failed to return the Index View for the {Type}.", DataObjectTypeName);
+            return Problem();
+        }
+    }
 }
