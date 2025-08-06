@@ -8,9 +8,6 @@ using Microsoft.Extensions.Logging;
 namespace JMayer.Web.Mvc.Controller;
 
 #warning I need to figure out if a User Editable and Sub User Editable needs to exist.
-#warning I need to figure out a standard for CUD actions.
-
-#warning I had to create a Syncfusion controller in the example project but at the very least, I believe I can have a standard for fetching views (index, add & edit; not sure if delete is needed).
 
 /// <summary>
 /// 
@@ -22,19 +19,24 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
     where U : Data.Database.DataLayer.IStandardCRUDDataLayer<T>
 {
     /// <summary>
+    /// The constant for the conflict message key.
+    /// </summary>
+    protected const string ConflictMessageKey = "ConflictMessage";
+
+    /// <summary>
     /// The data layer the controller will interact with.
     /// </summary>
     protected readonly Data.Database.DataLayer.IStandardCRUDDataLayer<T> DataLayer;
 
     /// <summary>
-    /// The logger the controller will interact with.
-    /// </summary>
-    protected readonly ILogger Logger;
-
-    /// <summary>
     /// The name of the data object.
     /// </summary>
     protected readonly string DataObjectTypeName = typeof(T).Name;
+
+    /// <summary>
+    /// The logger the controller will interact with.
+    /// </summary>
+    protected readonly ILogger Logger;
 
     /// <summary>
     /// The dependency injection constructor.
@@ -51,96 +53,116 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
         Logger = logger;
     }
 
-    //[HttpPost]
-    ////[ValidateAntiForgeryToken]
-    //public virtual async Task<IActionResult> CreateAsync(T dataObject)
-    //{
-    //    try
-    //    {
-    //        if (ModelState.IsValid)
-    //        {
-    //            await DataLayer.CreateAsync(dataObject);
-    //        }
+    /// <summary>
+    /// The method creates a data object using the data layer.
+    /// </summary>
+    /// <param name="dataObject">The data object.</param>
+    /// <returns>The created data object or a negative status code.</returns>
+    [HttpPost]
+    public virtual async Task<IActionResult> CreateAsync([FromBody] T dataObject)
+    {
+        try
+        {
+            if (ModelState.IsValid)
+            {
+                await DataLayer.CreateAsync(dataObject);
+                Logger.LogInformation("The {Type} was successfully created.", DataObjectTypeName);
+                return Json(dataObject);
+            }
+            else
+            {
+                Logger.LogWarning("Failed to create the {Type} because of a model validation error.", DataObjectTypeName);
+                return ValidationProblem(ModelState);
+            }
+        }
+        catch (DataObjectValidationException ex)
+        {
+            ServerSideValidationResult serverSideValidationResult = new(ex.ValidationResults);
+            Logger.LogWarning(ex, "Failed to create the {Type} because of a server-side validation error.", DataObjectTypeName);
+            return BadRequest(serverSideValidationResult);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Failed to create the {Type}.", DataObjectTypeName);
+            return Problem(detail: "Failed to create the record because of an error on the server.");
+        }
+    }
 
-    //        return Json(dataObject);
-    //    }
-    //    catch (DataObjectValidationException ex)
-    //    {
-    //        ServerSideValidationResult serverSideValidationResult = new(ex.ValidationResults);
-    //        Logger.LogWarning(ex, "Failed to create the {Type} because of a server-side validation error.", DataObjectTypeName);
-    //        return BadRequest(serverSideValidationResult);
-    //    }
-    //    catch (Exception ex)
-    //    {
-    //        Logger.LogError(ex, "Failed to create the {Type}.", DataObjectTypeName);
-    //        return Problem();
-    //    }
-    //}
+    /// <summary>
+    /// The method deletes a data object using the data layer.
+    /// </summary>
+    /// <param name="id">The id to delete.</param>
+    /// <returns>The deleted data object or a negative status code.</returns>
+    [HttpPost("[controller]/Delete/{id:long}")]
+    [HttpDelete("[controller]/{id:long}")]
+    public virtual async Task<IActionResult> DeleteAsync(long id)
+    {
+        try
+        {
+            T? dataObject = await DataLayer.GetSingleAsync(obj => obj.Integer64ID == id);
 
-    //[HttpPost]
-    ////[HttpDelete]
-    ////[ValidateAntiForgeryToken]
-    //public virtual async Task<IActionResult> DeleteAsync(int key)
-    //{
-    //    try
-    //    {
-    //        T? dataObject = await DataLayer.GetSingleAsync(obj => obj.Integer64ID == key);
+            if (dataObject is null)
+            {
+                Logger.LogWarning("The {ID} for the {Type} was not found.", id.ToString(), DataObjectTypeName);
+                return NotFound();
+            }
+            else
+            {
+                await DataLayer.DeleteAsync(dataObject);
+                Logger.LogInformation("The {ID} for the {Type} was successfully deleted.", id.ToString(), DataObjectTypeName);
+                return Json(dataObject);
+            }
+        }
+        catch (DataObjectDeleteConflictException ex)
+        {
+            ModelState.AddModelError(ConflictMessageKey, "The record has a dependency that prevents it from being deleted.");
+            Logger.LogError(ex, "Failed to delete the {Key} {Type} because of a data conflict.", id.ToString(), DataObjectTypeName);
+            return Conflict(ModelState);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Failed to delete the {Key} {Type}.", id.ToString(), DataObjectTypeName);
+            return Problem(detail: "Failed to delete the record because of an error on the server.");
+        }
+    }
 
-    //        if (dataObject != null)
-    //        {
-    //            await DataLayer.DeleteAsync(dataObject);
-    //        }
+    /// <summary>
+    /// The method deletes a data object using the data layer.
+    /// </summary>
+    /// <param name="id">The id to delete.</param>
+    /// <returns>The deleted data object or a negative status code.</returns>
+    [HttpPost("[controller]/Delete/{id}")]
+    [HttpDelete("[controller]/{id}")]
+    public virtual async Task<IActionResult> DeleteAsync(string id)
+    {
+        try
+        {
+            T? dataObject = await DataLayer.GetSingleAsync(obj => obj.StringID == id);
 
-    //        return Ok();
-    //    }
-    //    catch (DataObjectDeleteConflictException ex)
-    //    {
-    //        Logger.LogError(ex, "Failed to delete the {ID} {Type} because of a data conflict.", key, DataObjectTypeName);
-    //        return Conflict();
-    //    }
-    //    catch (Exception ex)
-    //    {
-    //        Logger.LogError(ex, "Failed to delete the {ID} {Type}.", key, DataObjectTypeName);
-    //        return Problem();
-    //    }
-    //}
-
-    //[HttpPut]
-    ////[ValidateAntiForgeryToken]
-    //public virtual async Task<IActionResult> UpdateAsync(long? integerID, T dataObject)
-    //{
-    //    try
-    //    {
-    //        if (integerID != dataObject.Integer64ID)
-    //        {
-    //            return NotFound();
-    //        }
-
-    //        if (ModelState.IsValid)
-    //        {
-    //            await DataLayer.UpdateAsync(dataObject);
-    //            return RedirectToAction($"{DataObjectTypeName}Index");
-    //        }
-
-    //        return View(dataObject);
-    //    }
-    //    catch (DataObjectUpdateConflictException ex)
-    //    {
-    //        Logger.LogWarning(ex, "Failed to update {Type} because the data was considered old.", DataObjectTypeName);
-    //        return Conflict();
-    //    }
-    //    catch (DataObjectValidationException ex)
-    //    {
-    //        ServerSideValidationResult serverSideValidationResult = new(ex.ValidationResults);
-    //        Logger.LogWarning(ex, "Failed to update the {Type} because of a server-side validation error.", DataObjectTypeName);
-    //        return BadRequest(serverSideValidationResult);
-    //    }
-    //    catch (Exception ex)
-    //    {
-    //        Logger.LogError(ex, "Failed to update the {Type}.", DataObjectTypeName);
-    //        return Problem();
-    //    }
-    //}
+            if (dataObject is null)
+            {
+                Logger.LogWarning("The {ID} for the {Type} was not found.", id, DataObjectTypeName);
+                return NotFound();
+            }
+            else
+            {
+                await DataLayer.DeleteAsync(dataObject);
+                Logger.LogInformation("The {ID} for the {Type} was successfully deleted.", id, DataObjectTypeName);
+                return Json(dataObject);
+            }
+        }
+        catch (DataObjectDeleteConflictException ex)
+        {
+            ModelState.AddModelError(ConflictMessageKey, "The record has a dependency that prevents it from being deleted.");
+            Logger.LogError(ex, "Failed to delete the {ID} {Type} because of a data conflict.", id, DataObjectTypeName);
+            return Conflict(ModelState);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Failed to delete the {ID} {Type}.", id, DataObjectTypeName);
+            return Problem(detail: "Failed to delete the record because of an error on the server.");
+        }
+    }
 
     /// <summary>
     /// The method returns the add partial view.
@@ -190,7 +212,7 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
         {
             T? dataObject = await DataLayer.GetSingleAsync(obj => obj.Integer64ID == id);
 
-            if (dataObject == null)
+            if (dataObject is null)
             {
                 Logger.LogError("Failed to find the {ID} when fetching the Edit Partial View for the {Type}.", id, DataObjectTypeName);
                 return NotFound();
@@ -221,7 +243,7 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
         {
             T? dataObject = await DataLayer.GetSingleAsync(obj => obj.StringID == id);
 
-            if (dataObject == null)
+            if (dataObject is null)
             {
                 Logger.LogError("Failed to find the {ID} when fetching the Edit Partial View for the {Type}.", id, DataObjectTypeName);
                 return NotFound();
@@ -252,7 +274,7 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
         {
             T? dataObject = await DataLayer.GetSingleAsync(obj => obj.Integer64ID == id);
 
-            if (dataObject == null)
+            if (dataObject is null)
             {
                 Logger.LogError("Failed to find the {ID} when fetching the Edit View for the {Type}.", id, DataObjectTypeName);
                 return NotFound();
@@ -309,6 +331,55 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
         {
             Logger.LogError(ex, "Failed to return the Index View for the {Type}.", DataObjectTypeName);
             return Problem();
+        }
+    }
+
+    /// <summary>
+    /// The method updates a data object using the data layer.
+    /// </summary>
+    /// <param name="dataObject">The data object.</param>
+    /// <returns>The updated data object or a negative status code.</returns>
+    [HttpPost]
+    [HttpPut]
+    public virtual async Task<IActionResult> UpdateAsync([FromBody] T dataObject)
+    {
+        string id = string.IsNullOrEmpty(dataObject.StringID) ? dataObject.Integer64ID.ToString() : dataObject.StringID;
+
+        try
+        {
+            if (ModelState.IsValid)
+            {
+                dataObject = await DataLayer.UpdateAsync(dataObject);
+                Logger.LogInformation("The {ID} for the {Type} was successfully updated.", id, DataObjectTypeName);
+                return Json(dataObject);
+            }
+            else
+            {
+                Logger.LogWarning("Failed to update the {ID} {Type} because of a model validation error.", id, DataObjectTypeName);
+                return ValidationProblem(ModelState);
+            }
+        }
+        catch (DataObjectUpdateConflictException ex)
+        {
+            ModelState.AddModelError(ConflictMessageKey, "The submitted data was detected to be out of date; please refresh the page and try again.");
+            Logger.LogWarning(ex, "Failed to update {ID} {Type} because the data was considered old.", id, DataObjectTypeName);
+            return Conflict(ModelState);
+        }
+        catch (DataObjectValidationException ex)
+        {
+            ServerSideValidationResult serverSideValidationResult = new(ex.ValidationResults);
+            Logger.LogWarning(ex, "Failed to update the {ID} {Type} because of a server-side validation error.", id, DataObjectTypeName);
+            return BadRequest(serverSideValidationResult);
+        }
+        catch (IDNotFoundException ex)
+        {
+            Logger.LogWarning(ex, "Failed to update the {ID} {Type} because it was not found.", id, DataObjectTypeName);
+            return NotFound(dataObject);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Failed to update the {Type} for {ID}.", DataObjectTypeName, id);
+            return Problem(detail: "Failed to update the record because of an error on the server.");
         }
     }
 }
