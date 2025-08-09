@@ -10,10 +10,10 @@ namespace JMayer.Web.Mvc.Controller;
 #warning I need to figure out if a User Editable and Sub User Editable needs to exist.
 
 /// <summary>
-/// 
+/// The class manages HTTP view and action requests associated with a data object and a data layer.
 /// </summary>
-/// <typeparam name="T"></typeparam>
-/// <typeparam name="U"></typeparam>
+/// <typeparam name="T">Must be a DataObject since the data layer requires this.</typeparam>
+/// <typeparam name="U">Must be an IStandardCRUDDataLayer so the controller can interact with the collection/table associated with it.</typeparam>
 public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Controller
     where T : DataObject
     where U : Data.Database.DataLayer.IStandardCRUDDataLayer<T>
@@ -292,18 +292,18 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
     /// <summary>
     /// The method returns the edit view.
     /// </summary>
-    /// <param name="stringID">The id for the record.</param>
+    /// <param name="id">The id for the record.</param>
     /// <returns>The edit view or a negative status code.</returns>
     [HttpGet("[controller]/GetEditView/{id}")]
-    public virtual async Task<IActionResult> GetEditViewAsync(string stringID)
+    public virtual async Task<IActionResult> GetEditViewAsync(string id)
     {
         try
         {
-            T? dataObject = await DataLayer.GetSingleAsync(obj => obj.StringID == stringID);
+            T? dataObject = await DataLayer.GetSingleAsync(obj => obj.StringID == id);
 
             if (dataObject == null)
             {
-                Logger.LogError("Failed to find the {ID} when fetching the Edit View for the {Type}.", stringID, DataObjectTypeName);
+                Logger.LogError("Failed to find the {ID} when fetching the Edit View for the {Type}.", id, DataObjectTypeName);
                 return NotFound();
             }
 
@@ -311,7 +311,7 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Failed to return the Edit View for the {Type} using the {ID} ID.", DataObjectTypeName, stringID);
+            Logger.LogError(ex, "Failed to return the Edit View for the {Type} using the {ID} ID.", DataObjectTypeName, id);
             return Problem(detail: "Failed to find the Edit View.");
         }
     }
