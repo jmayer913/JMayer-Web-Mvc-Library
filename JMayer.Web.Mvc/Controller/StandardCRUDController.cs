@@ -10,6 +10,7 @@ using System.Net;
 #warning In the asp.net core mvc examples, it returns NotFound() when an id doesn't exist. I like it better than returning a null object for GetSingle() and it's better than returning a server error for Update().
 #warning Problem() has the option to set details and other options which is returned as an object. I like the idea of returning an error message to the client and the HTTP data layer returning that error in the OperationResult object.
 #warning I see Conflict() takes in an object and I like the idea of it returning a message with why it returned a conflict. I see it also takes in a ModelState; maybe that should be used instead of 
+#warning Logging in Update should include the ID.
 
 #warning I'm thinking of abandoning the ServerSideValidationResult object since asp.net core already utilizes the ModelStateDictionary and ValidationProblemDetails objects.
 

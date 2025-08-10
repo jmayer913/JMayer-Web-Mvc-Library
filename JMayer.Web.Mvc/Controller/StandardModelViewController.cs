@@ -19,11 +19,6 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
     where U : Data.Database.DataLayer.IStandardCRUDDataLayer<T>
 {
     /// <summary>
-    /// The constant for the conflict message key.
-    /// </summary>
-    protected const string ConflictMessageKey = "ConflictMessage";
-
-    /// <summary>
     /// The data layer the controller will interact with.
     /// </summary>
     protected readonly Data.Database.DataLayer.IStandardCRUDDataLayer<T> DataLayer;
@@ -104,7 +99,7 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
             if (dataObject is null)
             {
                 Logger.LogWarning("The {ID} for the {Type} was not found.", id.ToString(), DataObjectTypeName);
-                return NotFound();
+                return NotFound(new { UserMessage = "The record was not found; please refresh the page because another user may have deleted it." });
             }
             else
             {
@@ -115,9 +110,8 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
         }
         catch (DataObjectDeleteConflictException ex)
         {
-            ModelState.AddModelError(ConflictMessageKey, "The record has a dependency that prevents it from being deleted.");
             Logger.LogError(ex, "Failed to delete the {Key} {Type} because of a data conflict.", id.ToString(), DataObjectTypeName);
-            return Conflict(ModelState);
+            return Conflict(new { UserMessage = "The record has a dependency that prevents it from being deleted." });
         }
         catch (Exception ex)
         {
@@ -142,7 +136,7 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
             if (dataObject is null)
             {
                 Logger.LogWarning("The {ID} for the {Type} was not found.", id, DataObjectTypeName);
-                return NotFound();
+                return NotFound(new { UserMessage = "The record was not found; please refresh the page because another user may have deleted it." });
             }
             else
             {
@@ -153,9 +147,8 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
         }
         catch (DataObjectDeleteConflictException ex)
         {
-            ModelState.AddModelError(ConflictMessageKey, "The record has a dependency that prevents it from being deleted.");
             Logger.LogError(ex, "Failed to delete the {ID} {Type} because of a data conflict.", id, DataObjectTypeName);
-            return Conflict(ModelState);
+            return Conflict(new { UserMessage = "The record has a dependency that prevents it from being deleted." });
         }
         catch (Exception ex)
         {
@@ -215,7 +208,7 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
             if (dataObject is null)
             {
                 Logger.LogError("Failed to find the {ID} when fetching the Edit Partial View for the {Type}.", id, DataObjectTypeName);
-                return NotFound();
+                return NotFound(new { UserMessage = "The record was not found; please refresh the page because another user may have deleted it." });
             }
 
             return new PartialViewResult()
@@ -246,7 +239,7 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
             if (dataObject is null)
             {
                 Logger.LogError("Failed to find the {ID} when fetching the Edit Partial View for the {Type}.", id, DataObjectTypeName);
-                return NotFound();
+                return NotFound(new { UserMessage = "The record was not found; please refresh the page because another user may have deleted it." });
             }
 
             return new PartialViewResult()
@@ -277,7 +270,7 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
             if (dataObject is null)
             {
                 Logger.LogError("Failed to find the {ID} when fetching the Edit View for the {Type}.", id, DataObjectTypeName);
-                return NotFound();
+                return NotFound(new { UserMessage = "The record was not found; please refresh the page because another user may have deleted it." });
             }
 
             return View($"{DataObjectTypeName}Edit", dataObject);
@@ -304,7 +297,7 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
             if (dataObject == null)
             {
                 Logger.LogError("Failed to find the {ID} when fetching the Edit View for the {Type}.", id, DataObjectTypeName);
-                return NotFound();
+                return NotFound(new { UserMessage = "The record was not found; please refresh the page because another user may have deleted it." });
             }
 
             return View($"{DataObjectTypeName}Edit", dataObject);
@@ -361,9 +354,8 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
         }
         catch (DataObjectUpdateConflictException ex)
         {
-            ModelState.AddModelError(ConflictMessageKey, "The submitted data was detected to be out of date; please refresh the page and try again.");
             Logger.LogWarning(ex, "Failed to update {ID} {Type} because the data was considered old.", id, DataObjectTypeName);
-            return Conflict(ModelState);
+            return Conflict(new { UserMessage = "The submitted data was detected to be out of date; please refresh the page and try again." });
         }
         catch (DataObjectValidationException ex)
         {
@@ -374,7 +366,7 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
         catch (IDNotFoundException ex)
         {
             Logger.LogWarning(ex, "Failed to update the {ID} {Type} because it was not found.", id, DataObjectTypeName);
-            return NotFound(dataObject);
+            return NotFound(new { UserMessage = "The record was not found; please refresh the page because another user may have deleted it." });
         }
         catch (Exception ex)
         {
