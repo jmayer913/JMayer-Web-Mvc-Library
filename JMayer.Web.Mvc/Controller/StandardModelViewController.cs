@@ -7,10 +7,13 @@ using Microsoft.Extensions.Logging;
 
 namespace JMayer.Web.Mvc.Controller;
 
-#warning Figure out how the controllers should handle errors for vanilla mvc. It probably needs to redirect to a view.
-
 /// <summary>
 /// The class manages HTTP view and action requests associated with a data object and a data layer.
+/// <br/>
+/// <br/>
+/// Properties dictate if the controller uses the MVC pattern (redirects or returning views with the model state) or 
+/// Ajax pattern (returning json) to be processed by javascript. The default functionality is the MVC pattern and you 
+/// can switch what you need to the Ajax pattern in the constructor of your child class.
 /// </summary>
 /// <typeparam name="T">Must be a DataObject since the data layer requires this.</typeparam>
 /// <typeparam name="U">Must be an IStandardCRUDDataLayer so the controller can interact with the collection/table associated with it.</typeparam>
@@ -18,6 +21,24 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
     where T : DataObject
     where U : IStandardCRUDDataLayer<T>
 {
+    /// <summary>
+    /// The property gets/sets the name of the conflict action.
+    /// </summary>
+    /// <remarks>
+    /// The default is Conflict but if you need to change it then in the constructor of your child class,
+    /// set this property to the name you need.
+    /// </remarks>
+    protected string ConflictActionName { get; init; } = "Conflict";
+
+    /// <summary>
+    /// The property gets/sets the name of the conflict controller.
+    /// </summary>
+    /// <remarks>
+    /// The default is Home but if you need to change it then in the constructor of your child class,
+    /// set this property to the name you need.
+    /// </remarks>
+    protected string ConflictControllerName { get; init; } = "Home";
+
     /// <summary>
     /// The data layer the controller will interact with.
     /// </summary>
@@ -29,18 +50,108 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
     protected string DataObjectTypeName { get; private init; } = typeof(T).Name;
 
     /// <summary>
+    /// The property gets/sets the name of the error action.
+    /// </summary>
+    /// <remarks>
+    /// The default is Error but if you need to change it then in the constructor of your child class,
+    /// set this property to the name you need.
+    /// </remarks>
+    protected string ErrorActionName { get; init; } = "Error";
+
+    /// <summary>
+    /// The property gets/sets the name of the error controller.
+    /// </summary>
+    /// <remarks>
+    /// The default is Home but if you need to change it then in the constructor of your child class,
+    /// set this property to the name you need.
+    /// </remarks>
+    protected string ErrorControllerName { get; init; } = "Home";
+
+    /// <summary>
+    /// The property gets/sets if the controller redirects on a data conflict.
+    /// </summary>
+    /// <remarks>
+    /// The default functionality is to do a redirect but if you need to return a 409 conflict with a user message
+    /// then in the constructor of your child class, set this property to false.
+    /// <br/>
+    /// <br/>
+    /// When a general exception is thrown in an action, the controller will redirect to the Home controller for the Conflict action
+    /// with a user message in the route. This allows you to accept the message as a string and display it if need be. If a different 
+    /// controller and/or action is needed, set the ConflictActionName and ConflictControllerName properties to what you need in the constructor 
+    /// of your child class.
+    /// </remarks>
+    protected bool IsActionRedirectedOnConflict { get; init; } = true;
+
+    /// <summary>
+    /// The property gets/sets if the controller redirects on error.
+    /// </summary>
+    /// <remarks>
+    /// The default functionality is to do a redirect but if you need to return a 500 internal server error with problem details 
+    /// then in the constructor of your child class, set this property to false.
+    /// <br/>
+    /// <br/>
+    /// When a general exception is thrown in an action, the controller will redirect to the Home controller for the Error action
+    /// with a user message in the route. This allows you to accept the message as a string and display it if need be. If a different 
+    /// controller and/or action is needed, set the ErrorActionName and ErrorControllerName properties to what you need in the constructor 
+    /// of your child class.
+    /// </remarks>
+    protected bool IsActionRedirectedOnError { get; init; } = true;
+
+    /// <summary>
+    /// The property gets/sets if the controller redirects when a data object is not found.
+    /// </summary>
+    /// <remarks>
+    /// The default functionality is to do a redirect but if you need to return a 404 not found with a user message
+    /// then in the constructor of your child class, set this property to false.
+    /// <br/>
+    /// <br/>
+    /// When a general exception is thrown in an action, the controller will redirect to the Home controller for the NotFound action
+    /// with a user message in the route. This allows you to accept the message as a string and display it if need be. If a different 
+    /// controller and/or action is needed, set the NotFoundActionName and NotFoundControllerName properties to what you need in the 
+    /// constructor of your child class.
+    /// </remarks>
+    protected bool IsActionRedirectedOnNotFound { get; init; } = true;
+
+    /// <summary>
+    /// The property gets/sets if the controller redirects a CUD (Create, Delete or Update) action on success to the Index view.
+    /// </summary>
+    /// <remarks>
+    /// The default functionality is to do a redirect but if you need to return json then in the constructor of your child class, 
+    /// set this property to false.
+    /// </remarks>
+    protected bool IsCUDActionRedirectedOnSuccess { get; init; } = true;
+
+    /// <summary>
     /// The logger the controller will interact with.
     /// </summary>
     protected ILogger Logger { get; private init; }
 
     /// <summary>
-    /// The property gets/sets if the controller returns json for an action (Create, Delete or Update) and for any errors.
+    /// The property gets/sets the name of the not found action.
     /// </summary>
     /// <remarks>
-    /// The default functionality is to do a redirect but if you need to return json because of a third party library
-    /// then in the constructor of your child class, set this property to true.
+    /// The default is NotFound but if you need to change it then in the constructor of your child class,
+    /// set this property to the name you need.
     /// </remarks>
-    protected bool ReturnJson { get; init; }
+    protected string NotFoundActionName { get; init; } = "NotFound";
+
+    /// <summary>
+    /// The property gets/sets the name of the not found controller.
+    /// </summary>
+    /// <remarks>
+    /// The default is Home but if you need to change it then in the constructor of your child class,
+    /// set this property to the name you need.
+    /// </remarks>
+    protected string NotFoundControllerName { get; init; } = "Home";
+
+    /// <summary>
+    /// The property gets/sets what the controller will do when the model fails server-side validation.
+    /// </summary>
+    /// <remarks>
+    /// The default functionality is to return the view associated with the action but if you need a different action (partial view or
+    /// 400 bad request with a model state dictionary) then in the constructor of your child class, set this property the action you need.
+    /// </remarks>
+    protected ValidationFailedAction ValidationFailedAction { get; init; }
 
     /// <summary>
     /// The dependency injection constructor.
@@ -72,14 +183,13 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
         {
             Logger.LogError(ex, "Failed to return the Add Partial View for the {Type}.", DataObjectTypeName);
 
-            if (ReturnJson)
+            if (IsActionRedirectedOnError)
             {
-                return Problem(detail: "Failed to find the Add Partial View.");
+                return RedirectToAction(ErrorActionName, ErrorControllerName, new { UserMessage = "Failed to find the Add Partial View because of an error on the server" });
             }
             else
             {
-                //TO DO: Figure out what view is returned when an error occurs for retrieving a partial view.
-                return View();
+                return Problem(detail: "Failed to find the Add Partial View because of an error on the server.");
             }
         }
     }
@@ -99,14 +209,13 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
         {
             Logger.LogError(ex, "Failed to return the Add View for the {Type}.", DataObjectTypeName);
 
-            if (ReturnJson)
+            if (IsActionRedirectedOnError)
             {
-                return Problem(detail: "Failed to find the Add View.");
+                return RedirectToAction(ErrorActionName, ErrorControllerName, new { UserMessage = "Failed to find the Add View because of an error on the server." });
             }
             else
             {
-                //TO DO: Figure out what view is returned when an error occurs for retrieving a view.
-                return View();
+                return Problem(detail: "Failed to find the Add View because of an error on the server.");
             }
         }
     }
@@ -126,39 +235,56 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
                 await DataLayer.CreateAsync(dataObject);
                 Logger.LogInformation("The {Type} was successfully created.", DataObjectTypeName);
 
-                if (ReturnJson)
+                if (IsCUDActionRedirectedOnSuccess)
                 {
-                    return Json(dataObject);
+                    return RedirectToAction(nameof(Index));
                 }
                 else
                 {
-                    return RedirectToAction(nameof(Index));
+                    return Json(dataObject);
                 }
             }
             else
             {
                 Logger.LogWarning("Failed to create the {Type} because of a model validation error.", DataObjectTypeName);
-                return ValidationProblem(ModelState);
+                return ValidationFailedAction switch
+                {
+                    ValidationFailedAction.ReturnView => View($"{DataObjectTypeName}Add", dataObject),
+                    ValidationFailedAction.ReturnPartialView => new PartialViewResult()
+                    {
+                        ViewData = new ViewDataDictionary<T>(ViewData, dataObject),
+                        ViewName = $"_{DataObjectTypeName}AddPartial",
+                    },
+                    _ => ValidationProblem(ModelState)
+                };
             }
         }
         catch (DataObjectValidationException ex)
         {
-            ex.CopyToModelState(ModelState);
             Logger.LogWarning(ex, "Failed to create the {Type} because of a server-side validation error.", DataObjectTypeName);
-            return ValidationProblem(ModelState);
+            ex.CopyToModelState(ModelState);
+            return ValidationFailedAction switch
+            {
+                ValidationFailedAction.ReturnView => View($"{DataObjectTypeName}Add", dataObject),
+                ValidationFailedAction.ReturnPartialView => new PartialViewResult()
+                {
+                    ViewData = new ViewDataDictionary<T>(ViewData, dataObject),
+                    ViewName = $"_{DataObjectTypeName}AddPartial",
+                },
+                _ => ValidationProblem(ModelState)
+            };
         }
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to create the {Type}.", DataObjectTypeName);
 
-            if (ReturnJson)
+            if (IsActionRedirectedOnError)
             {
-                return Problem(detail: "Failed to create the record because of an error on the server.");
+                return RedirectToAction(ErrorActionName, ErrorControllerName, new { UserMessage = "Failed to create the record because of an error on the server." });
             }
             else
             {
-                //TO DO: Figure out what view is returned when an error occurs creating a data object.
-                return View();
+                return Problem(detail: "Failed to create the record because of an error on the server.");
             }
         }
     }
@@ -178,20 +304,28 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
             if (dataObject is null)
             {
                 Logger.LogWarning("The {ID} for the {Type} was not found so no delete occurred.", id.ToString(), DataObjectTypeName);
-                return NotFound(new { UserMessage = "The record was not found; please refresh the page because another user may have deleted it." });
+
+                if (IsActionRedirectedOnNotFound)
+                {
+                    return RedirectToAction(NotFoundActionName, NotFoundControllerName, new { UserMessage = "The record was not found; another user may have deleted it." });
+                }
+                else
+                {
+                    return NotFound(new { UserMessage = "The record was not found; please refresh the page because another user may have deleted it." });
+                }
             }
             else
             {
                 await DataLayer.DeleteAsync(dataObject);
                 Logger.LogInformation("The {ID} for the {Type} was successfully deleted.", id.ToString(), DataObjectTypeName);
 
-                if (ReturnJson)
+                if (IsCUDActionRedirectedOnSuccess)
                 {
-                    return Json(dataObject);
+                    return RedirectToAction(nameof(Index));
                 }
                 else
                 {
-                    return RedirectToAction(nameof(Index));
+                    return Json(dataObject);
                 }
             }
         }
@@ -199,28 +333,26 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
         {
             Logger.LogError(ex, "Failed to delete the {ID} {Type} because of a data conflict.", id.ToString(), DataObjectTypeName);
 
-            if (ReturnJson)
+            if (IsActionRedirectedOnConflict)
             {
-                return Conflict(new { UserMessage = "The record has a dependency that prevents it from being deleted." });
+                return RedirectToAction(ConflictActionName, ConflictControllerName, new { UserMessage = "The record has a dependency that prevents it from being deleted; the dependency needs to be deleted first." });
             }
             else
             {
-                //TO DO: Figure out what view is returned when a delete conflict occurs.
-                return View();
+                return Conflict(new { UserMessage = "The record has a dependency that prevents it from being deleted; the dependency needs to be deleted first." });
             }
         }
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to delete the {ID} {Type}.", id.ToString(), DataObjectTypeName);
 
-            if (ReturnJson)
+            if (IsActionRedirectedOnError)
             {
-                return Problem(detail: "Failed to delete the record because of an error on the server.");
+                return RedirectToAction(ErrorActionName, ErrorControllerName, new { UserMessage = "Failed to delete the record because of an error on the server." });
             }
             else
             {
-                //TO DO: Figure out what view is returned when an error occurs deleting a data object.
-                return View();
+                return Problem(detail: "Failed to delete the record because of an error on the server.");
             }
         }
     }
@@ -240,20 +372,28 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
             if (dataObject is null)
             {
                 Logger.LogWarning("The {ID} for the {Type} was not found so no delete occurred.", id, DataObjectTypeName);
-                return NotFound(new { UserMessage = "The record was not found; please refresh the page because another user may have deleted it." });
+
+                if (IsActionRedirectedOnNotFound)
+                {
+                    return RedirectToAction(NotFoundActionName, NotFoundControllerName, new { UserMessage = "The record was not found; another user may have deleted it." });
+                }
+                else
+                {
+                    return NotFound(new { UserMessage = "The record was not found; please refresh the page because another user may have deleted it." });
+                }
             }
             else
             {
                 await DataLayer.DeleteAsync(dataObject);
                 Logger.LogInformation("The {ID} for the {Type} was successfully deleted.", id, DataObjectTypeName);
 
-                if (ReturnJson)
+                if (IsCUDActionRedirectedOnSuccess)
                 {
-                    return Json(dataObject);
+                    return RedirectToAction(nameof(Index));
                 }
                 else
                 {
-                    return RedirectToAction(nameof(Index));
+                    return Json(dataObject);
                 }
             }
         }
@@ -261,28 +401,26 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
         {
             Logger.LogError(ex, "Failed to delete the {ID} {Type} because of a data conflict.", id.ToString(), DataObjectTypeName);
 
-            if (ReturnJson)
+            if (IsActionRedirectedOnConflict)
             {
-                return Conflict(new { UserMessage = "The record has a dependency that prevents it from being deleted." });
+                return RedirectToAction(ConflictActionName, ConflictControllerName, new { UserMessage = "The record has a dependency that prevents it from being deleted; the dependency needs to be deleted first." });
             }
             else
             {
-                //TO DO: Figure out what view is returned when a delete conflict occurs.
-                return View();
+                return Conflict(new { UserMessage = "The record has a dependency that prevents it from being deleted; the dependency needs to be deleted first." });
             }
         }
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to delete the {ID} {Type}.", id.ToString(), DataObjectTypeName);
 
-            if (ReturnJson)
+            if (IsActionRedirectedOnError)
             {
-                return Problem(detail: "Failed to delete the record because of an error on the server.");
+                return RedirectToAction(ErrorActionName, ErrorControllerName, new { UserMessage = "Failed to delete the record because of an error on the server." });
             }
             else
             {
-                //TO DO: Figure out what view is returned when an error occurs deleting a data object.
-                return View();
+                return Problem(detail: "Failed to delete the record because of an error on the server.");
             }
         }
     }
@@ -302,7 +440,15 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
             if (dataObject is null)
             {
                 Logger.LogError("Failed to find the {ID} when fetching the Delete Partial View for the {Type}.", id, DataObjectTypeName);
-                return NotFound(new { UserMessage = "The record was not found; please refresh the page because another user may have deleted it." });
+
+                if (IsActionRedirectedOnNotFound)
+                {
+                    return RedirectToAction(NotFoundActionName, NotFoundControllerName, new { UserMessage = "The record was not found; another user may have deleted it." });
+                }
+                else
+                {
+                    return NotFound(new { UserMessage = "The record was not found; please refresh the page because another user may have deleted it." });
+                }
             }
 
             return new PartialViewResult()
@@ -315,14 +461,13 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
         {
             Logger.LogError(ex, "Failed to return the Delete Partial View for the {Type}.", DataObjectTypeName);
 
-            if (ReturnJson)
+            if (IsActionRedirectedOnError)
             {
-                return Problem(detail: "Failed to find the Delete View.");
+                return RedirectToAction(ErrorActionName, ErrorControllerName, new { UserMessage = "Failed to find the Delete View because of an error on the server." });
             }
             else
             {
-                //TO DO: Figure out what view is returned when an error occurs for retrieving a partial view.
-                return View();
+                return Problem(detail: "Failed to find the Delete View because of an error on the server.");
             }
         }
     }
@@ -342,7 +487,15 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
             if (dataObject is null)
             {
                 Logger.LogError("Failed to find the {ID} when fetching the Delete Partial View for the {Type}.", id, DataObjectTypeName);
-                return NotFound(new { UserMessage = "The record was not found; please refresh the page because another user may have deleted it." });
+
+                if (IsActionRedirectedOnNotFound)
+                {
+                    return RedirectToAction(NotFoundActionName, NotFoundControllerName, new { UserMessage = "The record was not found; another user may have deleted it." });
+                }
+                else
+                {
+                    return NotFound(new { UserMessage = "The record was not found; please refresh the page because another user may have deleted it." });
+                }
             }
 
             return new PartialViewResult()
@@ -355,14 +508,13 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
         {
             Logger.LogError(ex, "Failed to return the Delete Partial View for the {Type}.", DataObjectTypeName);
 
-            if (ReturnJson)
+            if (IsActionRedirectedOnError)
             {
-                return Problem(detail: "Failed to find the Delete View.");
+                return RedirectToAction(ErrorActionName, ErrorControllerName, new { UserMessage = "Failed to find the Delete View because of an error on the server." });
             }
             else
             {
-                //TO DO: Figure out what view is returned when an error occurs for retrieving a partial view.
-                return View();
+                return Problem(detail: "Failed to find the Delete View because of an error on the server.");
             }
         }
     }
@@ -382,7 +534,15 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
             if (dataObject is null)
             {
                 Logger.LogError("Failed to find the {ID} when fetching the Delete View for the {Type}.", id, DataObjectTypeName);
-                return NotFound(new { UserMessage = "The record was not found; please refresh the page because another user may have deleted it." });
+
+                if (IsActionRedirectedOnNotFound)
+                {
+                    return RedirectToAction(NotFoundActionName, NotFoundControllerName, new { UserMessage = "The record was not found; user may have deleted it." });
+                }
+                else
+                {
+                    return NotFound(new { UserMessage = "The record was not found; please refresh the page because another user may have deleted it." });
+                }
             }
 
             return View($"{DataObjectTypeName}Delete", dataObject);
@@ -391,14 +551,13 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
         {
             Logger.LogError(ex, "Failed to return the Delete View for the {Type} using the {ID} ID.", DataObjectTypeName, id);
 
-            if (ReturnJson)
+            if (IsActionRedirectedOnError)
             {
-                return Problem(detail: "Failed to find the Delete View.");
+                return RedirectToAction(ErrorActionName, ErrorControllerName, new { UserMessage = "Failed to find the Delete View because of an error on the server." });
             }
             else
             {
-                //TO DO: Figure out what view is returned when an error occurs for retrieving a view.
-                return View();
+                return Problem(detail: "Failed to find the Delete View because of an error on the server.");
             }
         }
     }
@@ -418,7 +577,15 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
             if (dataObject == null)
             {
                 Logger.LogError("Failed to find the {ID} when fetching the Delete View for the {Type}.", id, DataObjectTypeName);
-                return NotFound(new { UserMessage = "The record was not found; please refresh the page because another user may have deleted it." });
+
+                if (IsActionRedirectedOnNotFound)
+                {
+                    return RedirectToAction(NotFoundActionName, NotFoundControllerName, new { UserMessage = "The record was not found; user may have deleted it." });
+                }
+                else
+                {
+                    return NotFound(new { UserMessage = "The record was not found; please refresh the page because another user may have deleted it." });
+                }
             }
 
             return View($"{DataObjectTypeName}Delete", dataObject);
@@ -427,14 +594,13 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
         {
             Logger.LogError(ex, "Failed to return the Delete View for the {Type} using the {ID} ID.", DataObjectTypeName, id);
 
-            if (ReturnJson)
+            if (IsActionRedirectedOnError)
             {
-                return Problem(detail: "Failed to find the Delete View.");
+                return RedirectToAction(ErrorActionName, ErrorControllerName, new { UserMessage = "Failed to find the Delete View because of an error on the server." });
             }
             else
             {
-                //TO DO: Figure out what view is returned when an error occurs for retrieving a view.
-                return View();
+                return Problem(detail: "Failed to find the Delete View because of an error on the server.");
             }
         }
     }
@@ -454,7 +620,15 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
             if (dataObject is null)
             {
                 Logger.LogError("Failed to find the {ID} when fetching the Edit Partial View for the {Type}.", id, DataObjectTypeName);
-                return NotFound(new { UserMessage = "The record was not found; please refresh the page because another user may have deleted it." });
+
+                if (IsActionRedirectedOnNotFound)
+                {
+                    return RedirectToAction(NotFoundActionName, NotFoundControllerName, new { UserMessage = "The record was not found; another user may have deleted it." });
+                }
+                else
+                {
+                    return NotFound(new { UserMessage = "The record was not found; please refresh the page because another user may have deleted it." });
+                }
             }
 
             return new PartialViewResult()
@@ -467,14 +641,13 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
         {
             Logger.LogError(ex, "Failed to return the Edit Partial View for the {Type}.", DataObjectTypeName);
 
-            if (ReturnJson)
+            if (IsActionRedirectedOnError)
             {
-                return Problem(detail: "Failed to find the Edit View.");
+                return RedirectToAction(ErrorActionName, ErrorControllerName, new { UserMessage = "Failed to find the Edit View because of an error on the server." });
             }
             else
             {
-                //TO DO: Figure out what view is returned when an error occurs for retrieving a partial view.
-                return View();
+                return Problem(detail: "Failed to find the Edit View because of an error on the server.");
             }
         }
     }
@@ -494,7 +667,15 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
             if (dataObject is null)
             {
                 Logger.LogError("Failed to find the {ID} when fetching the Edit Partial View for the {Type}.", id, DataObjectTypeName);
-                return NotFound(new { UserMessage = "The record was not found; please refresh the page because another user may have deleted it." });
+
+                if (IsActionRedirectedOnNotFound)
+                {
+                    return RedirectToAction(NotFoundActionName, NotFoundControllerName, new { UserMessage = "The record was not found; another user may have deleted it." });
+                }
+                else
+                {
+                    return NotFound(new { UserMessage = "The record was not found; please refresh the page because another user may have deleted it." });
+                }
             }
 
             return new PartialViewResult()
@@ -507,14 +688,13 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
         {
             Logger.LogError(ex, "Failed to return the Edit Partial View for the {Type}.", DataObjectTypeName);
 
-            if (ReturnJson)
+            if (IsActionRedirectedOnError)
             {
-                return Problem(detail: "Failed to find the Edit View.");
+                return RedirectToAction(ErrorActionName, ErrorControllerName, new { UserMessage = "Failed to find the Edit View because of an error on the server." });
             }
             else
             {
-                //TO DO: Figure out what view is returned when an error occurs for retrieving a partial view.
-                return View();
+                return Problem(detail: "Failed to find the Edit View because of an error on the server.");
             }
         }
     }
@@ -534,7 +714,15 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
             if (dataObject is null)
             {
                 Logger.LogError("Failed to find the {ID} when fetching the Edit View for the {Type}.", id, DataObjectTypeName);
-                return NotFound(new { UserMessage = "The record was not found; please refresh the page because another user may have deleted it." });
+
+                if (IsActionRedirectedOnNotFound)
+                {
+                    return RedirectToAction(NotFoundActionName, NotFoundControllerName, new { UserMessage = "The record was not found; another user may have deleted it." });
+                }
+                else
+                {
+                    return NotFound(new { UserMessage = "The record was not found; please refresh the page because another user may have deleted it." });
+                }
             }
 
             return View($"{DataObjectTypeName}Edit", dataObject);
@@ -543,14 +731,13 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
         {
             Logger.LogError(ex, "Failed to return the Edit View for the {Type} using the {ID} ID.", DataObjectTypeName, id);
 
-            if (ReturnJson)
+            if (IsActionRedirectedOnError)
             {
-                return Problem(detail: "Failed to find the Edit View.");
+                return RedirectToAction(ErrorActionName, ErrorControllerName, new { UserMessage = "Failed to find the Edit View because of an error on the server." });
             }
             else
             {
-                //TO DO: Figure out what view is returned when an error occurs for retrieving a view.
-                return View();
+                return Problem(detail: "Failed to find the Edit View because of an error on the server.");
             }
         }
     }
@@ -570,7 +757,15 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
             if (dataObject == null)
             {
                 Logger.LogError("Failed to find the {ID} when fetching the Edit View for the {Type}.", id, DataObjectTypeName);
-                return NotFound(new { UserMessage = "The record was not found; please refresh the page because another user may have deleted it." });
+
+                if (IsActionRedirectedOnNotFound)
+                {
+                    return RedirectToAction(NotFoundActionName, NotFoundControllerName, new { UserMessage = "The record was not found; another user may have deleted it." });
+                }
+                else
+                {
+                    return NotFound(new { UserMessage = "The record was not found; please refresh the page because another user may have deleted it." });
+                }
             }
 
             return View($"{DataObjectTypeName}Edit", dataObject);
@@ -579,14 +774,13 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
         {
             Logger.LogError(ex, "Failed to return the Edit View for the {Type} using the {ID} ID.", DataObjectTypeName, id);
 
-            if (ReturnJson)
+            if (IsActionRedirectedOnError)
             {
-                return Problem(detail: "Failed to find the Edit View.");
+                return RedirectToAction(ErrorActionName, ErrorControllerName, new { UserMessage = "Failed to find the Edit View because of an error on the server." });
             }
             else
             {
-                //TO DO: Figure out what view is returned when an error occurs for retrieving a view.
-                return View();
+                return Problem(detail: "Failed to find the Edit View because of an error on the server.");
             }
         }
     }
@@ -606,14 +800,13 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
         {
             Logger.LogError(ex, "Failed to return the Index View for the {Type}.", DataObjectTypeName);
 
-            if (ReturnJson)
+            if (IsActionRedirectedOnError)
             {
-                return Problem();
+                return RedirectToAction(ErrorActionName, ErrorControllerName, new { UserMessage = "Failed to find the Index View because of an error on the server." });
             }
             else
             {
-                //TO DO: Figure out what view is returned when an error occurs for retrieving a view.
-                return View();
+                return Problem(detail: "Failed to find the Index View because of an error on the server.");
             }
         }
     }
@@ -635,67 +828,82 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
                 dataObject = await DataLayer.UpdateAsync(dataObject);
                 Logger.LogInformation("The {ID} for the {Type} was successfully updated.", id, DataObjectTypeName);
 
-                if (ReturnJson)
+                if (IsCUDActionRedirectedOnSuccess)
                 {
-                    return Json(dataObject);
+                    return RedirectToAction(nameof(Index));
                 }
                 else
                 {
-                    return RedirectToAction(nameof(Index));
+                    return Json(dataObject);
                 }
             }
             else
             {
                 Logger.LogWarning("Failed to update the {ID} {Type} because of a model validation error.", id, DataObjectTypeName);
-                return ValidationProblem(ModelState);
+                return ValidationFailedAction switch
+                {
+                    ValidationFailedAction.ReturnView => View($"{DataObjectTypeName}Edit", dataObject),
+                    ValidationFailedAction.ReturnPartialView => new PartialViewResult()
+                    {
+                        ViewData = new ViewDataDictionary<T>(ViewData, dataObject),
+                        ViewName = $"_{DataObjectTypeName}EditPartial",
+                    },
+                    _ => ValidationProblem(ModelState)
+                };
             }
         }
         catch (DataObjectUpdateConflictException ex)
         {
             Logger.LogWarning(ex, "Failed to update {ID} {Type} because the data was considered old.", id, DataObjectTypeName);
 
-            if (ReturnJson)
+            if (IsActionRedirectedOnConflict)
             {
-                return Conflict(new { UserMessage = "The submitted data was detected to be out of date; please refresh the page and try again." });
+                return RedirectToAction(ConflictActionName, ConflictControllerName, new { UserMessage = "The submitted data was detected to be out of date; please refresh the page and try again." });
             }
             else
             {
-                //TO DO: Figure out what view is returned when an error occurs for updating a data object.
-                return View();
+                return Conflict(new { UserMessage = "The submitted data was detected to be out of date; please refresh the page and try again." });
             }
         }
         catch (DataObjectValidationException ex)
         {
-            ex.CopyToModelState(ModelState);
             Logger.LogWarning(ex, "Failed to update the {ID} {Type} because of a server-side validation error.", id, DataObjectTypeName);
-            return ValidationProblem(ModelState);
+            ex.CopyToModelState(ModelState);
+            return ValidationFailedAction switch
+            {
+                ValidationFailedAction.ReturnView => View($"{DataObjectTypeName}Edit", dataObject),
+                ValidationFailedAction.ReturnPartialView => new PartialViewResult()
+                {
+                    ViewData = new ViewDataDictionary<T>(ViewData, dataObject),
+                    ViewName = $"_{DataObjectTypeName}EditPartial",
+                },
+                _ => ValidationProblem(ModelState)
+            };
         }
         catch (IDNotFoundException ex)
         {
             Logger.LogWarning(ex, "Failed to update the {ID} {Type} because it was not found.", id, DataObjectTypeName);
 
-            if (ReturnJson)
+            if (IsActionRedirectedOnNotFound)
             {
-                return NotFound(new { UserMessage = "The record was not found; please refresh the page because another user may have deleted it." });
+                return RedirectToAction(NotFoundActionName, NotFoundControllerName, new { UserMessage = "The record was not found; another user may have deleted it." });
             }
             else
             {
-                //TO DO: Figure out what view is returned when an error occurs for updating a data object.
-                return View();
+                return NotFound(new { UserMessage = "The record was not found; please refresh the page because another user may have deleted it." });
             }
         }
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to update the {Type} for {ID}.", DataObjectTypeName, id);
 
-            if (ReturnJson)
+            if (IsActionRedirectedOnError)
             {
-                return Problem(detail: "Failed to update the record because of an error on the server.");
+                return RedirectToAction(ErrorActionName, ErrorControllerName, new { UserMessage = "Failed to update the record because of an error on the server." });
             }
             else
             {
-                //TO DO: Figure out what view is returned when an error occurs for updating a data object.
-                return View();
+                return Problem(detail: "Failed to update the record because of an error on the server.");
             }
         }
     }
