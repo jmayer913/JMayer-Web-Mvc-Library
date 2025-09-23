@@ -5,6 +5,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.Extensions.Logging;
 
+#warning I need to decide if not found & conflict will redirect to a general view or a view specific to the model.
+#warning I'm also wondering if I shouldn't redirect when a not found occurs when retrieving a view. It seems like I can just return a not found view.
+
 namespace JMayer.Web.Mvc.Controller;
 
 /// <summary>
@@ -12,7 +15,7 @@ namespace JMayer.Web.Mvc.Controller;
 /// <br/>
 /// <br/>
 /// Properties dictate if the controller uses the MVC pattern (redirects or returning views with the model state) or 
-/// Ajax pattern (returning json) to be processed by javascript. The default functionality is the MVC pattern and you 
+/// Ajax pattern (returning json to be processed by javascript). The default functionality is the MVC pattern and you 
 /// can switch what you need to the Ajax pattern in the constructor of your child class.
 /// </summary>
 /// <typeparam name="T">Must be a DataObject since the data layer requires this.</typeparam>
@@ -159,7 +162,7 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
     /// <param name="dataLayer">The data layer the controller will interact with.</param>
     /// <param name="logger">The logger the controller will interact with.</param>
     /// <exception cref="ArgumentNullException">Thrown if the dataLayer or logger parameter is null.</exception>
-    public StandardModelViewController(IStandardCRUDDataLayer<T> dataLayer, ILogger logger)
+    public StandardModelViewController(U dataLayer, ILogger logger)
     {
         ArgumentNullException.ThrowIfNull(dataLayer);
         ArgumentNullException.ThrowIfNull(logger);
