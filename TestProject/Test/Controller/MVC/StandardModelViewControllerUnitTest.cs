@@ -236,7 +236,7 @@ public class StandardModelViewControllerUnitTest
         IActionResult actionResult = await controller.CreateAsync(new SimpleDataObject() { Value = DefaultValue });
 
         Assert.IsType<RedirectToActionResult>(actionResult); //Confirm the correct action is returned.
-        Assert.Equal($"{typeof(SimpleDataObject).Name}{nameof(Index)}", ((RedirectToActionResult)actionResult).ActionName); //Confirm the redirect is for Index.
+        Assert.Equal(nameof(Index), ((RedirectToActionResult)actionResult).ActionName); //Confirm the redirect is for Index.
         Assert.Null(((RedirectToActionResult)actionResult).ControllerName); //Confirm there's no controller name.
         Assert.Null(((RedirectToActionResult)actionResult).RouteValues); //Confirm there's no additional route values.
         Assert.Null(((RedirectToActionResult)actionResult).Fragment); //Confirm there's no fragment.
@@ -347,7 +347,7 @@ public class StandardModelViewControllerUnitTest
         IActionResult actionResult = await controller.DeleteAsync(DefaultId);
 
         Assert.IsType<RedirectToActionResult>(actionResult); //Confirm the correct action is returned.
-        Assert.Equal($"{typeof(SimpleDataObject).Name}{nameof(Index)}", ((RedirectToActionResult)actionResult).ActionName); //Confirm the redirect is for Index.
+        Assert.Equal(nameof(Index), ((RedirectToActionResult)actionResult).ActionName); //Confirm the redirect is for Index.
         Assert.Null(((RedirectToActionResult)actionResult).ControllerName); //Confirm there's no controller name.
         Assert.Null(((RedirectToActionResult)actionResult).RouteValues); //Confirm there's no additional route values.
         Assert.Null(((RedirectToActionResult)actionResult).Fragment); //Confirm there's no fragment.
@@ -572,7 +572,7 @@ public class StandardModelViewControllerUnitTest
         IActionResult actionResult = await controller.UpdateAsync(dataObject);
 
         Assert.IsType<RedirectToActionResult>(actionResult); //Confirm the correct action is returned.
-        Assert.Equal($"{typeof(SimpleDataObject).Name}{nameof(Index)}", ((RedirectToActionResult)actionResult).ActionName); //Confirm the redirect is for Index.
+        Assert.Equal(nameof(Index), ((RedirectToActionResult)actionResult).ActionName); //Confirm the redirect is for Index.
         Assert.Null(((RedirectToActionResult)actionResult).ControllerName); //Confirm there's no controller name.
         Assert.Null(((RedirectToActionResult)actionResult).RouteValues); //Confirm there's no additional route values.
         Assert.Null(((RedirectToActionResult)actionResult).Fragment); //Confirm there's no fragment.

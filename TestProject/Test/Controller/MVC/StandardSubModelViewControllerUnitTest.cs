@@ -128,7 +128,7 @@ public class StandardSubModelViewControllerUnitTest
         IActionResult actionResult = await controller.CreateAsync(new SimpleSubUserEditableDataObject() { Name = DefaultName });
 
         Assert.IsType<RedirectToActionResult>(actionResult); //Confirm the correct action is returned.
-        Assert.Equal($"{typeof(SimpleSubUserEditableDataObject).Name}{nameof(Index)}", ((RedirectToActionResult)actionResult).ActionName); //Confirm the redirect is for Index.
+        Assert.Equal(nameof(Index), ((RedirectToActionResult)actionResult).ActionName); //Confirm the redirect is for Index.
         Assert.Null(((RedirectToActionResult)actionResult).ControllerName); //Confirm there's no controller name.
         Assert.NotEmpty(((RedirectToActionResult)actionResult).RouteValues); //Confirm there's additional route values; owner id is injected into the redirect.
         Assert.Null(((RedirectToActionResult)actionResult).Fragment); //Confirm there's no fragment.
@@ -148,7 +148,7 @@ public class StandardSubModelViewControllerUnitTest
         IActionResult actionResult = await controller.DeleteAsync(DefaultId);
 
         Assert.IsType<RedirectToActionResult>(actionResult); //Confirm the correct action is returned.
-        Assert.Equal($"{typeof(SimpleSubUserEditableDataObject).Name}{nameof(Index)}", ((RedirectToActionResult)actionResult).ActionName); //Confirm the redirect is for Index.
+        Assert.Equal(nameof(Index), ((RedirectToActionResult)actionResult).ActionName); //Confirm the redirect is for Index.
         Assert.Null(((RedirectToActionResult)actionResult).ControllerName); //Confirm there's no controller name.
         Assert.NotEmpty(((RedirectToActionResult)actionResult).RouteValues); //Confirm there's additional route values; owner id is injected into the redirect.
         Assert.Null(((RedirectToActionResult)actionResult).Fragment); //Confirm there's no fragment.
@@ -189,7 +189,7 @@ public class StandardSubModelViewControllerUnitTest
         IActionResult actionResult = await controller.UpdateAsync(dataObject);
 
         Assert.IsType<RedirectToActionResult>(actionResult); //Confirm the correct action is returned.
-        Assert.Equal($"{typeof(SimpleSubUserEditableDataObject).Name}{nameof(Index)}", ((RedirectToActionResult)actionResult).ActionName); //Confirm the redirect is for Index.
+        Assert.Equal(nameof(Index), ((RedirectToActionResult)actionResult).ActionName); //Confirm the redirect is for Index.
         Assert.Null(((RedirectToActionResult)actionResult).ControllerName); //Confirm there's no controller name.
         Assert.NotEmpty(((RedirectToActionResult)actionResult).RouteValues); //Confirm there's additional route values; owner id is injected into the redirect.
         Assert.Null(((RedirectToActionResult)actionResult).Fragment); //Confirm there's no fragment.

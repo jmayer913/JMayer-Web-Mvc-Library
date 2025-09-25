@@ -240,7 +240,7 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
 
                 if (IsCUDActionRedirectedOnSuccess)
                 {
-                    return RedirectToAction($"{DataObjectTypeName}{nameof(Index)}");
+                    return RedirectToAction(nameof(Index));
                 }
                 else
                 {
@@ -324,7 +324,7 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
 
                 if (IsCUDActionRedirectedOnSuccess)
                 {
-                    return RedirectToAction($"{DataObjectTypeName}{nameof(Index)}");
+                    return RedirectToAction(nameof(Index));
                 }
                 else
                 {
@@ -392,7 +392,7 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
 
                 if (IsCUDActionRedirectedOnSuccess)
                 {
-                    return RedirectToAction($"{DataObjectTypeName}{nameof(Index)}");
+                    return RedirectToAction(nameof(Index));
                 }
                 else
                 {
@@ -863,7 +863,7 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
 
                 if (IsCUDActionRedirectedOnSuccess)
                 {
-                    return RedirectToAction($"{DataObjectTypeName}{nameof(Index)}");
+                    return RedirectToAction(nameof(Index));
                 }
                 else
                 {

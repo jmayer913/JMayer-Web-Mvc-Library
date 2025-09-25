@@ -139,7 +139,7 @@ public class StandardSubModelViewController<T, U> : StandardModelViewController<
 
                 if (IsCUDActionRedirectedOnSuccess)
                 {
-                    return RedirectToAction($"{DataObjectTypeName}{nameof(Index)}", new { id = dataObject.OwnerInteger64ID });
+                    return RedirectToAction(nameof(Index), new { id = dataObject.OwnerInteger64ID });
                 }
                 else
                 {
@@ -205,7 +205,7 @@ public class StandardSubModelViewController<T, U> : StandardModelViewController<
 
                 if (IsCUDActionRedirectedOnSuccess)
                 {
-                    return RedirectToAction($"{DataObjectTypeName}{nameof(Index)}", new { id = dataObject.OwnerStringID });
+                    return RedirectToAction(nameof(Index), new { id = dataObject.OwnerStringID });
                 }
                 else
                 {
