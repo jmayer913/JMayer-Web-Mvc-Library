@@ -31,16 +31,16 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
     /// The default is Conflict but if you need to change it then in the constructor of your child class,
     /// set this property to the name you need.
     /// </remarks>
-    protected string ConflictActionName { get; init; } = "Conflict";
+    public string ConflictActionName { get; init; } = "ConflictView";
 
     /// <summary>
     /// The property gets/sets the name of the conflict controller.
     /// </summary>
     /// <remarks>
-    /// The default is Home but if you need to change it then in the constructor of your child class,
+    /// The default is null but if you need to change it then in the constructor of your child class,
     /// set this property to the name you need.
     /// </remarks>
-    protected string ConflictControllerName { get; init; } = "Home";
+    public string? ConflictControllerName { get; init; }
 
     /// <summary>
     /// The data layer the controller will interact with.
@@ -59,7 +59,7 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
     /// The default is Error but if you need to change it then in the constructor of your child class,
     /// set this property to the name you need.
     /// </remarks>
-    protected string ErrorActionName { get; init; } = "Error";
+    public string ErrorActionName { get; init; } = "Error";
 
     /// <summary>
     /// The property gets/sets the name of the error controller.
@@ -68,7 +68,7 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
     /// The default is Home but if you need to change it then in the constructor of your child class,
     /// set this property to the name you need.
     /// </remarks>
-    protected string ErrorControllerName { get; init; } = "Home";
+    public string ErrorControllerName { get; init; } = "Home";
 
     /// <summary>
     /// The property gets/sets if the controller redirects on a data conflict.
@@ -83,7 +83,7 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
     /// controller and/or action is needed, set the ConflictActionName and ConflictControllerName properties to what you need in the constructor 
     /// of your child class.
     /// </remarks>
-    protected bool IsActionRedirectedOnConflict { get; init; } = true;
+    public bool IsActionRedirectedOnConflict { get; init; } = true;
 
     /// <summary>
     /// The property gets/sets if the controller redirects on error.
@@ -98,7 +98,7 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
     /// controller and/or action is needed, set the ErrorActionName and ErrorControllerName properties to what you need in the constructor 
     /// of your child class.
     /// </remarks>
-    protected bool IsActionRedirectedOnError { get; init; } = true;
+    public bool IsActionRedirectedOnError { get; init; } = true;
 
     /// <summary>
     /// The property gets/sets if the controller redirects when a data object is not found.
@@ -108,12 +108,12 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
     /// then in the constructor of your child class, set this property to false.
     /// <br/>
     /// <br/>
-    /// When a general exception is thrown in an action, the controller will redirect to the Home controller for the NotFound action
-    /// with a user message in the route. This allows you to accept the message as a string and display it if need be. If a different 
-    /// controller and/or action is needed, set the NotFoundActionName and NotFoundControllerName properties to what you need in the 
-    /// constructor of your child class.
+    /// When a data object is not found for an action, the controller will redirect to the local NotFoundView action with a user 
+    /// message in the route. The user message is stored in ViewBag.UserMessage; this allows you to display the message if need be. 
+    /// If a different controller and/or action is needed, set the NotFoundActionName and NotFoundControllerName properties to what 
+    /// you need in the constructor of your child class.
     /// </remarks>
-    protected bool IsActionRedirectedOnNotFound { get; init; } = true;
+    public bool IsActionRedirectedOnNotFound { get; init; } = true;
 
     /// <summary>
     /// The property gets/sets if the controller redirects a CUD (Create, Delete or Update) action on success to the Index view.
@@ -122,7 +122,7 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
     /// The default functionality is to do a redirect but if you need to return json then in the constructor of your child class, 
     /// set this property to false.
     /// </remarks>
-    protected bool IsCUDActionRedirectedOnSuccess { get; init; } = true;
+    public bool IsCUDActionRedirectedOnSuccess { get; init; } = true;
 
     /// <summary>
     /// The logger the controller will interact with.
@@ -133,19 +133,19 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
     /// The property gets/sets the name of the not found action.
     /// </summary>
     /// <remarks>
-    /// The default is NotFound but if you need to change it then in the constructor of your child class,
+    /// The default is NotFoundView but if you need to change it then in the constructor of your child class,
     /// set this property to the name you need.
     /// </remarks>
-    protected string NotFoundActionName { get; init; } = "NotFound";
+    public string NotFoundActionName { get; init; } = "NotFoundView";
 
     /// <summary>
     /// The property gets/sets the name of the not found controller.
     /// </summary>
     /// <remarks>
-    /// The default is Home but if you need to change it then in the constructor of your child class,
+    /// The default is null but if you need to change it then in the constructor of your child class,
     /// set this property to the name you need.
     /// </remarks>
-    protected string NotFoundControllerName { get; init; } = "Home";
+    public string? NotFoundControllerName { get; init; }
 
     /// <summary>
     /// The property gets/sets what the controller will do when the model fails server-side validation.
@@ -154,7 +154,7 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
     /// The default functionality is to return the view associated with the action but if you need a different action (partial view or
     /// 400 bad request with a model state dictionary) then in the constructor of your child class, set this property the action you need.
     /// </remarks>
-    protected ValidationFailedAction ValidationFailedAction { get; init; }
+    public ValidationFailedAction ValidationFailedAction { get; init; }
 
     /// <summary>
     /// The dependency injection constructor.
@@ -188,11 +188,11 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
 
             if (IsActionRedirectedOnError)
             {
-                return RedirectToAction(ErrorActionName, ErrorControllerName, new { UserMessage = "Failed to find the Add Partial View because of an error on the server" });
+                return RedirectToAction(ErrorActionName, ErrorControllerName, new { UserMessage = $"Failed to find the {DataObjectTypeName.SpaceCamelCase()} Add Partial View because of an error on the server" });
             }
             else
             {
-                return Problem(detail: "Failed to find the Add Partial View because of an error on the server.");
+                return Problem(detail: $"Failed to find the {DataObjectTypeName.SpaceCamelCase()} Add Partial View because of an error on the server.");
             }
         }
     }
@@ -214,11 +214,11 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
 
             if (IsActionRedirectedOnError)
             {
-                return RedirectToAction(ErrorActionName, ErrorControllerName, new { UserMessage = "Failed to find the Add View because of an error on the server." });
+                return RedirectToAction(ErrorActionName, ErrorControllerName, new { UserMessage = $"Failed to find the {DataObjectTypeName.SpaceCamelCase()} Add View because of an error on the server." });
             }
             else
             {
-                return Problem(detail: "Failed to find the Add View because of an error on the server.");
+                return Problem(detail: $"Failed to find the {DataObjectTypeName.SpaceCamelCase()} Add View because of an error on the server.");
             }
         }
     }
@@ -240,7 +240,7 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
 
                 if (IsCUDActionRedirectedOnSuccess)
                 {
-                    return RedirectToAction(nameof(Index));
+                    return RedirectToAction($"{DataObjectTypeName}{nameof(Index)}");
                 }
                 else
                 {
@@ -283,11 +283,11 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
 
             if (IsActionRedirectedOnError)
             {
-                return RedirectToAction(ErrorActionName, ErrorControllerName, new { UserMessage = "Failed to create the record because of an error on the server." });
+                return RedirectToAction(ErrorActionName, ErrorControllerName, new { UserMessage = $"Failed to create the {DataObjectTypeName.SpaceCamelCase()} record because of an error on the server." });
             }
             else
             {
-                return Problem(detail: "Failed to create the record because of an error on the server.");
+                return Problem(detail: $"Failed to create the {DataObjectTypeName.SpaceCamelCase()} record because of an error on the server.");
             }
         }
     }
@@ -310,11 +310,11 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
 
                 if (IsActionRedirectedOnNotFound)
                 {
-                    return RedirectToAction(NotFoundActionName, NotFoundControllerName, new { UserMessage = "The record was not found; another user may have deleted it." });
+                    return RedirectToAction(NotFoundActionName, NotFoundControllerName, new { UserMessage = $"The {DataObjectTypeName.SpaceCamelCase()} record was not found; another user may have deleted it." });
                 }
                 else
                 {
-                    return NotFound(new { UserMessage = "The record was not found; please refresh the page because another user may have deleted it." });
+                    return NotFound(new { UserMessage = $"The {DataObjectTypeName.SpaceCamelCase()} record was not found; please refresh the page because another user may have deleted it." });
                 }
             }
             else
@@ -324,7 +324,7 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
 
                 if (IsCUDActionRedirectedOnSuccess)
                 {
-                    return RedirectToAction(nameof(Index));
+                    return RedirectToAction($"{DataObjectTypeName}{nameof(Index)}");
                 }
                 else
                 {
@@ -338,11 +338,11 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
 
             if (IsActionRedirectedOnConflict)
             {
-                return RedirectToAction(ConflictActionName, ConflictControllerName, new { UserMessage = "The record has a dependency that prevents it from being deleted; the dependency needs to be deleted first." });
+                return RedirectToAction(ConflictActionName, ConflictControllerName, new { UserMessage = $"The {DataObjectTypeName.SpaceCamelCase()} record has a dependency that prevents it from being deleted; the dependency needs to be deleted first." });
             }
             else
             {
-                return Conflict(new { UserMessage = "The record has a dependency that prevents it from being deleted; the dependency needs to be deleted first." });
+                return Conflict(new { UserMessage = $"The {DataObjectTypeName.SpaceCamelCase()} record has a dependency that prevents it from being deleted; the dependency needs to be deleted first." });
             }
         }
         catch (Exception ex)
@@ -351,11 +351,11 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
 
             if (IsActionRedirectedOnError)
             {
-                return RedirectToAction(ErrorActionName, ErrorControllerName, new { UserMessage = "Failed to delete the record because of an error on the server." });
+                return RedirectToAction(ErrorActionName, ErrorControllerName, new { UserMessage = $"Failed to delete the {DataObjectTypeName.SpaceCamelCase()} record because of an error on the server." });
             }
             else
             {
-                return Problem(detail: "Failed to delete the record because of an error on the server.");
+                return Problem(detail: $"Failed to delete the {DataObjectTypeName.SpaceCamelCase()} record because of an error on the server.");
             }
         }
     }
@@ -378,11 +378,11 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
 
                 if (IsActionRedirectedOnNotFound)
                 {
-                    return RedirectToAction(NotFoundActionName, NotFoundControllerName, new { UserMessage = "The record was not found; another user may have deleted it." });
+                    return RedirectToAction(NotFoundActionName, NotFoundControllerName, new { UserMessage = $"The {DataObjectTypeName.SpaceCamelCase()} record was not found; another user may have deleted it." });
                 }
                 else
                 {
-                    return NotFound(new { UserMessage = "The record was not found; please refresh the page because another user may have deleted it." });
+                    return NotFound(new { UserMessage = $"The {DataObjectTypeName.SpaceCamelCase()} record was not found; please refresh the page because another user may have deleted it." });
                 }
             }
             else
@@ -392,7 +392,7 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
 
                 if (IsCUDActionRedirectedOnSuccess)
                 {
-                    return RedirectToAction(nameof(Index));
+                    return RedirectToAction($"{DataObjectTypeName}{nameof(Index)}");
                 }
                 else
                 {
@@ -406,11 +406,11 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
 
             if (IsActionRedirectedOnConflict)
             {
-                return RedirectToAction(ConflictActionName, ConflictControllerName, new { UserMessage = "The record has a dependency that prevents it from being deleted; the dependency needs to be deleted first." });
+                return RedirectToAction(ConflictActionName, ConflictControllerName, new { UserMessage = $"The {DataObjectTypeName.SpaceCamelCase()} record has a dependency that prevents it from being deleted; the dependency needs to be deleted first." });
             }
             else
             {
-                return Conflict(new { UserMessage = "The record has a dependency that prevents it from being deleted; the dependency needs to be deleted first." });
+                return Conflict(new { UserMessage = $"The {DataObjectTypeName.SpaceCamelCase()} record has a dependency that prevents it from being deleted; the dependency needs to be deleted first." });
             }
         }
         catch (Exception ex)
@@ -419,11 +419,11 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
 
             if (IsActionRedirectedOnError)
             {
-                return RedirectToAction(ErrorActionName, ErrorControllerName, new { UserMessage = "Failed to delete the record because of an error on the server." });
+                return RedirectToAction(ErrorActionName, ErrorControllerName, new { UserMessage = $"Failed to delete the {DataObjectTypeName.SpaceCamelCase()} record because of an error on the server." });
             }
             else
             {
-                return Problem(detail: "Failed to delete the record because of an error on the server.");
+                return Problem(detail: $"Failed to delete the {DataObjectTypeName.SpaceCamelCase()} record because of an error on the server.");
             }
         }
     }
@@ -446,11 +446,11 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
 
                 if (IsActionRedirectedOnNotFound)
                 {
-                    return RedirectToAction(NotFoundActionName, NotFoundControllerName, new { UserMessage = "The record was not found; another user may have deleted it." });
+                    return RedirectToAction(NotFoundActionName, NotFoundControllerName, new { UserMessage = $"The {DataObjectTypeName.SpaceCamelCase()} record was not found; another user may have deleted it." });
                 }
                 else
                 {
-                    return NotFound(new { UserMessage = "The record was not found; please refresh the page because another user may have deleted it." });
+                    return NotFound(new { UserMessage = $"The {DataObjectTypeName.SpaceCamelCase()} record was not found; please refresh the page because another user may have deleted it." });
                 }
             }
 
@@ -466,11 +466,11 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
 
             if (IsActionRedirectedOnError)
             {
-                return RedirectToAction(ErrorActionName, ErrorControllerName, new { UserMessage = "Failed to find the Delete View because of an error on the server." });
+                return RedirectToAction(ErrorActionName, ErrorControllerName, new { UserMessage = $"Failed to find the {DataObjectTypeName.SpaceCamelCase()} Delete View because of an error on the server." });
             }
             else
             {
-                return Problem(detail: "Failed to find the Delete View because of an error on the server.");
+                return Problem(detail: $"Failed to find the {DataObjectTypeName.SpaceCamelCase()} Delete View because of an error on the server.");
             }
         }
     }
@@ -493,11 +493,11 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
 
                 if (IsActionRedirectedOnNotFound)
                 {
-                    return RedirectToAction(NotFoundActionName, NotFoundControllerName, new { UserMessage = "The record was not found; another user may have deleted it." });
+                    return RedirectToAction(NotFoundActionName, NotFoundControllerName, new { UserMessage = $"The {DataObjectTypeName.SpaceCamelCase()} record was not found; another user may have deleted it." });
                 }
                 else
                 {
-                    return NotFound(new { UserMessage = "The record was not found; please refresh the page because another user may have deleted it." });
+                    return NotFound(new { UserMessage = $"The {DataObjectTypeName.SpaceCamelCase()} record was not found; please refresh the page because another user may have deleted it." });
                 }
             }
 
@@ -513,11 +513,11 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
 
             if (IsActionRedirectedOnError)
             {
-                return RedirectToAction(ErrorActionName, ErrorControllerName, new { UserMessage = "Failed to find the Delete View because of an error on the server." });
+                return RedirectToAction(ErrorActionName, ErrorControllerName, new { UserMessage = $"Failed to find the {DataObjectTypeName.SpaceCamelCase()} Delete View because of an error on the server." });
             }
             else
             {
-                return Problem(detail: "Failed to find the Delete View because of an error on the server.");
+                return Problem(detail: $"Failed to find the {DataObjectTypeName.SpaceCamelCase()} Delete View because of an error on the server.");
             }
         }
     }
@@ -540,11 +540,11 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
 
                 if (IsActionRedirectedOnNotFound)
                 {
-                    return RedirectToAction(NotFoundActionName, NotFoundControllerName, new { UserMessage = "The record was not found; user may have deleted it." });
+                    return RedirectToAction(NotFoundActionName, NotFoundControllerName, new { UserMessage = $"The {DataObjectTypeName.SpaceCamelCase()} record was not found; user may have deleted it." });
                 }
                 else
                 {
-                    return NotFound(new { UserMessage = "The record was not found; please refresh the page because another user may have deleted it." });
+                    return NotFound(new { UserMessage = $"The {DataObjectTypeName.SpaceCamelCase()} record was not found; please refresh the page because another user may have deleted it." });
                 }
             }
 
@@ -556,11 +556,11 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
 
             if (IsActionRedirectedOnError)
             {
-                return RedirectToAction(ErrorActionName, ErrorControllerName, new { UserMessage = "Failed to find the Delete View because of an error on the server." });
+                return RedirectToAction(ErrorActionName, ErrorControllerName, new { UserMessage = $"Failed to find the {DataObjectTypeName.SpaceCamelCase()} Delete View because of an error on the server." });
             }
             else
             {
-                return Problem(detail: "Failed to find the Delete View because of an error on the server.");
+                return Problem(detail: $"Failed to find the {DataObjectTypeName.SpaceCamelCase()} Delete View because of an error on the server.");
             }
         }
     }
@@ -583,11 +583,11 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
 
                 if (IsActionRedirectedOnNotFound)
                 {
-                    return RedirectToAction(NotFoundActionName, NotFoundControllerName, new { UserMessage = "The record was not found; user may have deleted it." });
+                    return RedirectToAction(NotFoundActionName, NotFoundControllerName, new { UserMessage = $"The {DataObjectTypeName.SpaceCamelCase()} record was not found; user may have deleted it." });
                 }
                 else
                 {
-                    return NotFound(new { UserMessage = "The record was not found; please refresh the page because another user may have deleted it." });
+                    return NotFound(new { UserMessage = $"The {DataObjectTypeName.SpaceCamelCase()} record was not found; please refresh the page because another user may have deleted it." });
                 }
             }
 
@@ -599,11 +599,11 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
 
             if (IsActionRedirectedOnError)
             {
-                return RedirectToAction(ErrorActionName, ErrorControllerName, new { UserMessage = "Failed to find the Delete View because of an error on the server." });
+                return RedirectToAction(ErrorActionName, ErrorControllerName, new { UserMessage = $"Failed to find the {DataObjectTypeName.SpaceCamelCase()} Delete View because of an error on the server." });
             }
             else
             {
-                return Problem(detail: "Failed to find the Delete View because of an error on the server.");
+                return Problem(detail: $"Failed to find the {DataObjectTypeName.SpaceCamelCase()} Delete View because of an error on the server.");
             }
         }
     }
@@ -626,11 +626,11 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
 
                 if (IsActionRedirectedOnNotFound)
                 {
-                    return RedirectToAction(NotFoundActionName, NotFoundControllerName, new { UserMessage = "The record was not found; another user may have deleted it." });
+                    return RedirectToAction(NotFoundActionName, NotFoundControllerName, new { UserMessage = $"The {DataObjectTypeName.SpaceCamelCase()} record was not found; another user may have deleted it." });
                 }
                 else
                 {
-                    return NotFound(new { UserMessage = "The record was not found; please refresh the page because another user may have deleted it." });
+                    return NotFound(new { UserMessage = $"The {DataObjectTypeName.SpaceCamelCase()} record was not found; please refresh the page because another user may have deleted it." });
                 }
             }
 
@@ -646,11 +646,11 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
 
             if (IsActionRedirectedOnError)
             {
-                return RedirectToAction(ErrorActionName, ErrorControllerName, new { UserMessage = "Failed to find the Edit View because of an error on the server." });
+                return RedirectToAction(ErrorActionName, ErrorControllerName, new { UserMessage = $"Failed to find the {DataObjectTypeName.SpaceCamelCase()} Edit View because of an error on the server." });
             }
             else
             {
-                return Problem(detail: "Failed to find the Edit View because of an error on the server.");
+                return Problem(detail: $"Failed to find the {DataObjectTypeName.SpaceCamelCase()} Edit View because of an error on the server.");
             }
         }
     }
@@ -673,11 +673,11 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
 
                 if (IsActionRedirectedOnNotFound)
                 {
-                    return RedirectToAction(NotFoundActionName, NotFoundControllerName, new { UserMessage = "The record was not found; another user may have deleted it." });
+                    return RedirectToAction(NotFoundActionName, NotFoundControllerName, new { UserMessage = $"The {DataObjectTypeName.SpaceCamelCase()} record was not found; another user may have deleted it." });
                 }
                 else
                 {
-                    return NotFound(new { UserMessage = "The record was not found; please refresh the page because another user may have deleted it." });
+                    return NotFound(new { UserMessage = $"The {DataObjectTypeName.SpaceCamelCase()} record was not found; please refresh the page because another user may have deleted it." });
                 }
             }
 
@@ -693,11 +693,11 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
 
             if (IsActionRedirectedOnError)
             {
-                return RedirectToAction(ErrorActionName, ErrorControllerName, new { UserMessage = "Failed to find the Edit View because of an error on the server." });
+                return RedirectToAction(ErrorActionName, ErrorControllerName, new { UserMessage = $"Failed to find the {DataObjectTypeName.SpaceCamelCase()} Edit View because of an error on the server." });
             }
             else
             {
-                return Problem(detail: "Failed to find the Edit View because of an error on the server.");
+                return Problem(detail: $"Failed to find the {DataObjectTypeName.SpaceCamelCase()} Edit View because of an error on the server.");
             }
         }
     }
@@ -720,11 +720,11 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
 
                 if (IsActionRedirectedOnNotFound)
                 {
-                    return RedirectToAction(NotFoundActionName, NotFoundControllerName, new { UserMessage = "The record was not found; another user may have deleted it." });
+                    return RedirectToAction(NotFoundActionName, NotFoundControllerName, new { UserMessage = $"The {DataObjectTypeName.SpaceCamelCase()} record was not found; another user may have deleted it." });
                 }
                 else
                 {
-                    return NotFound(new { UserMessage = "The record was not found; please refresh the page because another user may have deleted it." });
+                    return NotFound(new { UserMessage = $"The {DataObjectTypeName.SpaceCamelCase()} record was not found; please refresh the page because another user may have deleted it." });
                 }
             }
 
@@ -736,11 +736,11 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
 
             if (IsActionRedirectedOnError)
             {
-                return RedirectToAction(ErrorActionName, ErrorControllerName, new { UserMessage = "Failed to find the Edit View because of an error on the server." });
+                return RedirectToAction(ErrorActionName, ErrorControllerName, new { UserMessage = $"Failed to find the {DataObjectTypeName.SpaceCamelCase()} Edit View because of an error on the server." });
             }
             else
             {
-                return Problem(detail: "Failed to find the Edit View because of an error on the server.");
+                return Problem(detail: $"Failed to find the {DataObjectTypeName.SpaceCamelCase()} Edit View because of an error on the server.");
             }
         }
     }
@@ -763,11 +763,11 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
 
                 if (IsActionRedirectedOnNotFound)
                 {
-                    return RedirectToAction(NotFoundActionName, NotFoundControllerName, new { UserMessage = "The record was not found; another user may have deleted it." });
+                    return RedirectToAction(NotFoundActionName, NotFoundControllerName, new { UserMessage = $"The {DataObjectTypeName.SpaceCamelCase()} record was not found; another user may have deleted it." });
                 }
                 else
                 {
-                    return NotFound(new { UserMessage = "The record was not found; please refresh the page because another user may have deleted it." });
+                    return NotFound(new { UserMessage = $"The {DataObjectTypeName.SpaceCamelCase()} record was not found; please refresh the page because another user may have deleted it." });
                 }
             }
 
@@ -779,11 +779,11 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
 
             if (IsActionRedirectedOnError)
             {
-                return RedirectToAction(ErrorActionName, ErrorControllerName, new { UserMessage = "Failed to find the Edit View because of an error on the server." });
+                return RedirectToAction(ErrorActionName, ErrorControllerName, new { UserMessage = $"Failed to find the {DataObjectTypeName.SpaceCamelCase()} Edit View because of an error on the server." });
             }
             else
             {
-                return Problem(detail: "Failed to find the Edit View because of an error on the server.");
+                return Problem(detail: $"Failed to find the {DataObjectTypeName.SpaceCamelCase()} Edit View because of an error on the server.");
             }
         }
     }
@@ -797,7 +797,7 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
         try
         {
             List<T>? dataObjects = await DataLayer.GetAllAsync();
-            return View($"{DataObjectTypeName}Index", dataObjects);
+            return View($"{DataObjectTypeName}{nameof(Index)}", dataObjects);
         }
         catch (Exception ex)
         {
@@ -805,13 +805,41 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
 
             if (IsActionRedirectedOnError)
             {
-                return RedirectToAction(ErrorActionName, ErrorControllerName, new { UserMessage = "Failed to find the Index View because of an error on the server." });
+                return RedirectToAction(ErrorActionName, ErrorControllerName, new { UserMessage = $"Failed to find the {DataObjectTypeName.SpaceCamelCase()} Index View because of an error on the server." });
             }
             else
             {
-                return Problem(detail: "Failed to find the Index View because of an error on the server.");
+                return Problem(detail: $"Failed to find the {DataObjectTypeName.SpaceCamelCase()} Index View because of an error on the server.");
             }
         }
+    }
+
+    /// <summary>
+    /// The method returns the not found view.
+    /// </summary>
+    /// <param name="id">The id that was not found.</param>
+    /// <param name="userMessage">Optionally, a user message; stored in ViewBag.UserMessage.</param>
+    /// <returns>The view.</returns>
+    [HttpGet("[controller]/NotFoundView/{id:long}")]
+    public IActionResult NotFoundView(long? id, [FromQuery] string? userMessage)
+    {
+        ViewBag.Id = id;
+        ViewBag.UserMessage = userMessage;
+        return View($"{DataObjectTypeName}NotFound");
+    }
+
+    /// <summary>
+    /// The method returns the not found view.
+    /// </summary>
+    /// <param name="id">The id that was not found.</param>
+    /// <param name="userMessage">Optionally, a user message; stored in ViewBag.UserMessage.</param>
+    /// <returns>The view.</returns>
+    [HttpGet("[controller]/NotFoundView/{id}")]
+    public IActionResult NotFoundView(string? id, [FromQuery] string? userMessage)
+    {
+        ViewBag.Id = id;
+        ViewBag.UserMessage = userMessage;
+        return View($"{DataObjectTypeName}NotFound");
     }
 
     /// <summary>
@@ -822,10 +850,12 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
     [HttpPost]
     public virtual async Task<IActionResult> UpdateAsync(T dataObject)
     {
-        string id = string.IsNullOrEmpty(dataObject.StringID) ? dataObject.Integer64ID.ToString() : dataObject.StringID;
+        string id = string.Empty;
 
         try
         {
+            id = string.IsNullOrEmpty(dataObject.StringID) ? dataObject.Integer64ID.ToString() : dataObject.StringID;
+
             if (ModelState.IsValid)
             {
                 dataObject = await DataLayer.UpdateAsync(dataObject);
@@ -833,7 +863,7 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
 
                 if (IsCUDActionRedirectedOnSuccess)
                 {
-                    return RedirectToAction(nameof(Index));
+                    return RedirectToAction($"{DataObjectTypeName}{nameof(Index)}");
                 }
                 else
                 {
@@ -889,11 +919,11 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
 
             if (IsActionRedirectedOnNotFound)
             {
-                return RedirectToAction(NotFoundActionName, NotFoundControllerName, new { UserMessage = "The record was not found; another user may have deleted it." });
+                return RedirectToAction(NotFoundActionName, NotFoundControllerName, new { UserMessage = $"The {DataObjectTypeName.SpaceCamelCase()} record was not found; another user may have deleted it." });
             }
             else
             {
-                return NotFound(new { UserMessage = "The record was not found; please refresh the page because another user may have deleted it." });
+                return NotFound(new { UserMessage = $"The {DataObjectTypeName.SpaceCamelCase()} record was not found; please refresh the page because another user may have deleted it." });
             }
         }
         catch (Exception ex)
@@ -902,11 +932,11 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
 
             if (IsActionRedirectedOnError)
             {
-                return RedirectToAction(ErrorActionName, ErrorControllerName, new { UserMessage = "Failed to update the record because of an error on the server." });
+                return RedirectToAction(ErrorActionName, ErrorControllerName, new { UserMessage = $"Failed to update the {DataObjectTypeName.SpaceCamelCase()} record because of an error on the server." });
             }
             else
             {
-                return Problem(detail: "Failed to update the record because of an error on the server.");
+                return Problem(detail: $"Failed to update the {DataObjectTypeName.SpaceCamelCase()} record because of an error on the server.");
             }
         }
     }

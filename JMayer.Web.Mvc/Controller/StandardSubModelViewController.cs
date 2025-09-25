@@ -100,7 +100,7 @@ public class StandardSubModelViewController<T, U> : StandardModelViewController<
     {
         IActionResult actionResult = await base.CreateAsync(dataObject);
 
-        if (actionResult is RedirectToActionResult redirectToActionResult && redirectToActionResult.ActionName == nameof(Index))
+        if (actionResult is RedirectToActionResult redirectToActionResult && redirectToActionResult.ActionName is not null && redirectToActionResult.ActionName.EndsWith(nameof(Index)))
         {
             redirectToActionResult.RouteValues ??= [];
             redirectToActionResult.RouteValues.Add("Id", dataObject.OwnerInteger64ID);
@@ -139,7 +139,7 @@ public class StandardSubModelViewController<T, U> : StandardModelViewController<
 
                 if (IsCUDActionRedirectedOnSuccess)
                 {
-                    return RedirectToAction(nameof(Index), new { id = dataObject.OwnerInteger64ID });
+                    return RedirectToAction($"{DataObjectTypeName}{nameof(Index)}", new { id = dataObject.OwnerInteger64ID });
                 }
                 else
                 {
@@ -205,7 +205,7 @@ public class StandardSubModelViewController<T, U> : StandardModelViewController<
 
                 if (IsCUDActionRedirectedOnSuccess)
                 {
-                    return RedirectToAction(nameof(Index), new { id = dataObject.OwnerStringID });
+                    return RedirectToAction($"{DataObjectTypeName}{nameof(Index)}", new { id = dataObject.OwnerStringID });
                 }
                 else
                 {
@@ -253,7 +253,7 @@ public class StandardSubModelViewController<T, U> : StandardModelViewController<
         {
             ViewBag.OwnerId = ownerId;
             List<T>? dataObjects = await DataLayer.GetAllAsync(obj => obj.OwnerInteger64ID == ownerId);
-            return View($"{DataObjectTypeName}Index", dataObjects);
+            return View($"{DataObjectTypeName}{nameof(Index)}", dataObjects);
         }
         catch (Exception ex)
         {
@@ -282,7 +282,7 @@ public class StandardSubModelViewController<T, U> : StandardModelViewController<
         {
             ViewBag.OwnerId = ownerId;
             List<T>? dataObjects = await DataLayer.GetAllAsync(obj => obj.OwnerStringID == ownerId);
-            return View($"{DataObjectTypeName}Index", dataObjects);
+            return View($"{DataObjectTypeName}{nameof(Index)}", dataObjects);
         }
         catch (Exception ex)
         {
@@ -305,7 +305,7 @@ public class StandardSubModelViewController<T, U> : StandardModelViewController<
     {
         IActionResult actionResult = await base.UpdateAsync(dataObject);
 
-        if (actionResult is RedirectToActionResult redirectToActionResult && redirectToActionResult.ActionName == nameof(Index))
+        if (actionResult is RedirectToActionResult redirectToActionResult && redirectToActionResult.ActionName is not null && redirectToActionResult.ActionName.EndsWith(nameof(Index)))
         {
             redirectToActionResult.RouteValues ??= [];
             redirectToActionResult.RouteValues.Add("Id", dataObject.OwnerInteger64ID);

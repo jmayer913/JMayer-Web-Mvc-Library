@@ -3,7 +3,7 @@ using Microsoft.Extensions.Logging;
 using TestProject.Data;
 using TestProject.Database;
 
-namespace TestProject.Controller;
+namespace TestProject.Controller.MVC;
 
 /// <summary>
 /// The class manages HTTP view and action requests associated with a simple data object and simple memory data layer.
