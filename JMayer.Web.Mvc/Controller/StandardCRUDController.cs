@@ -14,6 +14,8 @@ using System.Net;
 
 #warning I'm thinking of abandoning the ServerSideValidationResult object since asp.net core already utilizes the ModelStateDictionary and ValidationProblemDetails objects.
 
+#warning I want to add more logging. I want to log the request has been made, take action on the request and then log success or failure of the action. I'm not logging the request and I'm not always logging success.
+
 namespace JMayer.Web.Mvc.Controller;
 
 /// <summary>

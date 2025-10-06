@@ -1,5 +1,6 @@
 ﻿using JMayer.Data.Data;
 using JMayer.Data.Database.DataLayer;
+using JMayer.Web.Mvc.Extension;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
@@ -100,7 +101,7 @@ public class StandardSubModelViewController<T, U> : StandardModelViewController<
     {
         IActionResult actionResult = await base.CreateAsync(dataObject);
 
-        if (actionResult is RedirectToActionResult redirectToActionResult && redirectToActionResult.ActionName is not null && redirectToActionResult.ActionName.EndsWith(nameof(Index)))
+        if (actionResult is RedirectToActionResult redirectToActionResult && redirectToActionResult.ActionName is not null && redirectToActionResult.ActionName is nameof(Index))
         {
             redirectToActionResult.RouteValues ??= [];
             redirectToActionResult.RouteValues.Add("Id", dataObject.OwnerInteger64ID);
@@ -122,15 +123,7 @@ public class StandardSubModelViewController<T, U> : StandardModelViewController<
             if (dataObject is null)
             {
                 Logger.LogWarning("The {ID} for the {Type} was not found so no delete occurred.", id.ToString(), DataObjectTypeName);
-
-                if (IsActionRedirectedOnNotFound)
-                {
-                    return RedirectToAction(NotFoundActionName, NotFoundControllerName, new { UserMessage = "The record was not found; another user may have deleted it." });
-                }
-                else
-                {
-                    return NotFound(new { UserMessage = "The record was not found; please refresh the page because another user may have deleted it." });
-                }
+                return NotFound(new { UserMessage = $"The {DataObjectTypeName.SpaceCamelCase()} record was not found; please refresh the page because another user may have deleted it." });
             }
             else
             {
@@ -188,15 +181,7 @@ public class StandardSubModelViewController<T, U> : StandardModelViewController<
             if (dataObject is null)
             {
                 Logger.LogWarning("The {ID} for the {Type} was not found so no delete occurred.", id, DataObjectTypeName);
-
-                if (IsActionRedirectedOnNotFound)
-                {
-                    return RedirectToAction(NotFoundActionName, NotFoundControllerName, new { UserMessage = "The record was not found; another user may have deleted it." });
-                }
-                else
-                {
-                    return NotFound(new { UserMessage = "The record was not found; please refresh the page because another user may have deleted it." });
-                }
+                return NotFound(new { UserMessage = $"The {DataObjectTypeName.SpaceCamelCase()} record was not found; please refresh the page because another user may have deleted it." });
             }
             else
             {
@@ -305,7 +290,7 @@ public class StandardSubModelViewController<T, U> : StandardModelViewController<
     {
         IActionResult actionResult = await base.UpdateAsync(dataObject);
 
-        if (actionResult is RedirectToActionResult redirectToActionResult && redirectToActionResult.ActionName is not null && redirectToActionResult.ActionName.EndsWith(nameof(Index)))
+        if (actionResult is RedirectToActionResult redirectToActionResult && redirectToActionResult.ActionName is not null && redirectToActionResult.ActionName is nameof(Index))
         {
             redirectToActionResult.RouteValues ??= [];
             redirectToActionResult.RouteValues.Add("Id", dataObject.OwnerInteger64ID);

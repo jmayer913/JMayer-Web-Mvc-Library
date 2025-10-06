@@ -5,8 +5,14 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.Extensions.Logging;
 
-#warning I need to decide if not found & conflict will redirect to a general view or a view specific to the model.
-#warning I'm also wondering if I shouldn't redirect when a not found occurs when retrieving a view. It seems like I can just return a not found view.
+#warning Conflict accepts the model state and I've been wondering if I should try to utilize it but I'm not 100% sure how that will work because the error requires a key which is a property name and the id might not be visible.
+#warning This makes me think I should just redirect. By default, it'll redirect to an action local to the controller but if the user needs to redirect elsewhere I have properties for the name and controller.
+#warning Ok. I think I have my solution for Conflict.
+#warning I have the Conflict accepting an Id which makes me feel like I should query the record and return it as a model.
+
+
+
+#warning I want to add more logging. I want to log the request has been made, take action on the request and then log success or failure of the action. I'm not logging the request and I'm not always logging success.
 
 namespace JMayer.Web.Mvc.Controller;
 
@@ -17,6 +23,10 @@ namespace JMayer.Web.Mvc.Controller;
 /// Properties dictate if the controller uses the MVC pattern (redirects or returning views with the model state) or 
 /// Ajax pattern (returning json to be processed by javascript). The default functionality is the MVC pattern and you 
 /// can switch what you need to the Ajax pattern in the constructor of your child class.
+/// <br/>
+/// <br/>
+/// When a model is not found, a 404 will be returned. With the MVC pattern, 404 handling will need to setup in the middleware
+/// so the user is displayed a meaningful page else the browser will display whatever it displays for a 404.
 /// </summary>
 /// <typeparam name="T">Must be a DataObject since the data layer requires this.</typeparam>
 /// <typeparam name="U">Must be an IStandardCRUDDataLayer so the controller can interact with the collection/table associated with it.</typeparam>
@@ -78,10 +88,10 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
     /// then in the constructor of your child class, set this property to false.
     /// <br/>
     /// <br/>
-    /// When a general exception is thrown in an action, the controller will redirect to the Home controller for the Conflict action
-    /// with a user message in the route. This allows you to accept the message as a string and display it if need be. If a different 
-    /// controller and/or action is needed, set the ConflictActionName and ConflictControllerName properties to what you need in the constructor 
-    /// of your child class.
+    /// When data conflict occurs, the controller will redirect to the this controller for the ConflictView action with the id
+    /// and a user message in the route. The id will be stored in the ViewBag.Id and the user message will be stored in the ViewBag.UserMessage;
+    /// you can use them if you want. If a different controller and/or action is needed, set the ConflictActionName and ConflictControllerName 
+    /// properties to what you need in the constructor of your child class.
     /// </remarks>
     public bool IsActionRedirectedOnConflict { get; init; } = true;
 
@@ -101,21 +111,6 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
     public bool IsActionRedirectedOnError { get; init; } = true;
 
     /// <summary>
-    /// The property gets/sets if the controller redirects when a data object is not found.
-    /// </summary>
-    /// <remarks>
-    /// The default functionality is to do a redirect but if you need to return a 404 not found with a user message
-    /// then in the constructor of your child class, set this property to false.
-    /// <br/>
-    /// <br/>
-    /// When a data object is not found for an action, the controller will redirect to the local NotFoundView action with a user 
-    /// message in the route. The user message is stored in ViewBag.UserMessage; this allows you to display the message if need be. 
-    /// If a different controller and/or action is needed, set the NotFoundActionName and NotFoundControllerName properties to what 
-    /// you need in the constructor of your child class.
-    /// </remarks>
-    public bool IsActionRedirectedOnNotFound { get; init; } = true;
-
-    /// <summary>
     /// The property gets/sets if the controller redirects a CUD (Create, Delete or Update) action on success to the Index view.
     /// </summary>
     /// <remarks>
@@ -128,24 +123,6 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
     /// The logger the controller will interact with.
     /// </summary>
     protected ILogger Logger { get; private init; }
-
-    /// <summary>
-    /// The property gets/sets the name of the not found action.
-    /// </summary>
-    /// <remarks>
-    /// The default is NotFoundView but if you need to change it then in the constructor of your child class,
-    /// set this property to the name you need.
-    /// </remarks>
-    public string NotFoundActionName { get; init; } = "NotFoundView";
-
-    /// <summary>
-    /// The property gets/sets the name of the not found controller.
-    /// </summary>
-    /// <remarks>
-    /// The default is null but if you need to change it then in the constructor of your child class,
-    /// set this property to the name you need.
-    /// </remarks>
-    public string? NotFoundControllerName { get; init; }
 
     /// <summary>
     /// The property gets/sets what the controller will do when the model fails server-side validation.
@@ -307,15 +284,7 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
             if (dataObject is null)
             {
                 Logger.LogWarning("The {ID} for the {Type} was not found so no delete occurred.", id.ToString(), DataObjectTypeName);
-
-                if (IsActionRedirectedOnNotFound)
-                {
-                    return RedirectToAction(NotFoundActionName, NotFoundControllerName, new { UserMessage = $"The {DataObjectTypeName.SpaceCamelCase()} record was not found; another user may have deleted it." });
-                }
-                else
-                {
-                    return NotFound(new { UserMessage = $"The {DataObjectTypeName.SpaceCamelCase()} record was not found; please refresh the page because another user may have deleted it." });
-                }
+                return NotFound(new { UserMessage = $"The {DataObjectTypeName.SpaceCamelCase()} record was not found; please refresh the page because another user may have deleted it." });
             }
             else
             {
@@ -375,15 +344,7 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
             if (dataObject is null)
             {
                 Logger.LogWarning("The {ID} for the {Type} was not found so no delete occurred.", id, DataObjectTypeName);
-
-                if (IsActionRedirectedOnNotFound)
-                {
-                    return RedirectToAction(NotFoundActionName, NotFoundControllerName, new { UserMessage = $"The {DataObjectTypeName.SpaceCamelCase()} record was not found; another user may have deleted it." });
-                }
-                else
-                {
-                    return NotFound(new { UserMessage = $"The {DataObjectTypeName.SpaceCamelCase()} record was not found; please refresh the page because another user may have deleted it." });
-                }
+                return NotFound(new { UserMessage = $"The {DataObjectTypeName.SpaceCamelCase()} record was not found; please refresh the page because another user may have deleted it." });
             }
             else
             {
@@ -443,15 +404,7 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
             if (dataObject is null)
             {
                 Logger.LogError("Failed to find the {ID} when fetching the Delete Partial View for the {Type}.", id, DataObjectTypeName);
-
-                if (IsActionRedirectedOnNotFound)
-                {
-                    return RedirectToAction(NotFoundActionName, NotFoundControllerName, new { UserMessage = $"The {DataObjectTypeName.SpaceCamelCase()} record was not found; another user may have deleted it." });
-                }
-                else
-                {
-                    return NotFound(new { UserMessage = $"The {DataObjectTypeName.SpaceCamelCase()} record was not found; please refresh the page because another user may have deleted it." });
-                }
+                return NotFound(new { UserMessage = $"The {DataObjectTypeName.SpaceCamelCase()} record was not found; please refresh the page because another user may have deleted it." });
             }
 
             return new PartialViewResult()
@@ -490,15 +443,7 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
             if (dataObject is null)
             {
                 Logger.LogError("Failed to find the {ID} when fetching the Delete Partial View for the {Type}.", id, DataObjectTypeName);
-
-                if (IsActionRedirectedOnNotFound)
-                {
-                    return RedirectToAction(NotFoundActionName, NotFoundControllerName, new { UserMessage = $"The {DataObjectTypeName.SpaceCamelCase()} record was not found; another user may have deleted it." });
-                }
-                else
-                {
-                    return NotFound(new { UserMessage = $"The {DataObjectTypeName.SpaceCamelCase()} record was not found; please refresh the page because another user may have deleted it." });
-                }
+                return NotFound(new { UserMessage = $"The {DataObjectTypeName.SpaceCamelCase()} record was not found; please refresh the page because another user may have deleted it." });
             }
 
             return new PartialViewResult()
@@ -537,15 +482,7 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
             if (dataObject is null)
             {
                 Logger.LogError("Failed to find the {ID} when fetching the Delete View for the {Type}.", id, DataObjectTypeName);
-
-                if (IsActionRedirectedOnNotFound)
-                {
-                    return RedirectToAction(NotFoundActionName, NotFoundControllerName, new { UserMessage = $"The {DataObjectTypeName.SpaceCamelCase()} record was not found; user may have deleted it." });
-                }
-                else
-                {
-                    return NotFound(new { UserMessage = $"The {DataObjectTypeName.SpaceCamelCase()} record was not found; please refresh the page because another user may have deleted it." });
-                }
+                return NotFound(new { UserMessage = $"The {DataObjectTypeName.SpaceCamelCase()} record was not found; please refresh the page because another user may have deleted it." });
             }
 
             return View($"{DataObjectTypeName}Delete", dataObject);
@@ -580,15 +517,7 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
             if (dataObject == null)
             {
                 Logger.LogError("Failed to find the {ID} when fetching the Delete View for the {Type}.", id, DataObjectTypeName);
-
-                if (IsActionRedirectedOnNotFound)
-                {
-                    return RedirectToAction(NotFoundActionName, NotFoundControllerName, new { UserMessage = $"The {DataObjectTypeName.SpaceCamelCase()} record was not found; user may have deleted it." });
-                }
-                else
-                {
-                    return NotFound(new { UserMessage = $"The {DataObjectTypeName.SpaceCamelCase()} record was not found; please refresh the page because another user may have deleted it." });
-                }
+                return NotFound(new { UserMessage = $"The {DataObjectTypeName.SpaceCamelCase()} record was not found; please refresh the page because another user may have deleted it." });
             }
 
             return View($"{DataObjectTypeName}Delete", dataObject);
@@ -623,15 +552,7 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
             if (dataObject is null)
             {
                 Logger.LogError("Failed to find the {ID} when fetching the Edit Partial View for the {Type}.", id, DataObjectTypeName);
-
-                if (IsActionRedirectedOnNotFound)
-                {
-                    return RedirectToAction(NotFoundActionName, NotFoundControllerName, new { UserMessage = $"The {DataObjectTypeName.SpaceCamelCase()} record was not found; another user may have deleted it." });
-                }
-                else
-                {
-                    return NotFound(new { UserMessage = $"The {DataObjectTypeName.SpaceCamelCase()} record was not found; please refresh the page because another user may have deleted it." });
-                }
+                return NotFound(new { UserMessage = $"The {DataObjectTypeName.SpaceCamelCase()} record was not found; please refresh the page because another user may have deleted it." });
             }
 
             return new PartialViewResult()
@@ -670,15 +591,7 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
             if (dataObject is null)
             {
                 Logger.LogError("Failed to find the {ID} when fetching the Edit Partial View for the {Type}.", id, DataObjectTypeName);
-
-                if (IsActionRedirectedOnNotFound)
-                {
-                    return RedirectToAction(NotFoundActionName, NotFoundControllerName, new { UserMessage = $"The {DataObjectTypeName.SpaceCamelCase()} record was not found; another user may have deleted it." });
-                }
-                else
-                {
-                    return NotFound(new { UserMessage = $"The {DataObjectTypeName.SpaceCamelCase()} record was not found; please refresh the page because another user may have deleted it." });
-                }
+                return NotFound(new { UserMessage = $"The {DataObjectTypeName.SpaceCamelCase()} record was not found; please refresh the page because another user may have deleted it." });
             }
 
             return new PartialViewResult()
@@ -717,15 +630,7 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
             if (dataObject is null)
             {
                 Logger.LogError("Failed to find the {ID} when fetching the Edit View for the {Type}.", id, DataObjectTypeName);
-
-                if (IsActionRedirectedOnNotFound)
-                {
-                    return RedirectToAction(NotFoundActionName, NotFoundControllerName, new { UserMessage = $"The {DataObjectTypeName.SpaceCamelCase()} record was not found; another user may have deleted it." });
-                }
-                else
-                {
-                    return NotFound(new { UserMessage = $"The {DataObjectTypeName.SpaceCamelCase()} record was not found; please refresh the page because another user may have deleted it." });
-                }
+                return NotFound(new { UserMessage = $"The {DataObjectTypeName.SpaceCamelCase()} record was not found; please refresh the page because another user may have deleted it." });
             }
 
             return View($"{DataObjectTypeName}Edit", dataObject);
@@ -760,15 +665,7 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
             if (dataObject == null)
             {
                 Logger.LogError("Failed to find the {ID} when fetching the Edit View for the {Type}.", id, DataObjectTypeName);
-
-                if (IsActionRedirectedOnNotFound)
-                {
-                    return RedirectToAction(NotFoundActionName, NotFoundControllerName, new { UserMessage = $"The {DataObjectTypeName.SpaceCamelCase()} record was not found; another user may have deleted it." });
-                }
-                else
-                {
-                    return NotFound(new { UserMessage = $"The {DataObjectTypeName.SpaceCamelCase()} record was not found; please refresh the page because another user may have deleted it." });
-                }
+                return NotFound(new { UserMessage = $"The {DataObjectTypeName.SpaceCamelCase()} record was not found; please refresh the page because another user may have deleted it." });
             }
 
             return View($"{DataObjectTypeName}Edit", dataObject);
@@ -812,34 +709,6 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
                 return Problem(detail: $"Failed to find the {DataObjectTypeName.SpaceCamelCase()} Index View because of an error on the server.");
             }
         }
-    }
-
-    /// <summary>
-    /// The method returns the not found view.
-    /// </summary>
-    /// <param name="id">The id that was not found.</param>
-    /// <param name="userMessage">Optionally, a user message; stored in ViewBag.UserMessage.</param>
-    /// <returns>The view.</returns>
-    [HttpGet("[controller]/NotFoundView/{id:long}")]
-    public IActionResult NotFoundView(long? id, [FromQuery] string? userMessage)
-    {
-        ViewBag.Id = id;
-        ViewBag.UserMessage = userMessage;
-        return View($"{DataObjectTypeName}NotFound");
-    }
-
-    /// <summary>
-    /// The method returns the not found view.
-    /// </summary>
-    /// <param name="id">The id that was not found.</param>
-    /// <param name="userMessage">Optionally, a user message; stored in ViewBag.UserMessage.</param>
-    /// <returns>The view.</returns>
-    [HttpGet("[controller]/NotFoundView/{id}")]
-    public IActionResult NotFoundView(string? id, [FromQuery] string? userMessage)
-    {
-        ViewBag.Id = id;
-        ViewBag.UserMessage = userMessage;
-        return View($"{DataObjectTypeName}NotFound");
     }
 
     /// <summary>
@@ -916,15 +785,7 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
         catch (IDNotFoundException ex)
         {
             Logger.LogWarning(ex, "Failed to update the {ID} {Type} because it was not found.", id, DataObjectTypeName);
-
-            if (IsActionRedirectedOnNotFound)
-            {
-                return RedirectToAction(NotFoundActionName, NotFoundControllerName, new { UserMessage = $"The {DataObjectTypeName.SpaceCamelCase()} record was not found; another user may have deleted it." });
-            }
-            else
-            {
-                return NotFound(new { UserMessage = $"The {DataObjectTypeName.SpaceCamelCase()} record was not found; please refresh the page because another user may have deleted it." });
-            }
+            return NotFound(new { UserMessage = $"The {DataObjectTypeName.SpaceCamelCase()} record was not found; please refresh the page because another user may have deleted it." });
         }
         catch (Exception ex)
         {
