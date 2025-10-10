@@ -10,10 +10,6 @@ using Microsoft.Extensions.Logging;
 #warning Ok. I think I have my solution for Conflict.
 #warning I have the Conflict accepting an Id which makes me feel like I should query the record and return it as a model.
 
-
-
-#warning I want to add more logging. I want to log the request has been made, take action on the request and then log success or failure of the action. I'm not logging the request and I'm not always logging success.
-
 namespace JMayer.Web.Mvc.Controller;
 
 /// <summary>
@@ -265,6 +261,164 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
             else
             {
                 return Problem(detail: $"Failed to create the {DataObjectTypeName.SpaceCamelCase()} record because of an error on the server.");
+            }
+        }
+    }
+
+    /// <summary>
+    /// The method returns the conflict partial view.
+    /// </summary>
+    /// <param name="id">Optionally, the id that had a conflict; stored in ViewBag.Id.</param>
+    /// <param name="userMessage">Optionally, a user message; stored in ViewBag.UserMessage.</param>
+    /// <returns>The view.</returns>
+    [HttpGet("[controller]/ConflictPartialView/{id:long}")]
+    public virtual async Task<IActionResult> ConflictPartialViewAsync(long? id, [FromQuery] string? userMessage)
+    {
+        try
+        {
+            T? dataObject = await DataLayer.GetSingleAsync(obj => obj.Integer64ID == id);
+
+            if (dataObject is null)
+            {
+                return NotFound(new { UserMessage = $"The {DataObjectTypeName.SpaceCamelCase()} record was not found; please refresh the page because another user may have deleted it." });
+            }
+
+            ViewBag.UserMessage = userMessage;
+
+            IActionResult actionResult = new PartialViewResult()
+            {
+                ViewData = new ViewDataDictionary<T>(ViewData, dataObject),
+                ViewName = $"_{DataObjectTypeName}ConflictPartial",
+            };
+            return await Task.FromResult(actionResult);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Failed to return the Conflict Partial View for the {Type}.", DataObjectTypeName);
+
+            if (IsActionRedirectedOnError)
+            {
+                return RedirectToAction(ErrorActionName, ErrorControllerName, new { UserMessage = $"Failed to find the {DataObjectTypeName.SpaceCamelCase()} Conflict Partial View because of an error on the server." });
+            }
+            else
+            {
+                return Problem(detail: $"Failed to find the {DataObjectTypeName.SpaceCamelCase()} Conflict Partial View because of an error on the server.");
+            }
+        }
+    }
+
+    /// <summary>
+    /// The method returns the conflict partial view.
+    /// </summary>
+    /// <param name="id">Optionally, the id that had a conflict; stored in ViewBag.Id.</param>
+    /// <param name="userMessage">Optionally, a user message; stored in ViewBag.UserMessage.</param>
+    /// <returns>The view.</returns>
+    [HttpGet("[controller]/ConflictPartialView/{id}")]
+    public virtual async Task<IActionResult> ConflictPartialViewAsync(string? id, [FromQuery] string? userMessage)
+    {
+        try
+        {
+            T? dataObject = await DataLayer.GetSingleAsync(obj => obj.StringID == id);
+
+            if (dataObject is null)
+            {
+                return NotFound(new { UserMessage = $"The {DataObjectTypeName.SpaceCamelCase()} record was not found; please refresh the page because another user may have deleted it." });
+            }
+
+            ViewBag.UserMessage = userMessage;
+
+            IActionResult actionResult = new PartialViewResult()
+            {
+                ViewData = new ViewDataDictionary<T>(ViewData, dataObject),
+                ViewName = $"_{DataObjectTypeName}ConflictPartial",
+            };
+            return await Task.FromResult(actionResult);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Failed to return the Conflict Partial View for the {Type}.", DataObjectTypeName);
+
+            if (IsActionRedirectedOnError)
+            {
+                return RedirectToAction(ErrorActionName, ErrorControllerName, new { UserMessage = $"Failed to find the {DataObjectTypeName.SpaceCamelCase()} Conflict Partial View because of an error on the server." });
+            }
+            else
+            {
+                return Problem(detail: $"Failed to find the {DataObjectTypeName.SpaceCamelCase()} Conflict Partial View because of an error on the server.");
+            }
+        }
+    }
+
+    /// <summary>
+    /// The method returns the conflict view.
+    /// </summary>
+    /// <param name="id">Optionally, the id that had a conflict; stored in ViewBag.Id.</param>
+    /// <param name="userMessage">Optionally, a user message; stored in ViewBag.UserMessage.</param>
+    /// <returns>The view.</returns>
+    [HttpGet("[controller]/ConflictView/{id:long}")]
+    public virtual async Task<IActionResult> ConflictViewAsync(long? id, [FromQuery] string? userMessage)
+    {
+        try
+        {
+            T? dataObject = await DataLayer.GetSingleAsync(obj => obj.Integer64ID == id);
+
+            if (dataObject is null)
+            {
+                return NotFound(new { UserMessage = $"The {DataObjectTypeName.SpaceCamelCase()} record was not found; please refresh the page because another user may have deleted it." });
+            }
+
+            ViewBag.UserMessage = userMessage;
+            IActionResult actionResult = View($"{DataObjectTypeName}Conflict", dataObject);
+            return await Task.FromResult(actionResult);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Failed to return the Conflict View for the {Type}.", DataObjectTypeName);
+
+            if (IsActionRedirectedOnError)
+            {
+                return RedirectToAction(ErrorActionName, ErrorControllerName, new { UserMessage = $"Failed to find the {DataObjectTypeName.SpaceCamelCase()} Conflict View because of an error on the server." });
+            }
+            else
+            {
+                return Problem(detail: $"Failed to find the {DataObjectTypeName.SpaceCamelCase()} Conflict View because of an error on the server.");
+            }
+        }
+    }
+
+    /// <summary>
+    /// The method returns the conflict view.
+    /// </summary>
+    /// <param name="id">Optionally, the id that had a conflict; stored in ViewBag.Id.</param>
+    /// <param name="userMessage">Optionally, a user message; stored in ViewBag.UserMessage.</param>
+    /// <returns>The view.</returns>
+    [HttpGet("[controller]/ConflictView/{id}")]
+    public virtual async Task<IActionResult> ConflictViewAsync(string? id, [FromQuery] string? userMessage)
+    {
+        try
+        {
+            T? dataObject = await DataLayer.GetSingleAsync(obj => obj.StringID == id);
+
+            if (dataObject is null)
+            {
+                return NotFound(new { UserMessage = $"The {DataObjectTypeName.SpaceCamelCase()} record was not found; please refresh the page because another user may have deleted it." });
+            }
+
+            ViewBag.UserMessage = userMessage;
+            IActionResult actionResult = View($"{DataObjectTypeName}Conflict");
+            return await Task.FromResult(actionResult);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Failed to return the Conflict View for the {Type}.", DataObjectTypeName);
+
+            if (IsActionRedirectedOnError)
+            {
+                return RedirectToAction(ErrorActionName, ErrorControllerName, new { UserMessage = $"Failed to find the {DataObjectTypeName.SpaceCamelCase()} Conflict View because of an error on the server." });
+            }
+            else
+            {
+                return Problem(detail: $"Failed to find the {DataObjectTypeName.SpaceCamelCase()} Conflict View because of an error on the server.");
             }
         }
     }
