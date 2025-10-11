@@ -6,7 +6,7 @@ namespace JMayer.Web.Mvc.Extension;
 /// <summary>
 /// The static class has methods that extend the functionality of the DataObjectValidationException class.
 /// </summary>
-internal static class DataObjectValidationExceptionExtension
+public static class DataObjectValidationExceptionExtension
 {
     /// <summary>
     /// The method copies the validation results in the exception to the model state.
