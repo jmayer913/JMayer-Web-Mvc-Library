@@ -4,19 +4,44 @@ using JMayer.Web.Mvc.Extension;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
-namespace JMayer.Web.Mvc.Controller;
+namespace JMayer.Web.Mvc.Controller.Mvc;
 
 /// <summary>
-/// The class manages HTTP view and action requests associated with a sub user editable data object and a data layer.
+/// The class manages HTTP action requests associated with a sub user editable data object and a data layer.
 /// <br/>
 /// <br/>
-/// The controller is desinged to return a subset of data objects based on an owner id. 
-/// [I need to explain how the owner id will be passed around.]
+/// The controller is desinged to return a subset of data objects based on an owner id. The IndexAsync() uses the
+/// default pattern mapping to accept an owner id and return the subset. The owner id will be stored in the ViewBag
+/// and you can use it in the MVC pattern when navigating to an add page. The AddViewAsync() and AddPartialViewAsync() 
+/// also uses the default pattern mapping to accept an owner id. The owner id will be stored in the ViewBag and
+/// when using the MVC pattern, it can be stored in a hidden input in the form so the owner id is added to the
+/// data object when posted to the Create action. When using the MVC pattern, the CUD actions, on success, will
+/// redirect back to the Index page and the id will be set to the owner id.
 /// <br/>
 /// <br/>
-/// Properties dictate if the controller uses the MVC pattern (redirects or returning views with the model state) or 
-/// Ajax pattern (returning json to be processed by javascript). The default functionality is the MVC pattern and you 
-/// can switch what you need to the Ajax pattern in the constructor of your child class.
+/// The IsCUDActionRedirectedOnSuccess and ValidationFailedAction properties dictate if the controller uses the MVC
+/// pattern (redirects or returning views with the model state) or the Ajax pattern (returning json to be processed 
+/// by javascript). The default functionality is the MVC pattern and you can switch what you need to the Ajax pattern 
+/// in the constructor of your child class.
+/// <br/>
+/// <br/>
+/// When a model is not found, a 404 not found will be returned. With the Ajax pattern, javascript needs to be able to 
+/// handle this type of response; an object with a UserMessage field will be returned for you to optionally use. With the 
+/// MVC pattern, the middleware needs to be setup to handle this type of response so a user friendly page is displayed 
+/// instead of the browser default.
+/// <br/>
+/// <br/>
+/// If the data layer has old data object detection enabled or the data layer checks for dependencies before a delete 
+/// (a DataObjectDeleteConflictException is thrown), a 409 conflict can be returned for you to optionally use. With the Ajax 
+/// pattern, javascript needs to be able to handle this type of response; an object with a UserMessage field will be returned. 
+/// With the MVC pattern, the middleware needs to be setup to handle this type of response so a user friendly page is displayed 
+/// instead of the browser default.
+/// <br/>
+/// <br/>
+/// If an unexpected exception occurs, a 500 internal server error will be returned. With the Ajax pattern, javascript needs to 
+/// be able to handle this type of response; an object with a detail field will be returned for you to optionally use. With the 
+/// MVC pattern, the middleware needs to be setup to handle this type of response so a user friendly page is displayed instead 
+/// of the browser default.
 /// </summary>
 /// <typeparam name="T">Must be a SubUserEditableDataObject since the data layer requires this.</typeparam>
 /// <typeparam name="U">Must be an IUserEditableDataLayer so the controller can interact with the collection/table associated with it.</typeparam>
@@ -115,7 +140,6 @@ public class StandardSubModelViewController<T, U> : StandardModelViewController<
     [HttpPost("[controller]/Delete/{id:long}")]
     public override async Task<IActionResult> DeleteAsync(long id)
     {
-#warning See if I can come up with a solution that doesn't require overriding the entire DeleteAsync() just so I can inject the owner Id into the redirect.
         try
         {
             T? dataObject = await DataLayer.GetSingleAsync(obj => obj.Integer64ID == id);
@@ -143,28 +167,12 @@ public class StandardSubModelViewController<T, U> : StandardModelViewController<
         catch (DataObjectDeleteConflictException ex)
         {
             Logger.LogError(ex, "Failed to delete the {ID} {Type} because of a data conflict.", id.ToString(), DataObjectTypeName);
-
-            if (IsActionRedirectedOnConflict)
-            {
-                return RedirectToAction(ConflictActionName, ConflictControllerName, new { UserMessage = "The record has a dependency that prevents it from being deleted; the dependency needs to be deleted first." });
-            }
-            else
-            {
-                return Conflict(new { UserMessage = "The record has a dependency that prevents it from being deleted; the dependency needs to be deleted first." });
-            }
+            return Conflict(new { UserMessage = "The record has a dependency that prevents it from being deleted; the dependency needs to be deleted first." });
         }
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to delete the {ID} {Type}.", id.ToString(), DataObjectTypeName);
-
-            if (IsActionRedirectedOnError)
-            {
-                return RedirectToAction(ErrorActionName, ErrorControllerName, new { UserMessage = "Failed to delete the record because of an error on the server." });
-            }
-            else
-            {
-                return Problem(detail: "Failed to delete the record because of an error on the server.");
-            }
+            return Problem(detail: "Failed to delete the record because of an error on the server.");
         }
     }
 
@@ -173,7 +181,6 @@ public class StandardSubModelViewController<T, U> : StandardModelViewController<
     [HttpPost("[controller]/Delete/{id}")]
     public override async Task<IActionResult> DeleteAsync(string id)
     {
-#warning See if I can come up with a solution that doesn't require overriding the entire DeleteAsync() just so I can inject the owner Id into the redirect.
         try
         {
             T? dataObject = await DataLayer.GetSingleAsync(obj => obj.StringID == id);
@@ -201,28 +208,12 @@ public class StandardSubModelViewController<T, U> : StandardModelViewController<
         catch (DataObjectDeleteConflictException ex)
         {
             Logger.LogError(ex, "Failed to delete the {ID} {Type} because of a data conflict.", id.ToString(), DataObjectTypeName);
-
-            if (IsActionRedirectedOnConflict)
-            {
-                return RedirectToAction(ConflictActionName, ConflictControllerName, new { UserMessage = "The record has a dependency that prevents it from being deleted; the dependency needs to be deleted first." });
-            }
-            else
-            {
-                return Conflict(new { UserMessage = "The record has a dependency that prevents it from being deleted; the dependency needs to be deleted first." });
-            }
+            return Conflict(new { UserMessage = "The record has a dependency that prevents it from being deleted; the dependency needs to be deleted first." });
         }
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to delete the {ID} {Type}.", id.ToString(), DataObjectTypeName);
-
-            if (IsActionRedirectedOnError)
-            {
-                return RedirectToAction(ErrorActionName, ErrorControllerName, new { UserMessage = "Failed to delete the record because of an error on the server." });
-            }
-            else
-            {
-                return Problem(detail: "Failed to delete the record because of an error on the server.");
-            }
+            return Problem(detail: "Failed to delete the record because of an error on the server.");
         }
     }
 
@@ -243,15 +234,7 @@ public class StandardSubModelViewController<T, U> : StandardModelViewController<
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to return the Index View for the {Type}.", DataObjectTypeName);
-
-            if (IsActionRedirectedOnError)
-            {
-                return RedirectToAction(ErrorActionName, ErrorControllerName, new { Message = "Failed to find the Index View because of an error on the server." });
-            }
-            else
-            {
-                return Problem(detail: "Failed to find the Index View because of an error on the server.");
-            }
+            return Problem(detail: "Failed to find the Index View because of an error on the server.");
         }
     }
 
@@ -272,15 +255,7 @@ public class StandardSubModelViewController<T, U> : StandardModelViewController<
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to return the Index View for the {Type}.", DataObjectTypeName);
-
-            if (IsActionRedirectedOnError)
-            {
-                return RedirectToAction(ErrorActionName, ErrorControllerName, new { Message = "Failed to find the Index View because of an error on the server." });
-            }
-            else
-            {
-                return Problem(detail: "Failed to find the Index View because of an error on the server.");
-            }
+            return Problem(detail: "Failed to find the Index View because of an error on the server.");
         }
     }
 

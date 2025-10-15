@@ -1,14 +1,14 @@
-﻿using JMayer.Web.Mvc.Controller;
+﻿using JMayer.Web.Mvc.Controller.Mvc;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using TestProject.Controller.MVC;
+using TestProject.Controller.Mvc;
 using TestProject.Data;
 using TestProject.Database;
 
-#warning I need to test conflict.
-#warning I might be able to cheat to test the string id methods.
+#warning I think I can cheat to test the string id methods. Try this in the big refactor.
+#warning Could not test the delete conflict. The cheat I originally did in the api version doesn't work in the mvc version.
 
-namespace TestProject.Test.Controller.MVC;
+namespace TestProject.Test.Controller.Mvc;
 
 /// <summary>
 /// The class manages tests for the StandardModelViewContoller object.
@@ -166,17 +166,14 @@ public class StandardModelViewControllerUnitTest
     }
 
     /// <summary>
-    /// The method verifies the StandardModelViewContoller.CreateAsync() return a ObjectResult when the model is invalid.
+    /// The method verifies the StandardModelViewContoller.CreateAsync() return a ObjectResult when an unexpected exception occurs.
     /// </summary>
     /// <returns>A Task object for the async.</returns>
     [Fact]
     public async Task VerifyCreateReturnJsonOnError()
     {
         SimpleStandardCRUDDataLayer dataLayer = new();
-        SimpleStandardModelViewController controller = new(dataLayer, CreateConsoleLogger())
-        {
-            IsActionRedirectedOnError = false,
-        };
+        SimpleStandardModelViewController controller = new(dataLayer, CreateConsoleLogger());
         IActionResult actionResult = await controller.CreateAsync(null);
 
         Assert.IsType<ObjectResult>(actionResult); //Confirm the correct action is returned.
@@ -239,25 +236,6 @@ public class StandardModelViewControllerUnitTest
         Assert.Equal(nameof(Index), ((RedirectToActionResult)actionResult).ActionName); //Confirm the redirect is for Index.
         Assert.Null(((RedirectToActionResult)actionResult).ControllerName); //Confirm there's no controller name.
         Assert.Null(((RedirectToActionResult)actionResult).RouteValues); //Confirm there's no additional route values.
-        Assert.Null(((RedirectToActionResult)actionResult).Fragment); //Confirm there's no fragment.
-        Assert.False(((RedirectToActionResult)actionResult).Permanent); //Confirm the redirect isn't permanent.
-    }
-
-    /// <summary>
-    /// The method verifies the StandardModelViewContoller.CreateAsync() return a RedirectToActionResult when the model is invalid.
-    /// </summary>
-    /// <returns>A Task object for the async.</returns>
-    [Fact]
-    public async Task VerifyCreateReturnRedirectOnError()
-    {
-        SimpleStandardCRUDDataLayer dataLayer = new();
-        SimpleStandardModelViewController controller = new(dataLayer, CreateConsoleLogger());
-        IActionResult actionResult = await controller.CreateAsync(null);
-
-        Assert.IsType<RedirectToActionResult>(actionResult); //Confirm the correct action is returned.
-        Assert.Equal(controller.ErrorActionName, ((RedirectToActionResult)actionResult).ActionName); //Confirm the redirect is for Error action.
-        Assert.Equal(controller.ErrorControllerName, ((RedirectToActionResult)actionResult).ControllerName); //Confirm the redirect is for Error controller.
-        Assert.NotEmpty(((RedirectToActionResult)actionResult).RouteValues); //Confirm there is route values.
         Assert.Null(((RedirectToActionResult)actionResult).Fragment); //Confirm there's no fragment.
         Assert.False(((RedirectToActionResult)actionResult).Permanent); //Confirm the redirect isn't permanent.
     }
@@ -332,6 +310,28 @@ public class StandardModelViewControllerUnitTest
         Assert.NotNull(((NotFoundObjectResult)actionResult).Value); //Confirm the value is set.
         Assert.NotNull(((dynamic)((NotFoundObjectResult)actionResult).Value).UserMessage); //Confirm there is a custom user message.
     }
+
+    /// <summary>
+    /// The method verifies the StandardModelViewContoller.DeleteAsync() return a ConflictObjectResult when the data object doesn't exist.
+    /// </summary>
+    /// <returns>A Task object for the async.</returns>
+//    [Fact]
+//    public async Task VerifyDeleteReturnConflict()
+//    {
+//        SimpleStandardCRUDDataLayer dataLayer = new();
+//        _ = await dataLayer.CreateAsync(new SimpleDataObject()
+//        {
+//            //This is a cheat to force a delete conflict.
+//            Integer64ID = SimpleStandardCRUDDataLayer.DeleteConflictId,
+//        });
+
+//        SimpleStandardModelViewController controller = new(dataLayer, CreateConsoleLogger());
+//        IActionResult actionResult = await controller.DeleteAsync(InvalidId);
+
+//        Assert.IsType<ConflictObjectResult>(actionResult); //Confirm the correct action is returned.
+//        Assert.NotNull(((ConflictObjectResult)actionResult).Value); //Confirm the value is set.
+//        Assert.NotNull(((dynamic)((ConflictObjectResult)actionResult).Value).UserMessage); //Confirm there is a custom user message.
+//    }
 
     /// <summary>
     /// The method verifies the StandardModelViewContoller.DeleteAsync() return a JsonResult when ran successfully.
@@ -517,6 +517,31 @@ public class StandardModelViewControllerUnitTest
     }
 
     /// <summary>
+    /// The method verifies the StandardModelViewContoller.UpdateAsync() returns a ConflictObjectResult when ran successfully.
+    /// </summary>
+    /// <returns>A Task object for the async.</returns>
+    [Fact]
+    public async Task VerifyUpdateReturnConflict()
+    {
+        SimpleUserEditableDataLayer dataLayer = new();
+        SimpleUserEditableDataObject dataObject = await dataLayer.CreateAsync(new SimpleUserEditableDataObject() { Name = "Update Conflict Test", Value = DefaultValue });
+        SimpleUserEditableController controller = new(dataLayer, CreateConsoleLogger())
+        {
+            IsCUDActionRedirectedOnSuccess = false,
+        };
+
+        dataObject.Value += 1;
+        SimpleUserEditableDataObject oldDataObject = new(dataObject);
+
+        _ = await controller.UpdateAsync(dataObject);
+        IActionResult actionResult = await controller.UpdateAsync(oldDataObject);
+
+        Assert.IsType<ConflictObjectResult>(actionResult); //Confirm the correct action is returned.
+        Assert.NotNull(((ConflictObjectResult)actionResult).Value); //Confirm the value is set.
+        Assert.NotNull(((dynamic)((ConflictObjectResult)actionResult).Value).UserMessage); //Confirm there is a custom user message.
+    }
+
+    /// <summary>
     /// The method verifies the StandardModelViewContoller.UpdateAsync() return a JsonResult when ran successfully.
     /// </summary>
     /// <returns>A Task object for the async.</returns>
@@ -584,17 +609,14 @@ public class StandardModelViewControllerUnitTest
     }
 
     /// <summary>
-    /// The method verifies the StandardModelViewContoller.UpdateAsync() return a ObjectResult when the model is invalid.
+    /// The method verifies the StandardModelViewContoller.UpdateAsync() return a ObjectResult when an unexpected exception occurs.
     /// </summary>
     /// <returns>A Task object for the async.</returns>
     [Fact]
     public async Task VerifyUpdateReturnJsonOnError()
     {
         SimpleStandardCRUDDataLayer dataLayer = new();
-        SimpleStandardModelViewController controller = new(dataLayer, CreateConsoleLogger())
-        {
-            IsActionRedirectedOnError = false,
-        };
+        SimpleStandardModelViewController controller = new(dataLayer, CreateConsoleLogger());
         IActionResult actionResult = await controller.UpdateAsync(null);
 
         Assert.IsType<ObjectResult>(actionResult); //Confirm the correct action is returned.
@@ -683,25 +705,6 @@ public class StandardModelViewControllerUnitTest
         Assert.Equal(nameof(Index), ((RedirectToActionResult)actionResult).ActionName); //Confirm the redirect is for Index.
         Assert.Null(((RedirectToActionResult)actionResult).ControllerName); //Confirm there's no controller name.
         Assert.Null(((RedirectToActionResult)actionResult).RouteValues); //Confirm there's no additional route values.
-        Assert.Null(((RedirectToActionResult)actionResult).Fragment); //Confirm there's no fragment.
-        Assert.False(((RedirectToActionResult)actionResult).Permanent); //Confirm the redirect isn't permanent.
-    }
-
-    /// <summary>
-    /// The method verifies the StandardModelViewContoller.UpdateAsync() return a RedirectToActionResult when the model is invalid.
-    /// </summary>
-    /// <returns>A Task object for the async.</returns>
-    [Fact]
-    public async Task VerifyUpdateReturnRedirectOnError()
-    {
-        SimpleStandardCRUDDataLayer dataLayer = new();
-        SimpleStandardModelViewController controller = new(dataLayer, CreateConsoleLogger());
-        IActionResult actionResult = await controller.UpdateAsync(null);
-
-        Assert.IsType<RedirectToActionResult>(actionResult); //Confirm the correct action is returned.
-        Assert.Equal(controller.ErrorActionName, ((RedirectToActionResult)actionResult).ActionName); //Confirm the redirect is for Error action.
-        Assert.Equal(controller.ErrorControllerName, ((RedirectToActionResult)actionResult).ControllerName); //Confirm the redirect is for Error controller.
-        Assert.NotEmpty(((RedirectToActionResult)actionResult).RouteValues); //Confirm there is route values.
         Assert.Null(((RedirectToActionResult)actionResult).Fragment); //Confirm there's no fragment.
         Assert.False(((RedirectToActionResult)actionResult).Permanent); //Confirm the redirect isn't permanent.
     }

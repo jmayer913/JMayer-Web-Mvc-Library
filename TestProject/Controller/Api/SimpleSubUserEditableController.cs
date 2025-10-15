@@ -3,7 +3,7 @@ using JMayer.Web.Mvc.Controller;
 using Microsoft.Extensions.Logging;
 using TestProject.Data;
 
-namespace TestProject.Controller;
+namespace TestProject.Controller.Api;
 
 /// <summary>
 /// The class manages HTTP requests for CRUD operations associated with the simple sub user editable data object and simple user editable memory data layer.

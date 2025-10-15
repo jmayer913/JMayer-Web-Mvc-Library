@@ -4,11 +4,13 @@ using JMayer.Data.HTTP.DataLayer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Net;
-using TestProject.Controller;
+using TestProject.Controller.Api;
 using TestProject.Data;
 using TestProject.Database;
 
-namespace TestProject.Test.Controller;
+#warning I think I can cheat to test the string id methods. Try this in the big refactor.
+
+namespace TestProject.Test.Controller.Api;
 
 /// <summary>
 /// The class manages tests for the StandardCRUDContoller object.

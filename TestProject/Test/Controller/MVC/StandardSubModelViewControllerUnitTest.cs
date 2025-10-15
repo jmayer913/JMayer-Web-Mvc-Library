@@ -1,13 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using TestProject.Controller.MVC;
+using TestProject.Controller.Mvc;
 using TestProject.Data;
 using TestProject.Database;
 
-namespace TestProject.Test.Controller.MVC;
+namespace TestProject.Test.Controller.Mvc;
 
-#warning I need to test conflict and not found.
-#warning I might be able to cheat to test the string id methods.
+#warning I think I can cheat to test the string id methods. Try this in the big refactor.
 
 /// <summary>
 /// The class manages tests for the StandardSubModelViewContoller object.

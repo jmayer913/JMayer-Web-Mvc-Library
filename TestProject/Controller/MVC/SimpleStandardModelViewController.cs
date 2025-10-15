@@ -1,12 +1,12 @@
-﻿using JMayer.Web.Mvc.Controller;
+﻿using JMayer.Web.Mvc.Controller.Mvc;
 using Microsoft.Extensions.Logging;
 using TestProject.Data;
 using TestProject.Database;
 
-namespace TestProject.Controller.MVC;
+namespace TestProject.Controller.Mvc;
 
 /// <summary>
-/// The class manages HTTP view and action requests associated with a simple data object and simple memory data layer.
+/// The class manages HTTP action requests associated with a simple data object and simple memory data layer.
 /// </summary>
 internal class SimpleStandardModelViewController : StandardModelViewController<SimpleDataObject, SimpleStandardCRUDDataLayer>
 {

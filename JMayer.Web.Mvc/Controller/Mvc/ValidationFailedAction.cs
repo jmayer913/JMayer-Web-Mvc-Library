@@ -1,4 +1,4 @@
-﻿namespace JMayer.Web.Mvc.Controller;
+﻿namespace JMayer.Web.Mvc.Controller.Mvc;
 
 /// <summary>
 /// The enumeration for what the controller should do when the model fails server-side validation.
