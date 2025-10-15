@@ -22,7 +22,7 @@ public class UserEditableController<T, U> : StandardCRUDController<T, U>
     /// </summary>
     /// <param name="dataLayer">The data layer the controller will interact with.</param>
     /// <param name="logger">The logger the controller will interact with.</param>
-    public UserEditableController(IUserEditableDataLayer<T> dataLayer, ILogger logger) : base(dataLayer, logger) { }
+    public UserEditableController(U dataLayer, ILogger logger) : base(dataLayer, logger) { }
 
     /// <summary>
     /// The method returns all the data objects as list views using the data layer.

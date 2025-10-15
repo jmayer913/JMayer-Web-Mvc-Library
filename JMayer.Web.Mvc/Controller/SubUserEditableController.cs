@@ -18,7 +18,7 @@ public class SubUserEditableController<T, U> : UserEditableController<T, U>
     where U : IUserEditableDataLayer<T>
 {
     /// <inheritdoc/>
-    public SubUserEditableController(IUserEditableDataLayer<T> dataLayer, ILogger logger) : base(dataLayer, logger) { }
+    public SubUserEditableController(U dataLayer, ILogger logger) : base(dataLayer, logger) { }
 
     /// <summary>
     /// The method returns all the sub data objects for an owner data object using the data layer.

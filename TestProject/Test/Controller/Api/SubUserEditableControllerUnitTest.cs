@@ -1,13 +1,15 @@
 ﻿using JMayer.Data.Data.Query;
 using JMayer.Data.Data;
 using Microsoft.AspNetCore.Mvc;
-using TestProject.Controller;
 using TestProject.Data;
 using TestProject.Database;
 using Microsoft.Extensions.Logging;
 using System.Net;
+using TestProject.Controller.Api;
 
-namespace TestProject.Test.Controller;
+#warning I think I can cheat to test the string id methods. Try this in the big refactor.
+
+namespace TestProject.Test.Controller.Api;
 
 /// <summary>
 /// The class manages tests for the SubUserEditableContoller object.
