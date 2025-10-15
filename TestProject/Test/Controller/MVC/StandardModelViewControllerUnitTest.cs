@@ -169,15 +169,24 @@ public class StandardModelViewControllerUnitTest
     /// The method verifies the StandardModelViewContoller.CreateAsync() return a ObjectResult when an unexpected exception occurs.
     /// </summary>
     /// <returns>A Task object for the async.</returns>
-    [Fact]
-    public async Task VerifyCreateReturnJsonOnError()
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task VerifyCreateReturnJsonOnError(bool details)
     {
         SimpleStandardCRUDDataLayer dataLayer = new();
-        SimpleStandardModelViewController controller = new(dataLayer, CreateConsoleLogger());
+        SimpleStandardModelViewController controller = new(dataLayer, CreateConsoleLogger())
+        {
+            IsDetailsIncludedInNegativeResponse = details
+        };
         IActionResult actionResult = await controller.CreateAsync(null);
 
         Assert.IsType<ObjectResult>(actionResult); //Confirm the correct action is returned.
-        Assert.IsType<ProblemDetails>(((ObjectResult)actionResult).Value); //Confirm there's a problem details.
+
+        if (details)
+        {
+            Assert.IsType<ProblemDetails>(((ObjectResult)actionResult).Value); //Confirm there's a problem details.
+        }
     }
 
     /// <summary>
@@ -297,41 +306,65 @@ public class StandardModelViewControllerUnitTest
     /// The method verifies the StandardModelViewContoller.DeletePartialViewAsync() return a NotFoundObjectResult when the data object doesn't exist.
     /// </summary>
     /// <returns>A Task object for the async.</returns>
-    [Fact]
-    public async Task VerifyDeletePartialViewReturnNotFound()
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task VerifyDeletePartialViewReturnNotFound(bool details)
     {
         SimpleStandardCRUDDataLayer dataLayer = new();
         _ = await dataLayer.CreateAsync(new SimpleDataObject());
 
-        SimpleStandardModelViewController controller = new(dataLayer, CreateConsoleLogger());
+        SimpleStandardModelViewController controller = new(dataLayer, CreateConsoleLogger())
+        {
+            IsDetailsIncludedInNegativeResponse = details
+        };
         IActionResult actionResult = await controller.DeletePartialViewAsync(InvalidId);
 
-        Assert.IsType<NotFoundObjectResult>(actionResult); //Confirm the correct action is returned.
-        Assert.NotNull(((NotFoundObjectResult)actionResult).Value); //Confirm the value is set.
-        Assert.NotNull(((dynamic)((NotFoundObjectResult)actionResult).Value).UserMessage); //Confirm there is a custom user message.
+        if (details)
+        {
+            Assert.IsType<NotFoundObjectResult>(actionResult); //Confirm the correct action is returned.
+            Assert.NotNull(((NotFoundObjectResult)actionResult).Value); //Confirm the value is set.
+            Assert.NotNull(((dynamic)((NotFoundObjectResult)actionResult).Value).UserMessage); //Confirm there is a custom user message.
+        }
+        else
+        {
+            Assert.IsType<NotFoundResult>(actionResult); //Confirm the correct action is returned.
+        }
     }
 
     /// <summary>
     /// The method verifies the StandardModelViewContoller.DeleteAsync() return a ConflictObjectResult when the data object doesn't exist.
     /// </summary>
     /// <returns>A Task object for the async.</returns>
-//    [Fact]
-//    public async Task VerifyDeleteReturnConflict()
-//    {
-//        SimpleStandardCRUDDataLayer dataLayer = new();
-//        _ = await dataLayer.CreateAsync(new SimpleDataObject()
-//        {
-//            //This is a cheat to force a delete conflict.
-//            Integer64ID = SimpleStandardCRUDDataLayer.DeleteConflictId,
-//        });
+    //[Theory]
+    //[InlineData(true)]
+    //[InlineData(false)]
+    //public async Task VerifyDeleteReturnConflict(bool details)
+    //{
+    //    SimpleStandardCRUDDataLayer dataLayer = new();
+    //    _ = await dataLayer.CreateAsync(new SimpleDataObject()
+    //    {
+    //        //This is a cheat to force a delete conflict.
+    //        Integer64ID = SimpleStandardCRUDDataLayer.DeleteConflictId,
+    //    });
 
-//        SimpleStandardModelViewController controller = new(dataLayer, CreateConsoleLogger());
-//        IActionResult actionResult = await controller.DeleteAsync(InvalidId);
+    //    SimpleStandardModelViewController controller = new(dataLayer, CreateConsoleLogger())
+    //    {
+    //        IsDetailsIncludedInNegativeResponse = details
+    //    };
+    //    IActionResult actionResult = await controller.DeleteAsync(InvalidId);
 
-//        Assert.IsType<ConflictObjectResult>(actionResult); //Confirm the correct action is returned.
-//        Assert.NotNull(((ConflictObjectResult)actionResult).Value); //Confirm the value is set.
-//        Assert.NotNull(((dynamic)((ConflictObjectResult)actionResult).Value).UserMessage); //Confirm there is a custom user message.
-//    }
+    //    if (details)
+    //    {
+    //        Assert.IsType<ConflictObjectResult>(actionResult); //Confirm the correct action is returned.
+    //        Assert.NotNull(((ConflictObjectResult)actionResult).Value); //Confirm the value is set.
+    //        Assert.NotNull(((dynamic)((ConflictObjectResult)actionResult).Value).UserMessage); //Confirm there is a custom user message.
+    //    }
+    //    else
+    //    {
+    //        Assert.IsType<ConflictResult>(actionResult); //Confirm the correct action is returned.
+    //    }
+    //}
 
     /// <summary>
     /// The method verifies the StandardModelViewContoller.DeleteAsync() return a JsonResult when ran successfully.
@@ -356,18 +389,30 @@ public class StandardModelViewControllerUnitTest
     /// The method verifies the StandardModelViewContoller.DeleteAsync() return a NotFoundObjectResult when the data object doesn't exist.
     /// </summary>
     /// <returns>A Task object for the async.</returns>
-    [Fact]
-    public async Task VerifyDeleteReturnNotFound()
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task VerifyDeleteReturnNotFound(bool details)
     {
         SimpleStandardCRUDDataLayer dataLayer = new();
         _ = await dataLayer.CreateAsync(new SimpleDataObject());
 
-        SimpleStandardModelViewController controller = new(dataLayer, CreateConsoleLogger());
+        SimpleStandardModelViewController controller = new(dataLayer, CreateConsoleLogger())
+        {
+            IsDetailsIncludedInNegativeResponse = details,
+        };
         IActionResult actionResult = await controller.DeleteAsync(InvalidId);
 
-        Assert.IsType<NotFoundObjectResult>(actionResult); //Confirm the correct action is returned.
-        Assert.NotNull(((NotFoundObjectResult)actionResult).Value); //Confirm the value is set.
-        Assert.NotNull(((dynamic)((NotFoundObjectResult)actionResult).Value).UserMessage); //Confirm there is a custom user message.
+        if (details)
+        {
+            Assert.IsType<NotFoundObjectResult>(actionResult); //Confirm the correct action is returned.
+            Assert.NotNull(((NotFoundObjectResult)actionResult).Value); //Confirm the value is set.
+            Assert.NotNull(((dynamic)((NotFoundObjectResult)actionResult).Value).UserMessage); //Confirm there is a custom user message.
+        }
+        else
+        {
+            Assert.IsType<NotFoundResult>(actionResult);
+        }
     }
 
     /// <summary>
@@ -412,18 +457,30 @@ public class StandardModelViewControllerUnitTest
     /// The method verifies the StandardModelViewContoller.DeleteViewAsync() return a NotFoundObjectResult when the data object doesn't exist.
     /// </summary>
     /// <returns>A Task object for the async.</returns>
-    [Fact]
-    public async Task VerifyDeleteViewReturnNotFound()
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task VerifyDeleteViewReturnNotFound(bool details)
     {
         SimpleStandardCRUDDataLayer dataLayer = new();
         _ = await dataLayer.CreateAsync(new SimpleDataObject());
 
-        SimpleStandardModelViewController controller = new(dataLayer, CreateConsoleLogger());
+        SimpleStandardModelViewController controller = new(dataLayer, CreateConsoleLogger())
+        {
+            IsDetailsIncludedInNegativeResponse = details
+        };
         IActionResult actionResult = await controller.DeleteViewAsync(InvalidId);
 
-        Assert.IsType<NotFoundObjectResult>(actionResult); //Confirm the correct action is returned.
-        Assert.NotNull(((NotFoundObjectResult)actionResult).Value); //Confirm the value is set.
-        Assert.NotNull(((dynamic)((NotFoundObjectResult)actionResult).Value).UserMessage); //Confirm there is a custom user message.
+        if (details)
+        {
+            Assert.IsType<NotFoundObjectResult>(actionResult); //Confirm the correct action is returned.
+            Assert.NotNull(((NotFoundObjectResult)actionResult).Value); //Confirm the value is set.
+            Assert.NotNull(((dynamic)((NotFoundObjectResult)actionResult).Value).UserMessage); //Confirm there is a custom user message.
+        }
+        else
+        {
+            Assert.IsType<NotFoundResult>(actionResult); //Confirm the correct action is returned.
+        }
     }
 
     /// <summary>
@@ -448,18 +505,30 @@ public class StandardModelViewControllerUnitTest
     /// The method verifies the StandardModelViewContoller.EditPartialViewAsync() return a NotFoundObjectResult when the data object doesn't exist.
     /// </summary>
     /// <returns>A Task object for the async.</returns>
-    [Fact]
-    public async Task VerifyEditPartialViewReturnNotFound()
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task VerifyEditPartialViewReturnNotFound(bool details)
     {
         SimpleStandardCRUDDataLayer dataLayer = new();
         _ = await dataLayer.CreateAsync(new SimpleDataObject());
 
-        SimpleStandardModelViewController controller = new(dataLayer, CreateConsoleLogger());
+        SimpleStandardModelViewController controller = new(dataLayer, CreateConsoleLogger())
+        {
+            IsDetailsIncludedInNegativeResponse = details
+        };
         IActionResult actionResult = await controller.EditPartialViewAsync(InvalidId);
 
-        Assert.IsType<NotFoundObjectResult>(actionResult); //Confirm the correct action is returned.
-        Assert.NotNull(((NotFoundObjectResult)actionResult).Value); //Confirm the value is set.
-        Assert.NotNull(((dynamic)((NotFoundObjectResult)actionResult).Value).UserMessage); //Confirm there is a custom user message.
+        if (details)
+        {
+            Assert.IsType<NotFoundObjectResult>(actionResult); //Confirm the correct action is returned.
+            Assert.NotNull(((NotFoundObjectResult)actionResult).Value); //Confirm the value is set.
+            Assert.NotNull(((dynamic)((NotFoundObjectResult)actionResult).Value).UserMessage); //Confirm there is a custom user message.
+        }
+        else
+        {
+            Assert.IsType<NotFoundResult>(actionResult); //Confirm the correct action is returned.
+        }
     }
 
     /// <summary>
@@ -484,18 +553,30 @@ public class StandardModelViewControllerUnitTest
     /// The method verifies the StandardModelViewContoller.EditViewAsync() return a NotFoundObjectResult when the data object doesn't exist.
     /// </summary>
     /// <returns>A Task object for the async.</returns>
-    [Fact]
-    public async Task VerifyEditViewReturnNotFound()
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task VerifyEditViewReturnNotFound(bool details)
     {
         SimpleStandardCRUDDataLayer dataLayer = new();
         _ = await dataLayer.CreateAsync(new SimpleDataObject());
 
-        SimpleStandardModelViewController controller = new(dataLayer, CreateConsoleLogger());
+        SimpleStandardModelViewController controller = new(dataLayer, CreateConsoleLogger())
+        {
+            IsDetailsIncludedInNegativeResponse = details
+        };
         IActionResult actionResult = await controller.EditViewAsync(InvalidId);
 
-        Assert.IsType<NotFoundObjectResult>(actionResult); //Confirm the correct action is returned.
-        Assert.NotNull(((NotFoundObjectResult)actionResult).Value); //Confirm the value is set.
-        Assert.NotNull(((dynamic)((NotFoundObjectResult)actionResult).Value).UserMessage); //Confirm there is a custom user message.
+        if (details)
+        {
+            Assert.IsType<NotFoundObjectResult>(actionResult); //Confirm the correct action is returned.
+            Assert.NotNull(((NotFoundObjectResult)actionResult).Value); //Confirm the value is set.
+            Assert.NotNull(((dynamic)((NotFoundObjectResult)actionResult).Value).UserMessage); //Confirm there is a custom user message.
+        }
+        else
+        {
+            Assert.IsType<NotFoundResult>(actionResult); //Confirm the correct action is returned.
+        }
     }
 
     /// <summary>
@@ -520,14 +601,17 @@ public class StandardModelViewControllerUnitTest
     /// The method verifies the StandardModelViewContoller.UpdateAsync() returns a ConflictObjectResult when ran successfully.
     /// </summary>
     /// <returns>A Task object for the async.</returns>
-    [Fact]
-    public async Task VerifyUpdateReturnConflict()
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task VerifyUpdateReturnConflict(bool details)
     {
         SimpleUserEditableDataLayer dataLayer = new();
         SimpleUserEditableDataObject dataObject = await dataLayer.CreateAsync(new SimpleUserEditableDataObject() { Name = "Update Conflict Test", Value = DefaultValue });
         SimpleUserEditableController controller = new(dataLayer, CreateConsoleLogger())
         {
             IsCUDActionRedirectedOnSuccess = false,
+            IsDetailsIncludedInNegativeResponse = details,
         };
 
         dataObject.Value += 1;
@@ -536,9 +620,16 @@ public class StandardModelViewControllerUnitTest
         _ = await controller.UpdateAsync(dataObject);
         IActionResult actionResult = await controller.UpdateAsync(oldDataObject);
 
-        Assert.IsType<ConflictObjectResult>(actionResult); //Confirm the correct action is returned.
-        Assert.NotNull(((ConflictObjectResult)actionResult).Value); //Confirm the value is set.
-        Assert.NotNull(((dynamic)((ConflictObjectResult)actionResult).Value).UserMessage); //Confirm there is a custom user message.
+        if (details)
+        {
+            Assert.IsType<ConflictObjectResult>(actionResult); //Confirm the correct action is returned.
+            Assert.NotNull(((ConflictObjectResult)actionResult).Value); //Confirm the value is set.
+            Assert.NotNull(((dynamic)((ConflictObjectResult)actionResult).Value).UserMessage); //Confirm there is a custom user message.
+        }
+        else
+        {
+            Assert.IsType<ConflictResult>(actionResult); //Confirm the correct action is returned.
+        }
     }
 
     /// <summary>
@@ -627,18 +718,30 @@ public class StandardModelViewControllerUnitTest
     /// The method verifies the StandardModelViewContoller.UpdateAsync() return a NotFoundObjectResult when the data object doesn't exist.
     /// </summary>
     /// <returns>A Task object for the async.</returns>
-    [Fact]
-    public async Task VerifyUpdateReturnNotFound()
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task VerifyUpdateReturnNotFound(bool details)
     {
         SimpleStandardCRUDDataLayer dataLayer = new();
         _ = await dataLayer.CreateAsync(new SimpleDataObject());
 
-        SimpleStandardModelViewController controller = new(dataLayer, CreateConsoleLogger());
+        SimpleStandardModelViewController controller = new(dataLayer, CreateConsoleLogger())
+        {
+            IsDetailsIncludedInNegativeResponse = details,
+        };
         IActionResult actionResult = await controller.UpdateAsync(new SimpleDataObject() { Integer64ID = InvalidId });
 
-        Assert.IsType<NotFoundObjectResult>(actionResult); //Confirm the correct action is returned.
-        Assert.NotNull(((NotFoundObjectResult)actionResult).Value); //Confirm the value is set.
-        Assert.NotNull(((dynamic)((NotFoundObjectResult)actionResult).Value).UserMessage); //Confirm there is a custom user message.
+        if (details)
+        {
+            Assert.IsType<NotFoundObjectResult>(actionResult); //Confirm the correct action is returned.
+            Assert.NotNull(((NotFoundObjectResult)actionResult).Value); //Confirm the value is set.
+            Assert.NotNull(((dynamic)((NotFoundObjectResult)actionResult).Value).UserMessage); //Confirm there is a custom user message.
+        }
+        else
+        {
+            Assert.IsType<NotFoundResult>(actionResult); //Confirm the correct action is returned.
+        }
     }
 
     /// <summary>
