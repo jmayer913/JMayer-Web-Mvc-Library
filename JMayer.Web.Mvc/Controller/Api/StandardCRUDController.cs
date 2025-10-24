@@ -21,19 +21,19 @@ public class StandardCRUDController<T, U> : ControllerBase
     where U : Data.Database.DataLayer.IStandardCRUDDataLayer<T>
 {
     /// <summary>
-    /// The data layer the controller will interact with.
+    /// The property gets data layer the controller will interact with.
     /// </summary>
-    protected readonly U DataLayer;
+    protected U DataLayer { get; private init; }
 
     /// <summary>
-    /// The logger the controller will interact with.
+    /// The property gets name of the data object.
     /// </summary>
-    protected readonly ILogger Logger;
+    protected string DataObjectTypeName { get; private init; } = typeof(T).Name;
 
     /// <summary>
-    /// The name of the data object.
+    /// The property gets logger the controller will interact with.
     /// </summary>
-    protected readonly string DataObjectTypeName = typeof(T).Name;
+    protected ILogger Logger { get; private init; }
 
     /// <summary>
     /// The dependency injection constructor.

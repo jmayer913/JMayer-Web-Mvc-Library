@@ -45,12 +45,12 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
     where U : IStandardCRUDDataLayer<T>
 {
     /// <summary>
-    /// The data layer the controller will interact with.
+    /// The property gets data layer the controller will interact with.
     /// </summary>
     protected IStandardCRUDDataLayer<T> DataLayer { get; private init; }
 
     /// <summary>
-    /// The name of the data object.
+    /// The property gets name of the data object.
     /// </summary>
     protected string DataObjectTypeName { get; private init; } = typeof(T).Name;
 
@@ -73,7 +73,7 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
     public bool IsDetailsIncludedInNegativeResponse { get; init; }
 
     /// <summary>
-    /// The logger the controller will interact with.
+    /// The property gets logger the controller will interact with.
     /// </summary>
     protected ILogger Logger { get; private init; }
 
