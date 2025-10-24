@@ -73,11 +73,11 @@ public class StandardSubModelViewControllerUnitTest
     /// </summary>
     /// <param name="dataLayer">The data layer to populate</param>
     /// <returns>A Task object for the async.</returns>
-    private static async Task PopulateDataObjects(SimpleSubUserEditableDataLayer dataLayer, long ownerID)
+    private static async Task PopulateDataObjects(SimpleStandardSubCRUDDataLayer dataLayer, long ownerID)
     {
         for (int index = 1; index <= MaxRecords; index++)
         {
-            _ = await dataLayer.CreateAsync(new SimpleSubUserEditableDataObject() { Name = $"{ownerID}-{index}", OwnerInteger64ID = ownerID, Value = index });
+            _ = await dataLayer.CreateAsync(new SimpleSubDataObject() { Name = $"{ownerID}-{index}", OwnerInteger64ID = ownerID, Value = index });
         }
     }
 
@@ -88,12 +88,12 @@ public class StandardSubModelViewControllerUnitTest
     [Fact]
     public async Task VerifyAddPartialView()
     {
-        SimpleSubUserEditableDataLayer dataLayer = new();
+        SimpleStandardSubCRUDDataLayer dataLayer = new();
         SimpleStandardSubModelViewController controller = new(dataLayer, CreateConsoleLogger());
         IActionResult actionResult = await controller.AddPartialViewAsync(DefaultOwnerId);
 
         Assert.IsType<PartialViewResult>(actionResult); //Confirm the correct action is returned.
-        Assert.Equal($"_{typeof(SimpleSubUserEditableDataObject).Name}AddPartial", ((PartialViewResult)actionResult).ViewName); //Confirm the view's name.
+        Assert.Equal($"_{typeof(SimpleSubDataObject).Name}AddPartial", ((PartialViewResult)actionResult).ViewName); //Confirm the view's name.
         Assert.Null(((PartialViewResult)actionResult).Model); //Confirm there's no model.
         Assert.NotEmpty(((PartialViewResult)actionResult).ViewData); //Confirm there's view data; owner id is stored here.
     }
@@ -105,12 +105,12 @@ public class StandardSubModelViewControllerUnitTest
     [Fact]
     public async Task VerifyAddView()
     {
-        SimpleSubUserEditableDataLayer dataLayer = new();
+        SimpleStandardSubCRUDDataLayer dataLayer = new();
         SimpleStandardSubModelViewController controller = new(dataLayer, CreateConsoleLogger());
         IActionResult actionResult = await controller.AddViewAsync(DefaultOwnerId);
 
         Assert.IsType<ViewResult>(actionResult); //Confirm the correct action is returned.
-        Assert.Equal($"{typeof(SimpleSubUserEditableDataObject).Name}Add", ((ViewResult)actionResult).ViewName); //Confirm the view's name.
+        Assert.Equal($"{typeof(SimpleSubDataObject).Name}Add", ((ViewResult)actionResult).ViewName); //Confirm the view's name.
         Assert.Null(((ViewResult)actionResult).Model); //Confirm there's no model.
         Assert.NotEmpty(((ViewResult)actionResult).ViewData); //Confirm there's view data; owner id is stored here.
     }
@@ -122,9 +122,9 @@ public class StandardSubModelViewControllerUnitTest
     [Fact]
     public async Task VerifyCreateReturnRedirectOnSuccess()
     {
-        SimpleSubUserEditableDataLayer dataLayer = new();
+        SimpleStandardSubCRUDDataLayer dataLayer = new();
         SimpleStandardSubModelViewController controller = new(dataLayer, CreateConsoleLogger());
-        IActionResult actionResult = await controller.CreateAsync(new SimpleSubUserEditableDataObject() { Name = DefaultName });
+        IActionResult actionResult = await controller.CreateAsync(new SimpleSubDataObject() { Name = DefaultName });
 
         Assert.IsType<RedirectToActionResult>(actionResult); //Confirm the correct action is returned.
         Assert.Equal(nameof(Index), ((RedirectToActionResult)actionResult).ActionName); //Confirm the redirect is for Index.
@@ -141,8 +141,8 @@ public class StandardSubModelViewControllerUnitTest
     [Fact]
     public async Task VerifyDeleteReturnRedirectOnSuccess()
     {
-        SimpleSubUserEditableDataLayer dataLayer = new();
-        _ = await dataLayer.CreateAsync(new SimpleSubUserEditableDataObject() { Name = DefaultName });
+        SimpleStandardSubCRUDDataLayer dataLayer = new();
+        _ = await dataLayer.CreateAsync(new SimpleSubDataObject() { Name = DefaultName });
         SimpleStandardSubModelViewController controller = new(dataLayer, CreateConsoleLogger());
         IActionResult actionResult = await controller.DeleteAsync(DefaultId);
 
@@ -161,7 +161,7 @@ public class StandardSubModelViewControllerUnitTest
     [Fact]
     public async Task VerifyIndex()
     {
-        SimpleSubUserEditableDataLayer dataLayer = new();
+        SimpleStandardSubCRUDDataLayer dataLayer = new();
         await PopulateDataObjects(dataLayer, OwnerOne);
         await PopulateDataObjects(dataLayer, OwnerTwo);
 
@@ -169,8 +169,8 @@ public class StandardSubModelViewControllerUnitTest
         IActionResult actionResult = await controller.IndexAsync(OwnerOne);
 
         Assert.IsType<ViewResult>(actionResult); //Confirm the correct action is returned.
-        Assert.Equal($"{typeof(SimpleSubUserEditableDataObject).Name}{nameof(Index)}", ((ViewResult)actionResult).ViewName); //Confirm the view's name.
-        Assert.IsType<List<SimpleSubUserEditableDataObject>>(((ViewResult)actionResult).Model); //Confirm there's a model and its the correct type.
+        Assert.Equal($"{typeof(SimpleSubDataObject).Name}{nameof(Index)}", ((ViewResult)actionResult).ViewName); //Confirm the view's name.
+        Assert.IsType<List<SimpleSubDataObject>>(((ViewResult)actionResult).Model); //Confirm there's a model and its the correct type.
     }
 
     /// <summary>
@@ -180,8 +180,8 @@ public class StandardSubModelViewControllerUnitTest
     [Fact]
     public async Task VerifyUpdateReturnRedirectOnSuccess()
     {
-        SimpleSubUserEditableDataLayer dataLayer = new();
-        SimpleSubUserEditableDataObject dataObject = await dataLayer.CreateAsync(new SimpleSubUserEditableDataObject() { Name = DefaultName });
+        SimpleStandardSubCRUDDataLayer dataLayer = new();
+        SimpleSubDataObject dataObject = await dataLayer.CreateAsync(new SimpleSubDataObject() { Name = DefaultName });
         SimpleStandardSubModelViewController controller = new(dataLayer, CreateConsoleLogger());
 
         dataObject.Value += 1;

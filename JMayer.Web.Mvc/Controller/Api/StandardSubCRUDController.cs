@@ -4,21 +4,21 @@ using JMayer.Data.Database.DataLayer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
-namespace JMayer.Web.Mvc.Controller;
+namespace JMayer.Web.Mvc.Controller.Api;
 
 /// <summary>
-/// The class manages HTTP requests for CRUD operations associated with a sub user editable data object and a data layer.
+/// The class manages HTTP requests for CRUD operations associated with a sub data object and a data layer.
 /// </summary>
 /// <typeparam name="T">Must be a SubUserEditableDataObject since the data layer requires this.</typeparam>
 /// <typeparam name="U">Must be an IUserEditableDataLayer so the controller can interact with the collection/table associated with it.</typeparam>
 [ApiController]
 [Route("api/[controller]")]
-public class SubUserEditableController<T, U> : UserEditableController<T, U>
-    where T : SubUserEditableDataObject
-    where U : IUserEditableDataLayer<T>
+public class StandardSubCRUDController<T, U> : StandardCRUDController<T, U>
+    where T : SubDataObject
+    where U : IStandardSubCRUDDataLayer<T>
 {
     /// <inheritdoc/>
-    public SubUserEditableController(U dataLayer, ILogger logger) : base(dataLayer, logger) { }
+    public StandardSubCRUDController(U dataLayer, ILogger logger) : base(dataLayer, logger) { }
 
     /// <summary>
     /// The method returns all the sub data objects for an owner data object using the data layer.
@@ -70,7 +70,7 @@ public class SubUserEditableController<T, U> : UserEditableController<T, U>
     {
         try
         {
-            List<ListView> dataObjects = await ((IUserEditableDataLayer<T>)DataLayer).GetAllListViewAsync(obj => obj.OwnerInteger64ID == ownerIntegerId);
+            List<ListView> dataObjects = await DataLayer.GetAllListViewAsync(obj => obj.OwnerInteger64ID == ownerIntegerId);
             return Ok(dataObjects);
         }
         catch (Exception ex)
@@ -90,7 +90,7 @@ public class SubUserEditableController<T, U> : UserEditableController<T, U>
     {
         try
         {
-            List<ListView> dataObjects = await ((IUserEditableDataLayer<T>)DataLayer).GetAllListViewAsync(obj => obj.OwnerStringID == ownerStringId);
+            List<ListView> dataObjects = await DataLayer.GetAllListViewAsync(obj => obj.OwnerStringID == ownerStringId);
             return Ok(dataObjects);
         }
         catch (Exception ex)
@@ -114,7 +114,7 @@ public class SubUserEditableController<T, U> : UserEditableController<T, U>
             //Insert the owner ID as a filter so its always returning a subset based on the owner.
             queryDefinition.FilterDefinitions.Insert(0, new FilterDefinition()
             {
-                FilterOn = nameof(SubUserEditableDataObject.OwnerInteger64ID),
+                FilterOn = nameof(SubDataObject.OwnerInteger64ID),
                 Operator = FilterDefinition.EqualsOperator,
                 Value = ownerIntegerId.ToString(),
             });
@@ -143,7 +143,7 @@ public class SubUserEditableController<T, U> : UserEditableController<T, U>
             //Insert the owner ID as a filter so its always returning a subset based on the owner.
             queryDefinition.FilterDefinitions.Insert(0, new FilterDefinition()
             {
-                FilterOn = nameof(SubUserEditableDataObject.OwnerStringID),
+                FilterOn = nameof(SubDataObject.OwnerStringID),
                 Operator = FilterDefinition.StringEqualsOperator,
                 Value = ownerStringId.ToString(),
             });
@@ -172,12 +172,12 @@ public class SubUserEditableController<T, U> : UserEditableController<T, U>
             //Insert the owner ID as a filter so its always returning a subset based on the owner.
             queryDefinition.FilterDefinitions.Insert(0, new FilterDefinition()
             {
-                FilterOn = nameof(SubUserEditableDataObject.OwnerInteger64ID),
+                FilterOn = nameof(SubDataObject.OwnerInteger64ID),
                 Operator = FilterDefinition.EqualsOperator,
                 Value = ownerIntegerId.ToString(),
             });
 
-            PagedList<ListView> dataObjects = await ((IUserEditableDataLayer<T>)DataLayer).GetPageListViewAsync(queryDefinition);
+            PagedList<ListView> dataObjects = await DataLayer.GetPageListViewAsync(queryDefinition);
             return Ok(dataObjects);
         }
         catch (Exception ex)
@@ -201,12 +201,12 @@ public class SubUserEditableController<T, U> : UserEditableController<T, U>
             //Insert the owner ID as a filter so its always returning a subset based on the owner.
             queryDefinition.FilterDefinitions.Insert(0, new FilterDefinition()
             {
-                FilterOn = nameof(SubUserEditableDataObject.OwnerStringID),
+                FilterOn = nameof(SubDataObject.OwnerStringID),
                 Operator = FilterDefinition.StringEqualsOperator,
                 Value = ownerStringId.ToString(),
             });
 
-            PagedList<ListView> dataObjects = await ((IUserEditableDataLayer<T>)DataLayer).GetPageListViewAsync(queryDefinition);
+            PagedList<ListView> dataObjects = await DataLayer.GetPageListViewAsync(queryDefinition);
             return Ok(dataObjects);
         }
         catch (Exception ex)

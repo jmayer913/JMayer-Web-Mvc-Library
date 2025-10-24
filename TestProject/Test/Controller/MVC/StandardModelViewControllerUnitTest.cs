@@ -606,16 +606,16 @@ public class StandardModelViewControllerUnitTest
     [InlineData(false)]
     public async Task VerifyUpdateReturnConflict(bool details)
     {
-        SimpleUserEditableDataLayer dataLayer = new();
-        SimpleUserEditableDataObject dataObject = await dataLayer.CreateAsync(new SimpleUserEditableDataObject() { Name = "Update Conflict Test", Value = DefaultValue });
-        SimpleUserEditableController controller = new(dataLayer, CreateConsoleLogger())
+        SimpleStandardCRUDDataLayer dataLayer = new();
+        SimpleDataObject dataObject = await dataLayer.CreateAsync(new SimpleDataObject() { Name = "Update Conflict Test", Value = DefaultValue });
+        SimpleStandardModelViewController controller = new(dataLayer, CreateConsoleLogger())
         {
             IsCUDActionRedirectedOnSuccess = false,
             IsDetailsIncludedInNegativeResponse = details,
         };
 
         dataObject.Value += 1;
-        SimpleUserEditableDataObject oldDataObject = new(dataObject);
+        SimpleDataObject oldDataObject = new(dataObject);
 
         _ = await controller.UpdateAsync(dataObject);
         IActionResult actionResult = await controller.UpdateAsync(oldDataObject);

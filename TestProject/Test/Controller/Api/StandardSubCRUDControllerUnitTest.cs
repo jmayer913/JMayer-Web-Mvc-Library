@@ -12,24 +12,24 @@ using TestProject.Controller.Api;
 namespace TestProject.Test.Controller.Api;
 
 /// <summary>
-/// The class manages tests for the SubUserEditableContoller object.
+/// The class manages tests for the StandardSubCRUDContoller object.
 /// </summary>
 /// <remarks>
-/// The tests are against a SimpleSubUserEditableController object which inherits from the SubUserEditableContoller and
-/// the SimpleSubUserEditableController doesn't override any of the base methods. Because of this, we're testing 
-/// the methods in the SubUserEditableContoller class.
+/// The tests are against a SimpleStandardSubCRUDController object which inherits from the StandardSubCRUDContoller and
+/// the SimpleStandardSubCRUDController doesn't override any of the base methods. Because of this, we're testing 
+/// the methods in the StandardSubCRUDContoller class.
 /// 
 /// The memory data layer is used and that utilizes an integer ID so the two string ID methods 
 /// (DeleteAsync() and SingleAsync()) are not tested.
 /// 
-/// SubUserEditableController class inherits from the UserEditableController. Because of this,
-/// only new and overriden methods in the SubUserEditableController are tested because
-/// the UserEditableControllerUnitTest already tests the UserEditableController.
+/// StandardSubCRUDContoller class inherits from the StandardCRUDContoller. Because of this,
+/// only new and overriden methods in the StandardCRUDContoller are tested because
+/// the StandardSubCRUDControllerUnitTest already tests the UserEditableController.
 /// 
 /// Not all negative responses can be tested and adding a property to force a certain response
 /// is risky so if there's missing fact/theory that's why.
 /// </remarks>
-public class SubUserEditableControllerUnitTest
+public class StandardSubCRUDControllerUnitTest
 {
     /// <summary>
     /// The constant for the maximum records.
@@ -52,7 +52,7 @@ public class SubUserEditableControllerUnitTest
     /// <returns>An ILogger.</returns>
     private static ILogger CreateConsoleLogger()
     {
-        return LoggerFactory.Create(logging => logging.AddConsole()).CreateLogger<SimpleCRUDController>();
+        return LoggerFactory.Create(logging => logging.AddConsole()).CreateLogger<SimpleStandardCRUDController>();
     }
 
     /// <summary>
@@ -60,11 +60,11 @@ public class SubUserEditableControllerUnitTest
     /// </summary>
     /// <param name="dataLayer">The data layer to populate</param>
     /// <returns>A Task object for the async.</returns>
-    private static async Task PopulateDataObjects(SimpleSubUserEditableDataLayer dataLayer, long ownerID)
+    private static async Task PopulateDataObjects(SimpleStandardSubCRUDDataLayer dataLayer, long ownerID)
     {
         for (int index = 1; index <= MaxRecords; index++)
         {
-            _ = await dataLayer.CreateAsync(new SimpleSubUserEditableDataObject() { Name = $"{ownerID}-{index}", OwnerInteger64ID = ownerID, Value = index });
+            _ = await dataLayer.CreateAsync(new SimpleSubDataObject() { Name = $"{ownerID}-{index}", OwnerInteger64ID = ownerID, Value = index });
         }
     }
 
@@ -75,15 +75,15 @@ public class SubUserEditableControllerUnitTest
     [Fact]
     public async Task VerifyGetAllOkResponse()
     {
-        SimpleSubUserEditableDataLayer dataLayer = new();
+        SimpleStandardSubCRUDDataLayer dataLayer = new();
         await PopulateDataObjects(dataLayer, OwnerOne);
         await PopulateDataObjects(dataLayer, OwnerTwo);
 
-        SimpleSubUserEditableController simpleCRUDController = new(dataLayer, CreateConsoleLogger());
+        SimpleStandardSubCRUDController simpleCRUDController = new(dataLayer, CreateConsoleLogger());
         IActionResult actionResult = await simpleCRUDController.GetAllAsync(OwnerOne);
 
         Assert.IsType<OkObjectResult>(actionResult); //Confirm the correct action is returned.
-        Assert.IsType<List<SimpleSubUserEditableDataObject>>(((OkObjectResult)actionResult).Value); //Confirm the action is responding with a list of data objects.
+        Assert.IsType<List<SimpleSubDataObject>>(((OkObjectResult)actionResult).Value); //Confirm the action is responding with a list of data objects.
     }
 
     /// <summary>
@@ -93,11 +93,11 @@ public class SubUserEditableControllerUnitTest
     [Fact]
     public async Task VerifyGetAllListViewOkResponse()
     {
-        SimpleSubUserEditableDataLayer dataLayer = new();
+        SimpleStandardSubCRUDDataLayer dataLayer = new();
         await PopulateDataObjects(dataLayer, OwnerOne);
         await PopulateDataObjects(dataLayer, OwnerTwo);
 
-        SimpleSubUserEditableController controller = new(dataLayer, CreateConsoleLogger());
+        SimpleStandardSubCRUDController controller = new(dataLayer, CreateConsoleLogger());
         IActionResult actionResult = await controller.GetAllListViewAsync(OwnerTwo);
 
         Assert.IsType<OkObjectResult>(actionResult); //Confirm the correct action is returned.
@@ -111,7 +111,7 @@ public class SubUserEditableControllerUnitTest
     [Fact]
     public async Task VerifyGetPageInternalErrorResponse()
     {
-        SimpleSubUserEditableController simpleCRUDController = new(new SimpleSubUserEditableDataLayer(), CreateConsoleLogger());
+        SimpleStandardSubCRUDController simpleCRUDController = new(new SimpleStandardSubCRUDDataLayer(), CreateConsoleLogger());
         IActionResult actionResult = await simpleCRUDController.GetPageAsync(null);
 
         Assert.IsType<ObjectResult>(actionResult); //Confirm the correct action is returned.
@@ -126,7 +126,7 @@ public class SubUserEditableControllerUnitTest
     [Fact]
     public async Task VerifyGetPageOkResponse()
     {
-        SimpleSubUserEditableDataLayer dataLayer = new();
+        SimpleStandardSubCRUDDataLayer dataLayer = new();
         await PopulateDataObjects(dataLayer, OwnerOne);
         await PopulateDataObjects(dataLayer, OwnerTwo);
 
@@ -135,11 +135,11 @@ public class SubUserEditableControllerUnitTest
             Skip = 0,
             Take = 20,
         };
-        SimpleSubUserEditableController simpleCRUDController = new(dataLayer, CreateConsoleLogger());
+        SimpleStandardSubCRUDController simpleCRUDController = new(dataLayer, CreateConsoleLogger());
         IActionResult actionResult = await simpleCRUDController.GetPageAsync(OwnerOne, queryDefinition);
 
         Assert.IsType<OkObjectResult>(actionResult); //Confirm the correct action is returned.
-        Assert.IsType<PagedList<SimpleSubUserEditableDataObject>>(((OkObjectResult)actionResult).Value); //Confirm the action is responding with a paged list of data objects.
+        Assert.IsType<PagedList<SimpleSubDataObject>>(((OkObjectResult)actionResult).Value); //Confirm the action is responding with a paged list of data objects.
     }
 
     /// <summary>
@@ -149,7 +149,7 @@ public class SubUserEditableControllerUnitTest
     [Fact]
     public async Task VerifyGetPageListViewInternalErrorResponse()
     {
-        SimpleSubUserEditableController simpleCRUDController = new(new SimpleSubUserEditableDataLayer(), CreateConsoleLogger());
+        SimpleStandardSubCRUDController simpleCRUDController = new(new SimpleStandardSubCRUDDataLayer(), CreateConsoleLogger());
         IActionResult actionResult = await simpleCRUDController.GetPageListViewAsync(null);
 
         Assert.IsType<ObjectResult>(actionResult); //Confirm the correct action is returned.
@@ -164,7 +164,7 @@ public class SubUserEditableControllerUnitTest
     [Fact]
     public async Task VerifyGetPageListViewOkResponse()
     {
-        SimpleSubUserEditableDataLayer dataLayer = new();
+        SimpleStandardSubCRUDDataLayer dataLayer = new();
         await PopulateDataObjects(dataLayer, OwnerOne);
         await PopulateDataObjects(dataLayer, OwnerTwo);
 
@@ -173,7 +173,7 @@ public class SubUserEditableControllerUnitTest
             Skip = 0,
             Take = 20,
         };
-        SimpleSubUserEditableController controller = new(dataLayer, CreateConsoleLogger());
+        SimpleStandardSubCRUDController controller = new(dataLayer, CreateConsoleLogger());
         IActionResult actionResult = await controller.GetPageListViewAsync(OwnerTwo, queryDefinition);
 
         Assert.IsType<OkObjectResult>(actionResult); //Confirm the correct action is returned.

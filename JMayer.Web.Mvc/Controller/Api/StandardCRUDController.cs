@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 using System.ComponentModel.DataAnnotations;
 using System.Net;
 
-namespace JMayer.Web.Mvc.Controller;
+namespace JMayer.Web.Mvc.Controller.Api;
 
 /// <summary>
 /// The class manages HTTP requests for CRUD operations associated with a data object and a data layer.
@@ -23,7 +23,7 @@ public class StandardCRUDController<T, U> : ControllerBase
     /// <summary>
     /// The data layer the controller will interact with.
     /// </summary>
-    protected readonly Data.Database.DataLayer.IStandardCRUDDataLayer<T> DataLayer;
+    protected readonly U DataLayer;
 
     /// <summary>
     /// The logger the controller will interact with.
@@ -175,6 +175,25 @@ public class StandardCRUDController<T, U> : ControllerBase
     }
 
     /// <summary>
+    /// The method returns all the data objects as list views using the data layer.
+    /// </summary>
+    /// <returns>A list of data objects.</returns>
+    [HttpGet("All/ListView")]
+    public async Task<IActionResult> GetAllListViewAsync()
+    {
+        try
+        {
+            List<ListView> listViews = await DataLayer.GetAllListViewAsync();
+            return Ok(listViews);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Failed to return all the {Type} data objects as list views.", DataObjectTypeName);
+            return Problem();
+        }
+    }
+
+    /// <summary>
     /// The method returns a page of data objects using the data layer.
     /// </summary>
     /// <param name="queryDefinition">Defines how the data should be queried; includes filtering, paging and sorting.</param>
@@ -190,6 +209,26 @@ public class StandardCRUDController<T, U> : ControllerBase
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to return a page of {Type} data objects.", DataObjectTypeName);
+            return Problem();
+        }
+    }
+
+    /// <summary>
+    /// The method returns a page of data objects as list views using the data layer.
+    /// </summary>
+    /// <param name="queryDefinition">Defines how the data should be queried; includes filtering, paging and sorting.</param>
+    /// <returns>A list of data objects.</returns>
+    [HttpGet("Page/ListView")]
+    public async Task<IActionResult> GetPageListViewAsync([FromQuery] QueryDefinition queryDefinition)
+    {
+        try
+        {
+            PagedList<ListView> listViews = await DataLayer.GetPageListViewAsync(queryDefinition);
+            return Ok(listViews);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Failed to return a page of {Type} data objects as list views.", DataObjectTypeName);
             return Problem();
         }
     }

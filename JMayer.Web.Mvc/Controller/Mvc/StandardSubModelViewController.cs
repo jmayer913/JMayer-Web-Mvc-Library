@@ -49,8 +49,8 @@ namespace JMayer.Web.Mvc.Controller.Mvc;
 /// <typeparam name="T">Must be a SubUserEditableDataObject since the data layer requires this.</typeparam>
 /// <typeparam name="U">Must be an IUserEditableDataLayer so the controller can interact with the collection/table associated with it.</typeparam>
 public class StandardSubModelViewController<T, U> : StandardModelViewController<T, U>
-    where T : SubUserEditableDataObject
-    where U : IUserEditableDataLayer<T>
+    where T : SubDataObject
+    where U : IStandardSubCRUDDataLayer<T>
 {
     /// <summary>
     /// The dependency injection constructor.

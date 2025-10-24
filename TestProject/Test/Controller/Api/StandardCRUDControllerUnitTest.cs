@@ -49,7 +49,7 @@ public class StandardCRUDControllerUnitTest
     /// <returns>An ILogger.</returns>
     private static ILogger CreateConsoleLogger()
     {
-        return LoggerFactory.Create(logging => logging.AddConsole()).CreateLogger<SimpleCRUDController>();
+        return LoggerFactory.Create(logging => logging.AddConsole()).CreateLogger<SimpleStandardCRUDController>();
     }
 
     /// <summary>
@@ -75,7 +75,7 @@ public class StandardCRUDControllerUnitTest
         SimpleStandardCRUDDataLayer dataLayer = new();
         _ = await dataLayer.CreateAsync(new SimpleDataObject());
 
-        SimpleCRUDController simpleCRUDController = new(dataLayer, CreateConsoleLogger());
+        SimpleStandardCRUDController simpleCRUDController = new(dataLayer, CreateConsoleLogger());
         IActionResult actionResult = await simpleCRUDController.CountAsync();
 
         Assert.IsType<OkObjectResult>(actionResult); //Confirm the correct action is returned.
@@ -90,7 +90,7 @@ public class StandardCRUDControllerUnitTest
     public async Task VerifyCreateBadRequestResponse()
     {
         SimpleStandardCRUDDataLayer dataLayer = new();
-        SimpleCRUDController simpleCRUDController = new(dataLayer, CreateConsoleLogger());
+        SimpleStandardCRUDController simpleCRUDController = new(dataLayer, CreateConsoleLogger());
         IActionResult actionResult = await simpleCRUDController.CreateAsync(new SimpleDataObject() { Value = InvalidValue });
 
         Assert.IsType<BadRequestObjectResult>(actionResult); //Confirm the correct action is returned.
@@ -105,7 +105,7 @@ public class StandardCRUDControllerUnitTest
     [Fact]
     public async Task VerifyCreateInternalErrorResponse()
     {
-        SimpleCRUDController simpleCRUDController = new(new SimpleStandardCRUDDataLayer(), CreateConsoleLogger());
+        SimpleStandardCRUDController simpleCRUDController = new(new SimpleStandardCRUDDataLayer(), CreateConsoleLogger());
         IActionResult actionResult = await simpleCRUDController.CreateAsync(null);
 
         Assert.IsType<ObjectResult>(actionResult); //Confirm the correct action is returned.
@@ -122,7 +122,7 @@ public class StandardCRUDControllerUnitTest
     {
         SimpleDataObject originalDataObject = new() { Value = DefaultValue };
         SimpleStandardCRUDDataLayer dataLayer = new();
-        SimpleCRUDController simpleCRUDController = new(dataLayer, CreateConsoleLogger());
+        SimpleStandardCRUDController simpleCRUDController = new(dataLayer, CreateConsoleLogger());
         IActionResult actionResult = await simpleCRUDController.CreateAsync(originalDataObject);
 
         Assert.IsType<OkObjectResult>(actionResult); //Confirm the correct action is returned.
@@ -140,7 +140,7 @@ public class StandardCRUDControllerUnitTest
         SimpleStandardCRUDDataLayer dataLayer = new();
         await PopulateDataObjects(dataLayer);
 
-        SimpleCRUDController simpleCRUDController = new(dataLayer, CreateConsoleLogger());
+        SimpleStandardCRUDController simpleCRUDController = new(dataLayer, CreateConsoleLogger());
         IActionResult actionResult = await simpleCRUDController.DeleteAsync(SimpleStandardCRUDDataLayer.DeleteConflictId);
 
         Assert.IsType<ConflictResult>(actionResult); //Confirm the correct action is returned.
@@ -156,7 +156,7 @@ public class StandardCRUDControllerUnitTest
         SimpleStandardCRUDDataLayer dataLayer = new();
         SimpleDataObject dataObject = await dataLayer.CreateAsync(new SimpleDataObject());
 
-        SimpleCRUDController simpleCRUDController = new(dataLayer, CreateConsoleLogger());
+        SimpleStandardCRUDController simpleCRUDController = new(dataLayer, CreateConsoleLogger());
         IActionResult actionResult = await simpleCRUDController.DeleteAsync(dataObject.Integer64ID);
 
         //Confirm the correct action is returned.
@@ -173,11 +173,28 @@ public class StandardCRUDControllerUnitTest
         SimpleStandardCRUDDataLayer dataLayer = new();
         await PopulateDataObjects(dataLayer);
 
-        SimpleCRUDController simpleCRUDController = new(dataLayer, CreateConsoleLogger());
+        SimpleStandardCRUDController simpleCRUDController = new(dataLayer, CreateConsoleLogger());
         IActionResult actionResult = await simpleCRUDController.GetAllAsync();
 
         Assert.IsType<OkObjectResult>(actionResult); //Confirm the correct action is returned.
         Assert.IsType<List<SimpleDataObject>>(((OkObjectResult)actionResult).Value); //Confirm the action is responding with a list of data objects.
+    }
+
+    /// <summary>
+    /// The method verifies the UserEditableContoller.GetAllListViewAsync() returns a 200 (OK) response when ran successfully.
+    /// </summary>
+    /// <returns>A Task object for the async.</returns>
+    [Fact]
+    public async Task VerifyGetAllListViewOkResponse()
+    {
+        SimpleStandardCRUDDataLayer dataLayer = new();
+        await PopulateDataObjects(dataLayer);
+
+        SimpleStandardCRUDController controller = new(dataLayer, CreateConsoleLogger());
+        IActionResult actionResult = await controller.GetAllListViewAsync();
+
+        Assert.IsType<OkObjectResult>(actionResult); //Confirm the correct action is returned.
+        Assert.IsType<List<ListView>>(((OkObjectResult)actionResult).Value); //Confirm the action is responding with a list of list views.
     }
 
     /// <summary>
@@ -187,7 +204,7 @@ public class StandardCRUDControllerUnitTest
     [Fact]
     public async Task VerifyGetPageInternalErrorResponse()
     {
-        SimpleCRUDController simpleCRUDController = new(new SimpleStandardCRUDDataLayer(), CreateConsoleLogger());
+        SimpleStandardCRUDController simpleCRUDController = new(new SimpleStandardCRUDDataLayer(), CreateConsoleLogger());
         IActionResult actionResult = await simpleCRUDController.GetPageAsync(null);
 
         Assert.IsType<ObjectResult>(actionResult); //Confirm the correct action is returned.
@@ -211,11 +228,48 @@ public class StandardCRUDControllerUnitTest
             Skip = 0,
             Take = 20,
         };
-        SimpleCRUDController simpleCRUDController = new(dataLayer, CreateConsoleLogger());
+        SimpleStandardCRUDController simpleCRUDController = new(dataLayer, CreateConsoleLogger());
         IActionResult actionResult = await simpleCRUDController.GetPageAsync(queryDefinition);
 
         Assert.IsType<OkObjectResult>(actionResult); //Confirm the correct action is returned.
         Assert.IsType<PagedList<SimpleDataObject>>(((OkObjectResult)actionResult).Value); //Confirm the action is responding with a paged list of data objects.
+    }
+
+    /// <summary>
+    /// The method verifies the UserEditableContoller.GetPageListViewAsync() returns a 500 (Interal Server Error) response when an exception is thrown by the data layer.
+    /// </summary>
+    /// <returns>A Task object for the async.</returns>
+    [Fact]
+    public async Task VerifyGetPageListViewInternalErrorResponse()
+    {
+        SimpleStandardCRUDController simpleCRUDController = new(new SimpleStandardCRUDDataLayer(), CreateConsoleLogger());
+        IActionResult actionResult = await simpleCRUDController.GetPageListViewAsync(null);
+
+        Assert.IsType<ObjectResult>(actionResult); //Confirm the correct action is returned.
+        Assert.IsType<ProblemDetails>(((ObjectResult)actionResult).Value); //Confirm the action is responding with problem details.
+        Assert.Equal((int)HttpStatusCode.InternalServerError, ((ProblemDetails)((ObjectResult)actionResult).Value).Status); //Confirm the correct HTTP status code is returned.
+    }
+
+    /// <summary>
+    /// The method verifies the UserEditableContoller.GetPageListViewAsync() returns a 200 (OK) response when ran successfully.
+    /// </summary>
+    /// <returns>A Task object for the async.</returns>
+    [Fact]
+    public async Task VerifyGetPageListViewOkResponse()
+    {
+        SimpleStandardCRUDDataLayer dataLayer = new();
+        await PopulateDataObjects(dataLayer);
+
+        QueryDefinition queryDefinition = new()
+        {
+            Skip = 0,
+            Take = 20,
+        };
+        SimpleStandardCRUDController controller = new(dataLayer, CreateConsoleLogger());
+        IActionResult actionResult = await controller.GetPageListViewAsync(queryDefinition);
+
+        Assert.IsType<OkObjectResult>(actionResult); //Confirm the correct action is returned.
+        Assert.IsType<PagedList<ListView>>(((OkObjectResult)actionResult).Value); //Confirm the action is responding with a paged list of list views.
     }
 
     /// <summary>
@@ -228,7 +282,7 @@ public class StandardCRUDControllerUnitTest
         SimpleStandardCRUDDataLayer dataLayer = new();
         _ = await dataLayer.CreateAsync(new SimpleDataObject());
 
-        SimpleCRUDController simpleCRUDController = new(dataLayer, CreateConsoleLogger());
+        SimpleStandardCRUDController simpleCRUDController = new(dataLayer, CreateConsoleLogger());
         IActionResult actionResult = await simpleCRUDController.GetSingleAsync();
 
         Assert.IsType<OkObjectResult>(actionResult); //Confirm the correct action is returned.
@@ -245,7 +299,7 @@ public class StandardCRUDControllerUnitTest
         SimpleStandardCRUDDataLayer dataLayer = new();
         _ = await dataLayer.CreateAsync([ new SimpleDataObject(), new SimpleDataObject() ]);
 
-        SimpleCRUDController simpleCRUDController = new(dataLayer, CreateConsoleLogger());
+        SimpleStandardCRUDController simpleCRUDController = new(dataLayer, CreateConsoleLogger());
         IActionResult actionResult = await simpleCRUDController.GetSingleAsync(2);
 
         Assert.IsType<OkObjectResult>(actionResult); //Confirm the correct action is returned.
@@ -264,12 +318,33 @@ public class StandardCRUDControllerUnitTest
 
         originalDataObject.Value = InvalidValue;
 
-        SimpleCRUDController simpleCRUDController = new(dataLayer, CreateConsoleLogger());
+        SimpleStandardCRUDController simpleCRUDController = new(dataLayer, CreateConsoleLogger());
         IActionResult actionResult = await simpleCRUDController.UpdateAsync(originalDataObject);
 
         Assert.IsType<BadRequestObjectResult>(actionResult); //Confirm the correct action is returned.
         Assert.IsType<ServerSideValidationResult>(((BadRequestObjectResult)actionResult).Value); //Confirm the action is responding with a validation result.
         Assert.False(((ServerSideValidationResult)((BadRequestObjectResult)actionResult).Value).IsSuccess); //Confirm the action is responding with a non-successful validation result.
+    }
+
+    /// <summary>
+    /// The method verifies the StandardCRUDContoller.UpdateAsync() returns a 409 (Conflict) response when the data object is old.
+    /// </summary>
+    /// <returns>A Task object for the async.</returns>
+    [Fact]
+    public async Task VerifyUpdateConflictResponse()
+    {
+        SimpleStandardCRUDDataLayer dataLayer = new();
+        SimpleDataObject dataObject = await dataLayer.CreateAsync(new SimpleDataObject() { Name = "10", Value = 10 });
+        await dataLayer.UpdateAsync(new SimpleDataObject(dataObject)
+        {
+            Value = 20,
+        });
+
+        dataObject.Value = 30;
+        SimpleStandardCRUDController controller = new(dataLayer, CreateConsoleLogger());
+        IActionResult actionResult = await controller.UpdateAsync(dataObject);
+
+        Assert.IsType<ConflictResult>(actionResult);
     }
 
     /// <summary>
@@ -279,7 +354,7 @@ public class StandardCRUDControllerUnitTest
     [Fact]
     public async Task VerifyUpdateInternalErrorResponse()
     {
-        SimpleCRUDController simpleCRUDController = new(new SimpleStandardCRUDDataLayer(), CreateConsoleLogger());
+        SimpleStandardCRUDController simpleCRUDController = new(new SimpleStandardCRUDDataLayer(), CreateConsoleLogger());
         IActionResult actionResult = await simpleCRUDController.UpdateAsync(null);
 
         Assert.IsType<ObjectResult>(actionResult); //Confirm the correct action is returned.
@@ -299,7 +374,7 @@ public class StandardCRUDControllerUnitTest
 
         originalDataObject.Value = DefaultValue;
 
-        SimpleCRUDController simpleCRUDController = new(dataLayer, CreateConsoleLogger());
+        SimpleStandardCRUDController simpleCRUDController = new(dataLayer, CreateConsoleLogger());
         IActionResult actionResult = await simpleCRUDController.UpdateAsync(originalDataObject);
 
         Assert.IsType<OkObjectResult>(actionResult); //Confirm the correct action is returned.
