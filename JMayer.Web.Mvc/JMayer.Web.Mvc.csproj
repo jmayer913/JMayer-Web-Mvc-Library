@@ -7,8 +7,9 @@
     <Version>9.0.0</Version>
     <Authors>jmayer913</Authors>
     <Company>jmayer913</Company>
-    <PackageDescription>Package contains generic Web API controllers which utilize the JMayer.Data package.</PackageDescription>
+    <PackageDescription>Package contains generic MVC controllers and Web API controllers which utilize the JMayer.Data package.</PackageDescription>
     <RepositoryUrl>https://github.com/jmayer913/JMayer-Web-Mvc-Library</RepositoryUrl>
+    <PackageTags>library;net-core;controller;mvc-core;web-api-core</PackageTags>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
 
