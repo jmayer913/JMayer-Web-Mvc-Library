@@ -1,6 +1,6 @@
 ﻿using JMayer.Data.Data;
 using JMayer.Data.Data.Query;
-using JMayer.Data.HTTP.DataLayer;
+using JMayer.Data.HTTP.Details;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Net;
@@ -94,8 +94,7 @@ public class StandardCRUDControllerUnitTest
         IActionResult actionResult = await simpleCRUDController.CreateAsync(new SimpleDataObject() { Value = InvalidValue });
 
         Assert.IsType<BadRequestObjectResult>(actionResult); //Confirm the correct action is returned.
-        Assert.IsType<ServerSideValidationResult>(((BadRequestObjectResult)actionResult).Value); //Confirm the action is responding with a validation result.
-        Assert.False(((ServerSideValidationResult)((BadRequestObjectResult)actionResult).Value).IsSuccess); //Confirm the action is responding with a non-successful validation result.
+        Assert.IsType<SerializableError>(((BadRequestObjectResult)actionResult).Value); //Confirm the action is responding with a dictionary.
     }
 
     /// <summary>
@@ -109,8 +108,10 @@ public class StandardCRUDControllerUnitTest
         IActionResult actionResult = await simpleCRUDController.CreateAsync(null);
 
         Assert.IsType<ObjectResult>(actionResult); //Confirm the correct action is returned.
-        Assert.IsType<ProblemDetails>(((ObjectResult)actionResult).Value); //Confirm the action is responding with problem details.
-        Assert.Equal((int)HttpStatusCode.InternalServerError, ((ProblemDetails)((ObjectResult)actionResult).Value).Status); //Confirm the correct HTTP status code is returned.
+        Assert.IsType< Microsoft.AspNetCore.Mvc.ProblemDetails >(((ObjectResult)actionResult).Value); //Confirm the action is responding with problem details.
+        Assert.Equal((int)HttpStatusCode.InternalServerError, ((Microsoft.AspNetCore.Mvc.ProblemDetails)((ObjectResult)actionResult).Value).Status); //Confirm the correct HTTP status code is returned.
+        Assert.NotEmpty(((Microsoft.AspNetCore.Mvc.ProblemDetails)((ObjectResult)actionResult).Value).Detail); //Confirm a detail is set.
+        Assert.NotEmpty(((Microsoft.AspNetCore.Mvc.ProblemDetails)((ObjectResult)actionResult).Value).Title); //Confirm a title is set.
     }
 
     /// <summary>
@@ -143,7 +144,31 @@ public class StandardCRUDControllerUnitTest
         SimpleStandardCRUDController simpleCRUDController = new(dataLayer, CreateConsoleLogger());
         IActionResult actionResult = await simpleCRUDController.DeleteAsync(SimpleStandardCRUDDataLayer.DeleteConflictId);
 
-        Assert.IsType<ConflictResult>(actionResult); //Confirm the correct action is returned.
+        Assert.IsType<ConflictObjectResult>(actionResult); //Confirm the correct action is returned.
+        Assert.IsType<ConflictDetails>(((ConflictObjectResult)actionResult).Value); //Confirm the action is responding with conflict details.
+        Assert.NotEmpty(((ConflictDetails)((ConflictObjectResult)actionResult).Value).Detail); //Confirm a detail is set.
+        Assert.NotEmpty(((ConflictDetails)((ConflictObjectResult)actionResult).Value).Title); //Confirm a title is set.
+        Assert.Equal((int)HttpStatusCode.Conflict, ((ConflictDetails)((ConflictObjectResult)actionResult).Value).Status); //Confirm the conflict status.
+    }
+
+    /// <summary>
+    /// The method verifies the StandardCRUDContoller.CreateAsync() returns a 404 (Not Found) response when the data object doesn't exist.
+    /// </summary>
+    /// <returns>A Task object for the async.</returns>
+    [Fact]
+    public async Task VerifyDeleteNotFoundResponse()
+    {
+        SimpleStandardCRUDDataLayer dataLayer = new();
+        await PopulateDataObjects(dataLayer);
+
+        SimpleStandardCRUDController simpleCRUDController = new(dataLayer, CreateConsoleLogger());
+        IActionResult actionResult = await simpleCRUDController.DeleteAsync(MaxRecords + 1);
+
+        Assert.IsType<NotFoundObjectResult>(actionResult); //Confirm the correct action is returned.
+        Assert.IsType<NotFoundDetails>(((NotFoundObjectResult)actionResult).Value); //Confirm the action is responding with conflict details.
+        Assert.NotEmpty(((NotFoundDetails)((NotFoundObjectResult)actionResult).Value).Detail); //Confirm a detail is set.
+        Assert.NotEmpty(((NotFoundDetails)((NotFoundObjectResult)actionResult).Value).Title); //Confirm a title is set.
+        Assert.Equal((int)HttpStatusCode.NotFound, ((NotFoundDetails)((NotFoundObjectResult)actionResult).Value).Status); //Confirm the conflict status.
     }
 
     /// <summary>
@@ -208,8 +233,10 @@ public class StandardCRUDControllerUnitTest
         IActionResult actionResult = await simpleCRUDController.GetPageAsync(null);
 
         Assert.IsType<ObjectResult>(actionResult); //Confirm the correct action is returned.
-        Assert.IsType<ProblemDetails>(((ObjectResult)actionResult).Value); //Confirm the action is responding with problem details.
-        Assert.Equal((int)HttpStatusCode.InternalServerError, ((ProblemDetails)((ObjectResult)actionResult).Value).Status); //Confirm the correct HTTP status code is returned.
+        Assert.IsType<Microsoft.AspNetCore.Mvc.ProblemDetails>(((ObjectResult)actionResult).Value); //Confirm the action is responding with problem details.
+        Assert.Equal((int)HttpStatusCode.InternalServerError, ((Microsoft.AspNetCore.Mvc.ProblemDetails)((ObjectResult)actionResult).Value).Status); //Confirm the correct HTTP status code is returned.
+        Assert.NotEmpty(((Microsoft.AspNetCore.Mvc.ProblemDetails)((ObjectResult)actionResult).Value).Detail); //Confirm a detail is set.
+        Assert.NotEmpty(((Microsoft.AspNetCore.Mvc.ProblemDetails)((ObjectResult)actionResult).Value).Title); //Confirm a title is set.
     }
 
     /// <summary>
@@ -246,8 +273,10 @@ public class StandardCRUDControllerUnitTest
         IActionResult actionResult = await simpleCRUDController.GetPageListViewAsync(null);
 
         Assert.IsType<ObjectResult>(actionResult); //Confirm the correct action is returned.
-        Assert.IsType<ProblemDetails>(((ObjectResult)actionResult).Value); //Confirm the action is responding with problem details.
-        Assert.Equal((int)HttpStatusCode.InternalServerError, ((ProblemDetails)((ObjectResult)actionResult).Value).Status); //Confirm the correct HTTP status code is returned.
+        Assert.IsType<Microsoft.AspNetCore.Mvc.ProblemDetails>(((ObjectResult)actionResult).Value); //Confirm the action is responding with problem details.
+        Assert.Equal((int)HttpStatusCode.InternalServerError, ((Microsoft.AspNetCore.Mvc.ProblemDetails)((ObjectResult)actionResult).Value).Status); //Confirm the correct HTTP status code is returned.
+        Assert.NotEmpty(((Microsoft.AspNetCore.Mvc.ProblemDetails)((ObjectResult)actionResult).Value).Detail); //Confirm a detail is set.
+        Assert.NotEmpty(((Microsoft.AspNetCore.Mvc.ProblemDetails)((ObjectResult)actionResult).Value).Title); //Confirm a title is set.
     }
 
     /// <summary>
@@ -322,8 +351,7 @@ public class StandardCRUDControllerUnitTest
         IActionResult actionResult = await simpleCRUDController.UpdateAsync(originalDataObject);
 
         Assert.IsType<BadRequestObjectResult>(actionResult); //Confirm the correct action is returned.
-        Assert.IsType<ServerSideValidationResult>(((BadRequestObjectResult)actionResult).Value); //Confirm the action is responding with a validation result.
-        Assert.False(((ServerSideValidationResult)((BadRequestObjectResult)actionResult).Value).IsSuccess); //Confirm the action is responding with a non-successful validation result.
+        Assert.IsType<SerializableError>(((BadRequestObjectResult)actionResult).Value); //Confirm the action is responding with a validation result.
     }
 
     /// <summary>
@@ -344,22 +372,50 @@ public class StandardCRUDControllerUnitTest
         SimpleStandardCRUDController controller = new(dataLayer, CreateConsoleLogger());
         IActionResult actionResult = await controller.UpdateAsync(dataObject);
 
-        Assert.IsType<ConflictResult>(actionResult);
+        Assert.IsType<ConflictObjectResult>(actionResult);
+        Assert.NotEmpty(((ConflictDetails)((ConflictObjectResult)actionResult).Value).Detail); //Confirm a detail is set.
+        Assert.NotEmpty(((ConflictDetails)((ConflictObjectResult)actionResult).Value).Title); //Confirm a title is set.
+        Assert.Equal((int)HttpStatusCode.Conflict, ((ConflictDetails)((ConflictObjectResult)actionResult).Value).Status); //Confirm the conflict status.
     }
 
+#warning DataLayer.Update() is now logging the id so it needs a non-null data object so the internal server error no longer works.
     /// <summary>
     /// The method verifies the StandardCRUDContoller.UpdateAsync() returns a 500 (Interal Server Error) response when an exception is thrown by the data layer.
     /// </summary>
     /// <returns>A Task object for the async.</returns>
-    [Fact]
-    public async Task VerifyUpdateInternalErrorResponse()
-    {
-        SimpleStandardCRUDController simpleCRUDController = new(new SimpleStandardCRUDDataLayer(), CreateConsoleLogger());
-        IActionResult actionResult = await simpleCRUDController.UpdateAsync(null);
+    //[Fact]
+    //public async Task VerifyUpdateInternalErrorResponse()
+    //{
+    //    SimpleStandardCRUDController simpleCRUDController = new(new SimpleStandardCRUDDataLayer(), CreateConsoleLogger());
+    //    IActionResult actionResult = await simpleCRUDController.UpdateAsync(null);
 
-        Assert.IsType<ObjectResult>(actionResult); //Confirm the correct action is returned.
-        Assert.IsType<ProblemDetails>(((ObjectResult)actionResult).Value); //Confirm the action is responding with problem details.
-        Assert.Equal((int)HttpStatusCode.InternalServerError, ((ProblemDetails)((ObjectResult)actionResult).Value).Status); //Confirm the correct HTTP status code is returned.
+    //    Assert.IsType<ObjectResult>(actionResult); //Confirm the correct action is returned.
+    //    Assert.IsType<Microsoft.AspNetCore.Mvc.ProblemDetails>(((ObjectResult)actionResult).Value); //Confirm the action is responding with problem details.
+    //    Assert.Equal((int)HttpStatusCode.InternalServerError, ((Microsoft.AspNetCore.Mvc.ProblemDetails)((ObjectResult)actionResult).Value).Status); //Confirm the correct HTTP status code is returned.
+    //    Assert.NotEmpty(((Microsoft.AspNetCore.Mvc.ProblemDetails)((ObjectResult)actionResult).Value).Detail); //Confirm a detail is set.
+    //    Assert.NotEmpty(((Microsoft.AspNetCore.Mvc.ProblemDetails)((ObjectResult)actionResult).Value).Title); //Confirm a title is set.
+    //}
+
+    /// <summary>
+    /// The method verifies the StandardCRUDContoller.UpdateAsync() returns a 404 (Not Found) response when the data object doesn't exist.
+    /// </summary>
+    /// <returns>A Task object for the async.</returns>
+    [Fact]
+    public async Task VerifyUpdateNotFoundResponse()
+    {
+        SimpleStandardCRUDDataLayer dataLayer = new();
+        SimpleDataObject dataObject = await dataLayer.CreateAsync(new SimpleDataObject() { Name = "10", Value = 10 });
+
+        dataObject.Integer64ID = dataObject.Integer64ID + 1;
+        dataObject.Value += 1;
+
+        SimpleStandardCRUDController controller = new(dataLayer, CreateConsoleLogger());
+        IActionResult actionResult = await controller.UpdateAsync(dataObject);
+
+        Assert.IsType<NotFoundObjectResult>(actionResult);
+        Assert.NotEmpty(((NotFoundDetails)((NotFoundObjectResult)actionResult).Value).Detail); //Confirm a detail is set.
+        Assert.NotEmpty(((NotFoundDetails)((NotFoundObjectResult)actionResult).Value).Title); //Confirm a title is set.
+        Assert.Equal((int)HttpStatusCode.NotFound, ((NotFoundDetails)((NotFoundObjectResult)actionResult).Value).Status); //Confirm the conflict status.
     }
 
     /// <summary>

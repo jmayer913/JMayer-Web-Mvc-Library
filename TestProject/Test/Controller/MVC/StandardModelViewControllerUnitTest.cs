@@ -1,6 +1,8 @@
-﻿using JMayer.Web.Mvc.Controller.Mvc;
+﻿using JMayer.Data.HTTP.Details;
+using JMayer.Web.Mvc.Controller.Mvc;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using System.Net;
 using TestProject.Controller.Mvc;
 using TestProject.Data;
 using TestProject.Database;
@@ -139,8 +141,8 @@ public class StandardModelViewControllerUnitTest
         IActionResult actionResult = await controller.CreateAsync(new SimpleDataObject() { Value = InvalidValue });
 
         Assert.IsType<ObjectResult>(actionResult); //Confirm the correct action is returned.
-        Assert.IsType<ValidationProblemDetails>(((ObjectResult)actionResult).Value); //Confirm there's a validation problem details.
-        Assert.NotEmpty(((ValidationProblemDetails)((ObjectResult)actionResult).Value).Errors); //Confirm the validation problem details is not empty.
+        Assert.IsType<Microsoft.AspNetCore.Mvc.ValidationProblemDetails>(((ObjectResult)actionResult).Value); //Confirm there's a validation problem details.
+        Assert.NotEmpty(((Microsoft.AspNetCore.Mvc.ValidationProblemDetails)((ObjectResult)actionResult).Value).Errors); //Confirm the validation problem details is not empty.
     }
 
     /// <summary>
@@ -161,8 +163,8 @@ public class StandardModelViewControllerUnitTest
         IActionResult actionResult = await controller.CreateAsync(new SimpleDataObject() { Value = InvalidValue });
 
         Assert.IsType<ObjectResult>(actionResult); //Confirm the correct action is returned.
-        Assert.IsType<ValidationProblemDetails>(((ObjectResult)actionResult).Value); //Confirm there's a validation problem details.
-        Assert.NotEmpty(((ValidationProblemDetails)((ObjectResult)actionResult).Value).Errors); //Confirm the validation problem details is not empty.
+        Assert.IsType<Microsoft.AspNetCore.Mvc.ValidationProblemDetails>(((ObjectResult)actionResult).Value); //Confirm there's a validation problem details.
+        Assert.NotEmpty(((Microsoft.AspNetCore.Mvc.ValidationProblemDetails)((ObjectResult)actionResult).Value).Errors); //Confirm the validation problem details is not empty.
     }
 
     /// <summary>
@@ -185,7 +187,10 @@ public class StandardModelViewControllerUnitTest
 
         if (details)
         {
-            Assert.IsType<ProblemDetails>(((ObjectResult)actionResult).Value); //Confirm there's a problem details.
+            Assert.IsType<Microsoft.AspNetCore.Mvc.ProblemDetails>(((ObjectResult)actionResult).Value); //Confirm there's a problem details.
+            Assert.Equal((int)HttpStatusCode.InternalServerError, ((Microsoft.AspNetCore.Mvc.ProblemDetails)((ObjectResult)actionResult).Value).Status); //Confirm the correct HTTP status code is returned.
+            Assert.NotEmpty(((Microsoft.AspNetCore.Mvc.ProblemDetails)((ObjectResult)actionResult).Value).Detail); //Confirm a detail is set.
+            Assert.NotEmpty(((Microsoft.AspNetCore.Mvc.ProblemDetails)((ObjectResult)actionResult).Value).Title); //Confirm a title is set.
         }
     }
 
@@ -323,8 +328,10 @@ public class StandardModelViewControllerUnitTest
         if (details)
         {
             Assert.IsType<NotFoundObjectResult>(actionResult); //Confirm the correct action is returned.
-            Assert.NotNull(((NotFoundObjectResult)actionResult).Value); //Confirm the value is set.
-            Assert.NotNull(((dynamic)((NotFoundObjectResult)actionResult).Value).UserMessage); //Confirm there is a custom user message.
+            Assert.IsType<NotFoundDetails>(((NotFoundObjectResult)actionResult).Value); //Confirm the action is responding with not found details.
+            Assert.Equal((int)HttpStatusCode.NotFound, ((NotFoundDetails)((NotFoundObjectResult)actionResult).Value).Status); //Confirm the correct HTTP status code is returned.
+            Assert.NotEmpty(((NotFoundDetails)((NotFoundObjectResult)actionResult).Value).Detail); //Confirm a detail is set.
+            Assert.NotEmpty(((NotFoundDetails)((NotFoundObjectResult)actionResult).Value).Title); //Confirm a title is set.
         }
         else
         {
@@ -357,8 +364,10 @@ public class StandardModelViewControllerUnitTest
     //    if (details)
     //    {
     //        Assert.IsType<ConflictObjectResult>(actionResult); //Confirm the correct action is returned.
-    //        Assert.NotNull(((ConflictObjectResult)actionResult).Value); //Confirm the value is set.
-    //        Assert.NotNull(((dynamic)((ConflictObjectResult)actionResult).Value).UserMessage); //Confirm there is a custom user message.
+    //        Assert.IsType<ConflictDetails>(((ConflictObjectResult)actionResult).Value); //Confirm the action is responding with conflict details.
+    //        Assert.Equal((int)HttpStatusCode.Conflict, ((ConflictDetails)((ConflictObjectResult)actionResult).Value).Status); //Confirm the correct HTTP status code is returned.
+    //        Assert.NotEmpty(((ConflictDetails)((ConflictObjectResult)actionResult).Value).Detail); //Confirm a detail is set.
+    //        Assert.NotEmpty(((ConflictDetails)((ConflictObjectResult)actionResult).Value).Title); //Confirm a title is set.
     //    }
     //    else
     //    {
@@ -406,8 +415,10 @@ public class StandardModelViewControllerUnitTest
         if (details)
         {
             Assert.IsType<NotFoundObjectResult>(actionResult); //Confirm the correct action is returned.
-            Assert.NotNull(((NotFoundObjectResult)actionResult).Value); //Confirm the value is set.
-            Assert.NotNull(((dynamic)((NotFoundObjectResult)actionResult).Value).UserMessage); //Confirm there is a custom user message.
+            Assert.IsType<NotFoundDetails>(((NotFoundObjectResult)actionResult).Value); //Confirm the action is responding with not found details.
+            Assert.Equal((int)HttpStatusCode.NotFound, ((NotFoundDetails)((NotFoundObjectResult)actionResult).Value).Status); //Confirm the correct HTTP status code is returned.
+            Assert.NotEmpty(((NotFoundDetails)((NotFoundObjectResult)actionResult).Value).Detail); //Confirm a detail is set.
+            Assert.NotEmpty(((NotFoundDetails)((NotFoundObjectResult)actionResult).Value).Title); //Confirm a title is set.
         }
         else
         {
@@ -474,8 +485,10 @@ public class StandardModelViewControllerUnitTest
         if (details)
         {
             Assert.IsType<NotFoundObjectResult>(actionResult); //Confirm the correct action is returned.
-            Assert.NotNull(((NotFoundObjectResult)actionResult).Value); //Confirm the value is set.
-            Assert.NotNull(((dynamic)((NotFoundObjectResult)actionResult).Value).UserMessage); //Confirm there is a custom user message.
+            Assert.IsType<NotFoundDetails>(((NotFoundObjectResult)actionResult).Value); //Confirm the action is responding with not found details.
+            Assert.Equal((int)HttpStatusCode.NotFound, ((NotFoundDetails)((NotFoundObjectResult)actionResult).Value).Status); //Confirm the correct HTTP status code is returned.
+            Assert.NotEmpty(((NotFoundDetails)((NotFoundObjectResult)actionResult).Value).Detail); //Confirm a detail is set.
+            Assert.NotEmpty(((NotFoundDetails)((NotFoundObjectResult)actionResult).Value).Title); //Confirm a title is set.
         }
         else
         {
@@ -522,8 +535,10 @@ public class StandardModelViewControllerUnitTest
         if (details)
         {
             Assert.IsType<NotFoundObjectResult>(actionResult); //Confirm the correct action is returned.
-            Assert.NotNull(((NotFoundObjectResult)actionResult).Value); //Confirm the value is set.
-            Assert.NotNull(((dynamic)((NotFoundObjectResult)actionResult).Value).UserMessage); //Confirm there is a custom user message.
+            Assert.IsType<NotFoundDetails>(((NotFoundObjectResult)actionResult).Value); //Confirm the action is responding with not found details.
+            Assert.Equal((int)HttpStatusCode.NotFound, ((NotFoundDetails)((NotFoundObjectResult)actionResult).Value).Status); //Confirm the correct HTTP status code is returned.
+            Assert.NotEmpty(((NotFoundDetails)((NotFoundObjectResult)actionResult).Value).Detail); //Confirm a detail is set.
+            Assert.NotEmpty(((NotFoundDetails)((NotFoundObjectResult)actionResult).Value).Title); //Confirm a title is set.
         }
         else
         {
@@ -570,8 +585,10 @@ public class StandardModelViewControllerUnitTest
         if (details)
         {
             Assert.IsType<NotFoundObjectResult>(actionResult); //Confirm the correct action is returned.
-            Assert.NotNull(((NotFoundObjectResult)actionResult).Value); //Confirm the value is set.
-            Assert.NotNull(((dynamic)((NotFoundObjectResult)actionResult).Value).UserMessage); //Confirm there is a custom user message.
+            Assert.IsType<NotFoundDetails>(((NotFoundObjectResult)actionResult).Value); //Confirm the action is responding with not found details.
+            Assert.Equal((int)HttpStatusCode.NotFound, ((NotFoundDetails)((NotFoundObjectResult)actionResult).Value).Status); //Confirm the correct HTTP status code is returned.
+            Assert.NotEmpty(((NotFoundDetails)((NotFoundObjectResult)actionResult).Value).Detail); //Confirm a detail is set.
+            Assert.NotEmpty(((NotFoundDetails)((NotFoundObjectResult)actionResult).Value).Title); //Confirm a title is set.
         }
         else
         {
@@ -623,8 +640,10 @@ public class StandardModelViewControllerUnitTest
         if (details)
         {
             Assert.IsType<ConflictObjectResult>(actionResult); //Confirm the correct action is returned.
-            Assert.NotNull(((ConflictObjectResult)actionResult).Value); //Confirm the value is set.
-            Assert.NotNull(((dynamic)((ConflictObjectResult)actionResult).Value).UserMessage); //Confirm there is a custom user message.
+            Assert.IsType<ConflictDetails>(((ConflictObjectResult)actionResult).Value); //Confirm the action is responding with conflict details.
+            Assert.Equal((int)HttpStatusCode.Conflict, ((ConflictDetails)((ConflictObjectResult)actionResult).Value).Status); //Confirm the correct HTTP status code is returned.
+            Assert.NotEmpty(((ConflictDetails)((ConflictObjectResult)actionResult).Value).Detail); //Confirm a detail is set.
+            Assert.NotEmpty(((ConflictDetails)((ConflictObjectResult)actionResult).Value).Title); //Confirm a title is set.
         }
         else
         {
@@ -671,8 +690,8 @@ public class StandardModelViewControllerUnitTest
         IActionResult actionResult = await controller.UpdateAsync(dataObject);
 
         Assert.IsType<ObjectResult>(actionResult); //Confirm the correct action is returned.
-        Assert.IsType<ValidationProblemDetails>(((ObjectResult)actionResult).Value); //Confirm there's a validation problem details.
-        Assert.NotEmpty(((ValidationProblemDetails)((ObjectResult)actionResult).Value).Errors); //Confirm the validation problem details is not empty.
+        Assert.IsType<Microsoft.AspNetCore.Mvc.ValidationProblemDetails>(((ObjectResult)actionResult).Value); //Confirm there's a validation problem details.
+        Assert.NotEmpty(((Microsoft.AspNetCore.Mvc.ValidationProblemDetails)((ObjectResult)actionResult).Value).Errors); //Confirm the validation problem details is not empty.
     }
 
     /// <summary>
@@ -695,23 +714,35 @@ public class StandardModelViewControllerUnitTest
         IActionResult actionResult = await controller.UpdateAsync(dataObject);
 
         Assert.IsType<ObjectResult>(actionResult); //Confirm the correct action is returned.
-        Assert.IsType<ValidationProblemDetails>(((ObjectResult)actionResult).Value); //Confirm there's a validation problem details.
-        Assert.NotEmpty(((ValidationProblemDetails)((ObjectResult)actionResult).Value).Errors); //Confirm the validation problem details is not empty.
+        Assert.IsType<Microsoft.AspNetCore.Mvc.ValidationProblemDetails>(((ObjectResult)actionResult).Value); //Confirm there's a validation problem details.
+        Assert.NotEmpty(((Microsoft.AspNetCore.Mvc.ValidationProblemDetails)((ObjectResult)actionResult).Value).Errors); //Confirm the validation problem details is not empty.
     }
 
     /// <summary>
     /// The method verifies the StandardModelViewContoller.UpdateAsync() return a ObjectResult when an unexpected exception occurs.
     /// </summary>
     /// <returns>A Task object for the async.</returns>
-    [Fact]
-    public async Task VerifyUpdateReturnJsonOnError()
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task VerifyUpdateReturnJsonOnError(bool details)
     {
         SimpleStandardCRUDDataLayer dataLayer = new();
-        SimpleStandardModelViewController controller = new(dataLayer, CreateConsoleLogger());
+        SimpleStandardModelViewController controller = new(dataLayer, CreateConsoleLogger())
+        {
+            IsDetailsIncludedInNegativeResponse = details
+        };
         IActionResult actionResult = await controller.UpdateAsync(null);
 
         Assert.IsType<ObjectResult>(actionResult); //Confirm the correct action is returned.
-        Assert.IsType<ProblemDetails>(((ObjectResult)actionResult).Value); //Confirm there's a problem details.
+
+        if (details)
+        {
+            Assert.IsType<Microsoft.AspNetCore.Mvc.ProblemDetails>(((ObjectResult)actionResult).Value); //Confirm there's a problem details.
+            Assert.Equal((int)HttpStatusCode.InternalServerError, ((Microsoft.AspNetCore.Mvc.ProblemDetails)((ObjectResult)actionResult).Value).Status); //Confirm the correct HTTP status code is returned.
+            Assert.NotEmpty(((Microsoft.AspNetCore.Mvc.ProblemDetails)((ObjectResult)actionResult).Value).Detail); //Confirm a detail is set.
+            Assert.NotEmpty(((Microsoft.AspNetCore.Mvc.ProblemDetails)((ObjectResult)actionResult).Value).Title); //Confirm a title is set.
+        }
     }
 
     /// <summary>
@@ -735,8 +766,10 @@ public class StandardModelViewControllerUnitTest
         if (details)
         {
             Assert.IsType<NotFoundObjectResult>(actionResult); //Confirm the correct action is returned.
-            Assert.NotNull(((NotFoundObjectResult)actionResult).Value); //Confirm the value is set.
-            Assert.NotNull(((dynamic)((NotFoundObjectResult)actionResult).Value).UserMessage); //Confirm there is a custom user message.
+            Assert.IsType<NotFoundDetails>(((NotFoundObjectResult)actionResult).Value); //Confirm the action is responding with not found details.
+            Assert.Equal((int)HttpStatusCode.NotFound, ((NotFoundDetails)((NotFoundObjectResult)actionResult).Value).Status); //Confirm the correct HTTP status code is returned.
+            Assert.NotEmpty(((NotFoundDetails)((NotFoundObjectResult)actionResult).Value).Detail); //Confirm a detail is set.
+            Assert.NotEmpty(((NotFoundDetails)((NotFoundObjectResult)actionResult).Value).Title); //Confirm a title is set.
         }
         else
         {

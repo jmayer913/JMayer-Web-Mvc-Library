@@ -117,6 +117,8 @@ public class StandardSubCRUDControllerUnitTest
         Assert.IsType<ObjectResult>(actionResult); //Confirm the correct action is returned.
         Assert.IsType<ProblemDetails>(((ObjectResult)actionResult).Value); //Confirm the action is responding with problem details.
         Assert.Equal((int)HttpStatusCode.InternalServerError, ((ProblemDetails)((ObjectResult)actionResult).Value).Status); //Confirm the correct HTTP status code is returned.
+        Assert.NotEmpty(((ProblemDetails)((ObjectResult)actionResult).Value).Detail); //Confirm a detail is set.
+        Assert.NotEmpty(((ProblemDetails)((ObjectResult)actionResult).Value).Title); //Confirm a title is set.
     }
 
     /// <summary>
@@ -155,6 +157,8 @@ public class StandardSubCRUDControllerUnitTest
         Assert.IsType<ObjectResult>(actionResult); //Confirm the correct action is returned.
         Assert.IsType<ProblemDetails>(((ObjectResult)actionResult).Value); //Confirm the action is responding with problem details.
         Assert.Equal((int)HttpStatusCode.InternalServerError, ((ProblemDetails)((ObjectResult)actionResult).Value).Status); //Confirm the correct HTTP status code is returned.
+        Assert.NotEmpty(((ProblemDetails)((ObjectResult)actionResult).Value).Detail); //Confirm a detail is set.
+        Assert.NotEmpty(((ProblemDetails)((ObjectResult)actionResult).Value).Title); //Confirm a title is set.
     }
 
     /// <summary>

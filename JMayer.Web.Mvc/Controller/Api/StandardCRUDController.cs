@@ -1,11 +1,11 @@
 ﻿using JMayer.Data.Data;
 using JMayer.Data.Data.Query;
 using JMayer.Data.Database.DataLayer;
-using JMayer.Data.HTTP.DataLayer;
+using JMayer.Data.HTTP.Details;
+using JMayer.Web.Mvc.Extension;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.ComponentModel.DataAnnotations;
-using System.Net;
 
 namespace JMayer.Web.Mvc.Controller.Api;
 
@@ -18,7 +18,7 @@ namespace JMayer.Web.Mvc.Controller.Api;
 [Route("api/[controller]")]
 public class StandardCRUDController<T, U> : ControllerBase 
     where T : DataObject
-    where U : Data.Database.DataLayer.IStandardCRUDDataLayer<T>
+    where U : IStandardCRUDDataLayer<T>
 {
     /// <summary>
     /// The property gets data layer the controller will interact with.
@@ -65,7 +65,7 @@ public class StandardCRUDController<T, U> : ControllerBase
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to return the count for the {Type} data objects.", DataObjectTypeName);
-            return StatusCode((int)HttpStatusCode.InternalServerError);
+            return Problem(title: $"{DataObjectTypeName.SpaceCamelCase()} Count Error", detail: $"Failed to return the {DataObjectTypeName.SpaceCamelCase()} count because of an error on the server.");
         }
     }
 
@@ -85,73 +85,82 @@ public class StandardCRUDController<T, U> : ControllerBase
         }
         catch (DataObjectValidationException ex)
         {
-            ServerSideValidationResult serverSideValidationResult = new(ex.ValidationResults);
             Logger.LogWarning(ex, "Failed to create the {Type} because of a server-side validation error.", DataObjectTypeName);
-            return BadRequest(serverSideValidationResult);
+            ex.CopyToModelState(ModelState);
+            return BadRequest(ModelState);
         }
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to create the {Type}.", DataObjectTypeName);
-            return Problem();
+            return Problem(title: $"{DataObjectTypeName.SpaceCamelCase()} Create Error", detail: $"Failed to create the {DataObjectTypeName.SpaceCamelCase()} record because of an error on the server.");
         }
     }
 
     /// <summary>
     /// The method deletes a data object using the data layer.
     /// </summary>
-    /// <param name="integerID">The id for the data object.</param>
+    /// <param name="id">The id for the data object.</param>
     /// <returns>An IActionResult object.</returns>
-    [HttpDelete("{integerID:long}")]
-    public virtual async Task<IActionResult> DeleteAsync(long integerID)
+    [HttpDelete("{id:long}")]
+    public virtual async Task<IActionResult> DeleteAsync(long id)
     {
         try
         {
-            T? dataObject = await DataLayer.GetSingleAsync(obj => obj.Integer64ID == integerID);
+            T? dataObject = await DataLayer.GetSingleAsync(obj => obj.Integer64ID == id);
 
-            if (dataObject != null)
+            if (dataObject is null)
             {
-                await DataLayer.DeleteAsync(dataObject);
-                Logger.LogInformation("The {ID} for the {Type} was successfully deleted.", integerID, DataObjectTypeName);
+                Logger.LogWarning("The {ID} for the {Type} was not found so no delete occurred.", id.ToString(), DataObjectTypeName);
+                return NotFound(new NotFoundDetails(title: $"{DataObjectTypeName.SpaceCamelCase()} Delete Error - Not Found", detail: $"The {DataObjectTypeName.SpaceCamelCase()} record was not found; please refresh the page because another user may have deleted it."));
             }
-            
+
+            await DataLayer.DeleteAsync(dataObject);
+            Logger.LogInformation("The {ID} for the {Type} was successfully deleted.", id, DataObjectTypeName);
             return Ok();
         }
         catch (DataObjectDeleteConflictException ex)
         {
-            Logger.LogError(ex, "Failed to delete the {ID} {Type} because of a data conflict.", integerID, DataObjectTypeName);
-            return Conflict();
+            Logger.LogError(ex, "Failed to delete the {ID} {Type} because of a data conflict.", id, DataObjectTypeName);
+            return Conflict(new ConflictDetails(title: $"{DataObjectTypeName.SpaceCamelCase()} Delete Error - Data Conflict", detail: $"The {DataObjectTypeName.SpaceCamelCase()} record has a dependency that prevents it from being deleted; the dependency needs to be deleted first."));
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Failed to delete the {ID} {Type}.", integerID, DataObjectTypeName);
-            return Problem();
+            Logger.LogError(ex, "Failed to delete the {ID} {Type}.", id, DataObjectTypeName);
+            return Problem(title: $"{DataObjectTypeName.SpaceCamelCase()} Delete Error", detail: $"Failed to delete the {DataObjectTypeName.SpaceCamelCase()} record because of an error on the server.");
         }
     }
 
     /// <summary>
     /// The method deletes a data object using the data layer.
     /// </summary>
-    /// <param name="stringID">The id for the data object.</param>
+    /// <param name="id">The id for the data object.</param>
     /// <returns>An IActionResult object.</returns>
-    [HttpDelete("{stringID}")]
-    public virtual async Task<IActionResult> DeleteAsync(string stringID)
+    [HttpDelete("{id}")]
+    public virtual async Task<IActionResult> DeleteAsync(string id)
     {
         try
         {
-            T? dataObject = await DataLayer.GetSingleAsync(obj => obj.StringID == stringID);
+            T? dataObject = await DataLayer.GetSingleAsync(obj => obj.StringID == id);
 
-            if (dataObject != null)
+            if (dataObject is null)
             {
-                await DataLayer.DeleteAsync(dataObject);
-                Logger.LogInformation("The {ID} for the {Type} was successfully deleted.", stringID, DataObjectTypeName);
+                Logger.LogWarning("The {ID} for the {Type} was not found so no delete occurred.", id.ToString(), DataObjectTypeName);
+                return NotFound(new NotFoundDetails(title: $"{DataObjectTypeName.SpaceCamelCase()} Delete Error - Not Found", detail: $"The {DataObjectTypeName.SpaceCamelCase()} record was not found; please refresh the page because another user may have deleted it."));
             }
 
+            await DataLayer.DeleteAsync(dataObject);
+            Logger.LogInformation("The {ID} for the {Type} was successfully deleted.", id, DataObjectTypeName);
             return Ok();
+        }
+        catch (DataObjectDeleteConflictException ex)
+        {
+            Logger.LogError(ex, "Failed to delete the {ID} {Type} because of a data conflict.", id, DataObjectTypeName);
+            return Conflict(new ConflictDetails(title: $"{DataObjectTypeName.SpaceCamelCase()} Delete Error - Data Conflict", detail: $"The {DataObjectTypeName.SpaceCamelCase()} record has a dependency that prevents it from being deleted; the dependency needs to be deleted first."));
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Failed to delete the {ID} {Type}.", stringID, DataObjectTypeName);
-            return Problem();
+            Logger.LogError(ex, "Failed to delete the {ID} {Type}.", id, DataObjectTypeName);
+            return Problem(title: $"{DataObjectTypeName.SpaceCamelCase()} Delete Error", detail: $"Failed to delete the {DataObjectTypeName.SpaceCamelCase()} record because of an error on the server.");
         }
     }
 
@@ -170,7 +179,7 @@ public class StandardCRUDController<T, U> : ControllerBase
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to return all the {Type} data objects.", DataObjectTypeName);
-            return Problem();
+            return Problem(title: $"{DataObjectTypeName.SpaceCamelCase()} Get All Error", detail: $"Failed to return all the {DataObjectTypeName.SpaceCamelCase()} records because of an error on the server.");
         }
     }
 
@@ -189,7 +198,7 @@ public class StandardCRUDController<T, U> : ControllerBase
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to return all the {Type} data objects as list views.", DataObjectTypeName);
-            return Problem();
+            return Problem(title: $"{DataObjectTypeName.SpaceCamelCase()} Get All List View Error", detail: $"Failed to return all the {DataObjectTypeName.SpaceCamelCase()} records as list views because of an error on the server.");
         }
     }
 
@@ -209,7 +218,7 @@ public class StandardCRUDController<T, U> : ControllerBase
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to return a page of {Type} data objects.", DataObjectTypeName);
-            return Problem();
+            return Problem(title: $"{DataObjectTypeName.SpaceCamelCase()} Get Page Error", detail: $"Failed to return a page of the {DataObjectTypeName.SpaceCamelCase()} records because of an error on the server.");
         }
     }
 
@@ -229,7 +238,7 @@ public class StandardCRUDController<T, U> : ControllerBase
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to return a page of {Type} data objects as list views.", DataObjectTypeName);
-            return Problem();
+            return Problem(title: $"{DataObjectTypeName.SpaceCamelCase()} Get Page List View Error", detail: $"Failed to return a page of the {DataObjectTypeName.SpaceCamelCase()} records as list views because of an error on the server.");
         }
     }
 
@@ -248,7 +257,7 @@ public class StandardCRUDController<T, U> : ControllerBase
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to return the first {Type} data object.", DataObjectTypeName);
-            return Problem();
+            return Problem(title: $"{DataObjectTypeName.SpaceCamelCase()} Get Single Error", detail: $"Failed to return the {DataObjectTypeName.SpaceCamelCase()} record because of an error on the server.");
         }
     }
 
@@ -268,7 +277,7 @@ public class StandardCRUDController<T, U> : ControllerBase
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to return the {ID} {Type} data object.", integerID, DataObjectTypeName);
-            return Problem();
+            return Problem(title: $"{DataObjectTypeName.SpaceCamelCase()} Get Single Error", detail: $"Failed to return the {DataObjectTypeName.SpaceCamelCase()} record because of an error on the server.");
         }
     }
 
@@ -288,7 +297,7 @@ public class StandardCRUDController<T, U> : ControllerBase
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to return the {ID} {Type} data object.", stringID, DataObjectTypeName);
-            return Problem();
+            return Problem(title: $"{DataObjectTypeName.SpaceCamelCase()} Get Single Error", detail: $"Failed to return the {DataObjectTypeName.SpaceCamelCase()} record because of an error on the server.");
         }
     }
 
@@ -300,6 +309,8 @@ public class StandardCRUDController<T, U> : ControllerBase
     [HttpPut]
     public virtual async Task<IActionResult> UpdateAsync([FromBody] T dataObject)
     {
+        string id = string.IsNullOrEmpty(dataObject.StringID) ? dataObject.Integer64ID.ToString() : dataObject.StringID;
+
         try
         {
             dataObject = await DataLayer.UpdateAsync(dataObject);
@@ -308,41 +319,47 @@ public class StandardCRUDController<T, U> : ControllerBase
         }
         catch (DataObjectUpdateConflictException ex)
         {
-            Logger.LogWarning(ex, "Failed to update {Type} because the data was considered old.", DataObjectTypeName);
-            return Conflict();
+            Logger.LogWarning(ex, "Failed to update {ID} {Type} because the data was considered old.", id, DataObjectTypeName);
+            return Conflict(new ConflictDetails(title: $"{DataObjectTypeName.SpaceCamelCase()} Update Error - Data Conflict", detail: $"The submitted {DataObjectTypeName.SpaceCamelCase()} data was detected to be out of date; please refresh the page and try again."));
         }
         catch (DataObjectValidationException ex)
         {
-            ServerSideValidationResult serverSideValidationResult = new(ex.ValidationResults);
-            Logger.LogWarning(ex, "Failed to update the {Type} because of a server-side validation error.", DataObjectTypeName);
-            return BadRequest(serverSideValidationResult);
+            Logger.LogWarning(ex, "Failed to update the {ID} {Type} because of a server-side validation error.", id, DataObjectTypeName);
+            ex.CopyToModelState(ModelState);
+            return BadRequest(ModelState);
+        }
+        catch (IDNotFoundException ex)
+        {
+            Logger.LogWarning(ex, "Failed to update the {ID} {Type} because it was not found.", id, DataObjectTypeName);
+            return NotFound(new NotFoundDetails(title: $"{DataObjectTypeName.SpaceCamelCase()} Update Error - Not Found", detail: $"The {DataObjectTypeName.SpaceCamelCase()} record was not found; please refresh the page because another user may have deleted it."));
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Failed to update the {Type}.", DataObjectTypeName);
-            return Problem();
+            Logger.LogError(ex, "Failed to update the {Type} for {ID}.", DataObjectTypeName , id);
+            return Problem(title: $"{DataObjectTypeName.SpaceCamelCase()} Update Error", detail: $"Failed to update the {DataObjectTypeName.SpaceCamelCase()} record because of an error on the server.");
         }
     }
 
+#warning For Validate(), I need to figure out what is returned since ServerSideValidationResult will be removed.
     /// <summary>
     /// The method validates a data object using the data layer.
     /// </summary>
     /// <param name="dataObject">The data object to validated.</param>
     /// <returns>The validation result.</returns>
-    [HttpPost("Validate")]
-    public virtual async Task<IActionResult> ValidateAsync([FromBody] T dataObject)
-    {
-        try
-        {
-            List<ValidationResult> validationResults = await DataLayer.ValidateAsync(dataObject);
-            ServerSideValidationResult serverSideValidationResult = new(validationResults);
-            Logger.LogInformation("The {Type} was successfully validated.", DataObjectTypeName);
-            return Ok(serverSideValidationResult);
-        }
-        catch (Exception ex)
-        {
-            Logger.LogError(ex, "Failed to validate the {Type}.", DataObjectTypeName);
-            return Problem();
-        }
-    }
+    //    [HttpPost("Validate")]
+    //    public virtual async Task<IActionResult> ValidateAsync([FromBody] T dataObject)
+    //    {
+    //        try
+    //        {
+    //            List<ValidationResult> validationResults = await DataLayer.ValidateAsync(dataObject);
+    //            ServerSideValidationResult serverSideValidationResult = new(validationResults);
+    //            Logger.LogInformation("The {Type} was successfully validated.", DataObjectTypeName);
+    //            return Ok(serverSideValidationResult);
+    //        }
+    //        catch (Exception ex)
+    //        {
+    //            Logger.LogError(ex, "Failed to validate the {Type}.", DataObjectTypeName);
+    //            return Problem(detail: $"Failed to validate the {DataObjectTypeName.SpaceCamelCase()} record because of an error on the server.");
+    //        }
+    //    }
 }

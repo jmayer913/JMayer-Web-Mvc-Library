@@ -1,5 +1,6 @@
 ﻿using JMayer.Data.Data;
 using JMayer.Data.Database.DataLayer;
+using JMayer.Data.HTTP.Details;
 using JMayer.Web.Mvc.Extension;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -26,24 +27,24 @@ namespace JMayer.Web.Mvc.Controller.Mvc;
 /// <br/>
 /// <br/>
 /// When a model is not found, a 404 not found will be returned. With the Ajax pattern, javascript needs to be able to 
-/// handle this type of response. You can set the IsDetailsIncludedInNegativeResponse property to true and an object will
-/// be returned with a UserMessage field. With the MVC pattern, you need to setup the middleware so a user friendly page
-/// is displayed. The suggested way is to register UseStatusCodePagesWithRedirects() with the middleware; the
-/// IsDetailsIncludedInNegativeResponse property must be set to false else redirects won't work.
+/// handle this type of response. You can set the IsDetailsIncludedInNegativeResponse property to true and a problem details
+/// will be returned; the title and detail fields will be set. With the MVC pattern, you need to setup the middleware so a 
+/// user friendly page is displayed. The suggested way is to register UseStatusCodePagesWithRedirects() with the middleware; 
+/// the IsDetailsIncludedInNegativeResponse property must be set to false else redirects won't work.
 /// <br/>
 /// <br/>
 /// If the data layer has old data object detection enabled or the data layer checks for dependencies before a delete 
 /// (a DataObjectDeleteConflictException is thrown), a 409 conflict can be returned. With the Ajax pattern, javascript 
 /// needs to be able to handle this type of response. You can set the IsDetailsIncludedInNegativeResponse property to true 
-/// and an object will be returned with a UserMessage field. With the MVC pattern, you need to setup the middleware so 
-/// a user friendly page is displayed. The suggested way is to register UseStatusCodePagesWithRedirects() with the 
-/// middleware; the IsDetailsIncludedInNegativeResponse property must be set to false else redirects won't work.
+/// and a problem details will be returned; the title and detail fields will be set. With the MVC pattern, you need to setup 
+/// the middleware so a user friendly page is displayed. The suggested way is to register UseStatusCodePagesWithRedirects() 
+/// with the middleware; the IsDetailsIncludedInNegativeResponse property must be set to false else redirects won't work.
 /// <br/>
 /// <br/>
 /// If an unexpected exception occurs, a 500 internal server error will be returned. With the Ajax pattern, javascript needs to 
-/// be able to handle this type of response. You can set the IsDetailsIncludedInNegativeResponse property to true and an object will
-/// be returned with a UserMessage field. With the MVC pattern, you need to setup the middleware so a user friendly page
-/// is displayed. The suggested way is to register UseStatusCodePagesWithRedirects() with the middleware; the
+/// be able to handle this type of response. You can set the IsDetailsIncludedInNegativeResponse property to true and a problem 
+/// details will be returned; the title and detail fields will be set. With the MVC pattern, you need to setup the middleware so 
+/// a user friendly page is displayed. The suggested way is to register UseStatusCodePagesWithRedirects() with the middleware; the
 /// IsDetailsIncludedInNegativeResponse property must be set to false else redirects won't work.
 /// </summary>
 /// <typeparam name="T">Must be a SubUserEditableDataObject since the data layer requires this.</typeparam>
@@ -150,7 +151,7 @@ public class StandardSubModelViewController<T, U> : StandardModelViewController<
             if (dataObject is null)
             {
                 Logger.LogWarning("The {ID} for the {Type} was not found so no delete occurred.", id.ToString(), DataObjectTypeName);
-                return IsDetailsIncludedInNegativeResponse ? NotFound(new { UserMessage = $"The {DataObjectTypeName.SpaceCamelCase()} record was not found; please refresh the page because another user may have deleted it." }) : NotFound();
+                return IsDetailsIncludedInNegativeResponse ? NotFound(new NotFoundDetails(title: $"{DataObjectTypeName.SpaceCamelCase()} Delete Error - Not Found", detail: $"The {DataObjectTypeName.SpaceCamelCase()} record was not found; please refresh the page because another user may have deleted it.")) : NotFound();
             }
             else
             {
@@ -170,12 +171,12 @@ public class StandardSubModelViewController<T, U> : StandardModelViewController<
         catch (DataObjectDeleteConflictException ex)
         {
             Logger.LogError(ex, "Failed to delete the {ID} {Type} because of a data conflict.", id.ToString(), DataObjectTypeName);
-            return IsDetailsIncludedInNegativeResponse ? Conflict(new { UserMessage = "The record has a dependency that prevents it from being deleted; the dependency needs to be deleted first." }) : Conflict();
+            return IsDetailsIncludedInNegativeResponse ? Conflict(new ConflictDetails(title: $"{DataObjectTypeName.SpaceCamelCase()} Delete Error - Data Conflict", detail: $"The {DataObjectTypeName.SpaceCamelCase()} record has a dependency that prevents it from being deleted; the dependency needs to be deleted first.")) : Conflict();
         }
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to delete the {ID} {Type}.", id.ToString(), DataObjectTypeName);
-            return IsDetailsIncludedInNegativeResponse ? Problem(detail: "Failed to delete the record because of an error on the server.") : Problem();
+            return IsDetailsIncludedInNegativeResponse ? Problem(title: $"{DataObjectTypeName.SpaceCamelCase()} Delete Error", detail: "Failed to delete the record because of an error on the server.") : Problem();
         }
     }
 
@@ -191,7 +192,7 @@ public class StandardSubModelViewController<T, U> : StandardModelViewController<
             if (dataObject is null)
             {
                 Logger.LogWarning("The {ID} for the {Type} was not found so no delete occurred.", id, DataObjectTypeName);
-                return IsDetailsIncludedInNegativeResponse ? NotFound(new { UserMessage = $"The {DataObjectTypeName.SpaceCamelCase()} record was not found; please refresh the page because another user may have deleted it." }) : NotFound();
+                return IsDetailsIncludedInNegativeResponse ? NotFound(new NotFoundDetails(title: $"{DataObjectTypeName.SpaceCamelCase()} Delete Error - Not Found", detail: $"The {DataObjectTypeName.SpaceCamelCase()} record was not found; please refresh the page because another user may have deleted it.")) : NotFound();
             }
             else
             {
@@ -211,12 +212,12 @@ public class StandardSubModelViewController<T, U> : StandardModelViewController<
         catch (DataObjectDeleteConflictException ex)
         {
             Logger.LogError(ex, "Failed to delete the {ID} {Type} because of a data conflict.", id.ToString(), DataObjectTypeName);
-            return IsDetailsIncludedInNegativeResponse ? Conflict(new { UserMessage = "The record has a dependency that prevents it from being deleted; the dependency needs to be deleted first." }) : Conflict();
+            return IsDetailsIncludedInNegativeResponse ? Conflict(new ConflictDetails(title: $"{DataObjectTypeName.SpaceCamelCase()} Delete Error - Data Conflict", detail: $"The {DataObjectTypeName.SpaceCamelCase()} record has a dependency that prevents it from being deleted; the dependency needs to be deleted first.")) : Conflict();
         }
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to delete the {ID} {Type}.", id.ToString(), DataObjectTypeName);
-            return IsDetailsIncludedInNegativeResponse ? Problem(detail: "Failed to delete the record because of an error on the server.") : Problem();
+            return IsDetailsIncludedInNegativeResponse ? Problem(title: $"{DataObjectTypeName.SpaceCamelCase()} Delete Error", detail: "Failed to delete the record because of an error on the server.") : Problem();
         }
     }
 
@@ -237,7 +238,7 @@ public class StandardSubModelViewController<T, U> : StandardModelViewController<
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to return the Index View for the {Type}.", DataObjectTypeName);
-            return IsDetailsIncludedInNegativeResponse ? Problem(detail: "Failed to find the Index View because of an error on the server.") : Problem();
+            return IsDetailsIncludedInNegativeResponse ? Problem(title: $"{DataObjectTypeName.SpaceCamelCase()} Index View Error", detail: "Failed to find the Index View because of an error on the server.") : Problem();
         }
     }
 
@@ -258,7 +259,7 @@ public class StandardSubModelViewController<T, U> : StandardModelViewController<
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to return the Index View for the {Type}.", DataObjectTypeName);
-            return IsDetailsIncludedInNegativeResponse ? Problem(detail: "Failed to find the Index View because of an error on the server.") : Problem();
+            return IsDetailsIncludedInNegativeResponse ? Problem(title: $"{DataObjectTypeName.SpaceCamelCase()} Index View Error", detail: "Failed to find the Index View because of an error on the server.") : Problem();
         }
     }
 
