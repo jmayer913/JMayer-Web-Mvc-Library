@@ -87,7 +87,7 @@ public class StandardCRUDController<T, U> : ControllerBase
         {
             Logger.LogWarning(ex, "Failed to create the {Type} because of a server-side validation error.", DataObjectTypeName);
             ex.CopyToModelState(ModelState);
-            return BadRequest(ModelState);
+            return base.ValidationProblem(ModelState);
         }
         catch (Exception ex)
         {
@@ -326,7 +326,7 @@ public class StandardCRUDController<T, U> : ControllerBase
         {
             Logger.LogWarning(ex, "Failed to update the {ID} {Type} because of a server-side validation error.", id, DataObjectTypeName);
             ex.CopyToModelState(ModelState);
-            return BadRequest(ModelState);
+            return base.ValidationProblem(ModelState);
         }
         catch (IDNotFoundException ex)
         {

@@ -93,8 +93,8 @@ public class StandardCRUDControllerUnitTest
         SimpleStandardCRUDController simpleCRUDController = new(dataLayer, CreateConsoleLogger());
         IActionResult actionResult = await simpleCRUDController.CreateAsync(new SimpleDataObject() { Value = InvalidValue });
 
-        Assert.IsType<BadRequestObjectResult>(actionResult); //Confirm the correct action is returned.
-        Assert.IsType<SerializableError>(((BadRequestObjectResult)actionResult).Value); //Confirm the action is responding with a dictionary.
+        Assert.IsType<ObjectResult>(actionResult); //Confirm the correct action is returned.
+        Assert.IsType<Microsoft.AspNetCore.Mvc.ValidationProblemDetails>(((ObjectResult)actionResult).Value); //Confirm the action is responding with a validation problem details.
     }
 
     /// <summary>
@@ -350,8 +350,8 @@ public class StandardCRUDControllerUnitTest
         SimpleStandardCRUDController simpleCRUDController = new(dataLayer, CreateConsoleLogger());
         IActionResult actionResult = await simpleCRUDController.UpdateAsync(originalDataObject);
 
-        Assert.IsType<BadRequestObjectResult>(actionResult); //Confirm the correct action is returned.
-        Assert.IsType<SerializableError>(((BadRequestObjectResult)actionResult).Value); //Confirm the action is responding with a validation result.
+        Assert.IsType<ObjectResult>(actionResult); //Confirm the correct action is returned.
+        Assert.IsType<Microsoft.AspNetCore.Mvc.ValidationProblemDetails>(((ObjectResult)actionResult).Value); //Confirm the action is responding with a validation problem details.
     }
 
     /// <summary>
