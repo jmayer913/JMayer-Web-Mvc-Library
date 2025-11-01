@@ -37,7 +37,7 @@ public class StandardSubCRUDController<T, U> : StandardCRUDController<T, U>
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to return all the {Type} data objects for {OwnerID}.", DataObjectTypeName, ownerIntegerId);
-            return Problem(title: $"{DataObjectTypeName.SpaceCamelCase()} Get All Error", detail: $"Failed to return all the {DataObjectTypeName.SpaceCamelCase()} records for an owner because of an error on the server.");
+            return Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Get All Error", detail: $"Failed to return all the {DataObjectTypeName.SpaceCapitalLetters()} records for an owner because of an error on the server.");
         }
     }
 
@@ -57,7 +57,7 @@ public class StandardSubCRUDController<T, U> : StandardCRUDController<T, U>
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to return all the {Type} data objects for {OwnerID}.", DataObjectTypeName, ownerStringId);
-            return Problem(title: $"{DataObjectTypeName.SpaceCamelCase()} Get All Error", detail: $"Failed to return all the {DataObjectTypeName.SpaceCamelCase()} records for an owner because of an error on the server.");
+            return Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Get All Error", detail: $"Failed to return all the {DataObjectTypeName.SpaceCapitalLetters()} records for an owner because of an error on the server.");
         }
     }
 
@@ -77,7 +77,7 @@ public class StandardSubCRUDController<T, U> : StandardCRUDController<T, U>
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to return all the {Type} data objects as list views for {OwnerID}.", DataObjectTypeName, ownerIntegerId);
-            return Problem(title: $"{DataObjectTypeName.SpaceCamelCase()} Get All List View Error", detail: $"Failed to return all the {DataObjectTypeName.SpaceCamelCase()} records as list views for an owner because of an error on the server.");
+            return Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Get All List View Error", detail: $"Failed to return all the {DataObjectTypeName.SpaceCapitalLetters()} records as list views for an owner because of an error on the server.");
         }
     }
 
@@ -97,7 +97,7 @@ public class StandardSubCRUDController<T, U> : StandardCRUDController<T, U>
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to return all the {Type} data objects as list views for {OwnerID}.", DataObjectTypeName, ownerStringId);
-            return Problem(title: $"{DataObjectTypeName.SpaceCamelCase()} Get All List View Error", detail: $"Failed to return all the {DataObjectTypeName.SpaceCamelCase()} records as list views for an owner because of an error on the server.");
+            return Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Get All List View Error", detail: $"Failed to return all the {DataObjectTypeName.SpaceCapitalLetters()} records as list views for an owner because of an error on the server.");
         }
     }
 
@@ -126,7 +126,7 @@ public class StandardSubCRUDController<T, U> : StandardCRUDController<T, U>
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to return a page of the {Type} data objects for {OwnerID}.", DataObjectTypeName, ownerIntegerId);
-            return Problem(title: $"{DataObjectTypeName.SpaceCamelCase()} Get Page Error", detail: $"Failed to return a paged of {DataObjectTypeName.SpaceCamelCase()} records for an owner because of an error on the server.");
+            return Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Get Page Error", detail: $"Failed to return a paged of {DataObjectTypeName.SpaceCapitalLetters()} records for an owner because of an error on the server.");
         }
     }
 
@@ -155,7 +155,7 @@ public class StandardSubCRUDController<T, U> : StandardCRUDController<T, U>
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to return a page of the {Type} data objects for {OwnerID}.", DataObjectTypeName, ownerStringId);
-            return Problem(title: $"{DataObjectTypeName.SpaceCamelCase()} Get Page Error", detail: $"Failed to return a paged of {DataObjectTypeName.SpaceCamelCase()} records for an owner because of an error on the server.");
+            return Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Get Page Error", detail: $"Failed to return a paged of {DataObjectTypeName.SpaceCapitalLetters()} records for an owner because of an error on the server.");
         }
     }
 
@@ -184,7 +184,7 @@ public class StandardSubCRUDController<T, U> : StandardCRUDController<T, U>
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to return a page of the {Type} data objects as list views for {OwnerID}.", DataObjectTypeName, ownerIntegerId);
-            return Problem(title: $"{DataObjectTypeName.SpaceCamelCase()} Get Page List View Error", detail: $"Failed to return a paged of {DataObjectTypeName.SpaceCamelCase()} records as list views for an owner because of an error on the server.");
+            return Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Get Page List View Error", detail: $"Failed to return a paged of {DataObjectTypeName.SpaceCapitalLetters()} records as list views for an owner because of an error on the server.");
         }
     }
 
@@ -213,7 +213,7 @@ public class StandardSubCRUDController<T, U> : StandardCRUDController<T, U>
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to return a page of the {Type} data objects as list views for {OwnerID}.", DataObjectTypeName, ownerStringId);
-            return Problem(title: $"{DataObjectTypeName.SpaceCamelCase()} Get Page List View Error", detail: $"Failed to return a paged of {DataObjectTypeName.SpaceCamelCase()} records as list views for an owner because of an error on the server.");
+            return Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Get Page List View Error", detail: $"Failed to return a paged of {DataObjectTypeName.SpaceCapitalLetters()} records as list views for an owner because of an error on the server.");
         }
     }
 }

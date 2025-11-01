@@ -151,7 +151,7 @@ public class StandardSubModelViewController<T, U> : StandardModelViewController<
             if (dataObject is null)
             {
                 Logger.LogWarning("The {ID} for the {Type} was not found so no delete occurred.", id.ToString(), DataObjectTypeName);
-                return IsDetailsIncludedInNegativeResponse ? NotFound(new NotFoundDetails(title: $"{DataObjectTypeName.SpaceCamelCase()} Delete Error - Not Found", detail: $"The {DataObjectTypeName.SpaceCamelCase()} record was not found; please refresh the page because another user may have deleted it.")) : NotFound();
+                return IsDetailsIncludedInNegativeResponse ? NotFound(new NotFoundDetails(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Delete Error - Not Found", detail: $"The {DataObjectTypeName.SpaceCapitalLetters()} record was not found; please refresh the page because another user may have deleted it.")) : NotFound();
             }
             else
             {
@@ -171,12 +171,12 @@ public class StandardSubModelViewController<T, U> : StandardModelViewController<
         catch (DataObjectDeleteConflictException ex)
         {
             Logger.LogError(ex, "Failed to delete the {ID} {Type} because of a data conflict.", id.ToString(), DataObjectTypeName);
-            return IsDetailsIncludedInNegativeResponse ? Conflict(new ConflictDetails(title: $"{DataObjectTypeName.SpaceCamelCase()} Delete Error - Data Conflict", detail: $"The {DataObjectTypeName.SpaceCamelCase()} record has a dependency that prevents it from being deleted; the dependency needs to be deleted first.")) : Conflict();
+            return IsDetailsIncludedInNegativeResponse ? Conflict(new ConflictDetails(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Delete Error - Data Conflict", detail: $"The {DataObjectTypeName.SpaceCapitalLetters()} record has a dependency that prevents it from being deleted; the dependency needs to be deleted first.")) : Conflict();
         }
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to delete the {ID} {Type}.", id.ToString(), DataObjectTypeName);
-            return IsDetailsIncludedInNegativeResponse ? Problem(title: $"{DataObjectTypeName.SpaceCamelCase()} Delete Error", detail: "Failed to delete the record because of an error on the server.") : Problem();
+            return IsDetailsIncludedInNegativeResponse ? Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Delete Error", detail: "Failed to delete the record because of an error on the server.") : Problem();
         }
     }
 
@@ -192,7 +192,7 @@ public class StandardSubModelViewController<T, U> : StandardModelViewController<
             if (dataObject is null)
             {
                 Logger.LogWarning("The {ID} for the {Type} was not found so no delete occurred.", id, DataObjectTypeName);
-                return IsDetailsIncludedInNegativeResponse ? NotFound(new NotFoundDetails(title: $"{DataObjectTypeName.SpaceCamelCase()} Delete Error - Not Found", detail: $"The {DataObjectTypeName.SpaceCamelCase()} record was not found; please refresh the page because another user may have deleted it.")) : NotFound();
+                return IsDetailsIncludedInNegativeResponse ? NotFound(new NotFoundDetails(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Delete Error - Not Found", detail: $"The {DataObjectTypeName.SpaceCapitalLetters()} record was not found; please refresh the page because another user may have deleted it.")) : NotFound();
             }
             else
             {
@@ -212,12 +212,12 @@ public class StandardSubModelViewController<T, U> : StandardModelViewController<
         catch (DataObjectDeleteConflictException ex)
         {
             Logger.LogError(ex, "Failed to delete the {ID} {Type} because of a data conflict.", id.ToString(), DataObjectTypeName);
-            return IsDetailsIncludedInNegativeResponse ? Conflict(new ConflictDetails(title: $"{DataObjectTypeName.SpaceCamelCase()} Delete Error - Data Conflict", detail: $"The {DataObjectTypeName.SpaceCamelCase()} record has a dependency that prevents it from being deleted; the dependency needs to be deleted first.")) : Conflict();
+            return IsDetailsIncludedInNegativeResponse ? Conflict(new ConflictDetails(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Delete Error - Data Conflict", detail: $"The {DataObjectTypeName.SpaceCapitalLetters()} record has a dependency that prevents it from being deleted; the dependency needs to be deleted first.")) : Conflict();
         }
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to delete the {ID} {Type}.", id.ToString(), DataObjectTypeName);
-            return IsDetailsIncludedInNegativeResponse ? Problem(title: $"{DataObjectTypeName.SpaceCamelCase()} Delete Error", detail: "Failed to delete the record because of an error on the server.") : Problem();
+            return IsDetailsIncludedInNegativeResponse ? Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Delete Error", detail: "Failed to delete the record because of an error on the server.") : Problem();
         }
     }
 
@@ -238,7 +238,7 @@ public class StandardSubModelViewController<T, U> : StandardModelViewController<
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to return the Index View for the {Type}.", DataObjectTypeName);
-            return IsDetailsIncludedInNegativeResponse ? Problem(title: $"{DataObjectTypeName.SpaceCamelCase()} Index View Error", detail: "Failed to find the Index View because of an error on the server.") : Problem();
+            return IsDetailsIncludedInNegativeResponse ? Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Index View Error", detail: "Failed to find the Index View because of an error on the server.") : Problem();
         }
     }
 
@@ -259,7 +259,7 @@ public class StandardSubModelViewController<T, U> : StandardModelViewController<
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to return the Index View for the {Type}.", DataObjectTypeName);
-            return IsDetailsIncludedInNegativeResponse ? Problem(title: $"{DataObjectTypeName.SpaceCamelCase()} Index View Error", detail: "Failed to find the Index View because of an error on the server.") : Problem();
+            return IsDetailsIncludedInNegativeResponse ? Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Index View Error", detail: "Failed to find the Index View because of an error on the server.") : Problem();
         }
     }
 

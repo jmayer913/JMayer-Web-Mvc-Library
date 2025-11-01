@@ -116,7 +116,7 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to return the Add Partial View for the {Type}.", DataObjectTypeName);
-            return IsDetailsIncludedInNegativeResponse ? Problem(title: $"{DataObjectTypeName.SpaceCamelCase()} Add Partial View Error", detail: $"Failed to find the {DataObjectTypeName.SpaceCamelCase()} Add Partial View because of an error on the server.") : Problem();
+            return IsDetailsIncludedInNegativeResponse ? Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Add Partial View Error", detail: $"Failed to find the {DataObjectTypeName.SpaceCapitalLetters()} Add Partial View because of an error on the server.") : Problem();
         }
     }
 
@@ -134,7 +134,7 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to return the Add View for the {Type}.", DataObjectTypeName);
-            return IsDetailsIncludedInNegativeResponse ? Problem(title: $"{DataObjectTypeName.SpaceCamelCase()} Add View Error", detail: $"Failed to find the {DataObjectTypeName.SpaceCamelCase()} Add View because of an error on the server.") : Problem();
+            return IsDetailsIncludedInNegativeResponse ? Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Add View Error", detail: $"Failed to find the {DataObjectTypeName.SpaceCapitalLetters()} Add View because of an error on the server.") : Problem();
         }
     }
 
@@ -193,7 +193,7 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to create the {Type}.", DataObjectTypeName);
-            return IsDetailsIncludedInNegativeResponse ? Problem(title: $"{DataObjectTypeName.SpaceCamelCase()} Create Error", detail: $"Failed to create the {DataObjectTypeName.SpaceCamelCase()} record because of an error on the server.") : Problem();
+            return IsDetailsIncludedInNegativeResponse ? Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Create Error", detail: $"Failed to create the {DataObjectTypeName.SpaceCapitalLetters()} record because of an error on the server.") : Problem();
         }
     }
 
@@ -212,7 +212,7 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
             if (dataObject is null)
             {
                 Logger.LogWarning("The {ID} for the {Type} was not found so no delete occurred.", id.ToString(), DataObjectTypeName);
-                return IsDetailsIncludedInNegativeResponse ? NotFound(new NotFoundDetails(title: $"{DataObjectTypeName.SpaceCamelCase()} Delete Error - Not Found", detail: $"The {DataObjectTypeName.SpaceCamelCase()} record was not found; please refresh the page because another user may have deleted it.")) : NotFound();
+                return IsDetailsIncludedInNegativeResponse ? NotFound(new NotFoundDetails(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Delete Error - Not Found", detail: $"The {DataObjectTypeName.SpaceCapitalLetters()} record was not found; please refresh the page because another user may have deleted it.")) : NotFound();
             }
 
             await DataLayer.DeleteAsync(dataObject);
@@ -230,12 +230,12 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
         catch (DataObjectDeleteConflictException ex)
         {
             Logger.LogError(ex, "Failed to delete the {ID} {Type} because of a data conflict.", id.ToString(), DataObjectTypeName);
-            return IsDetailsIncludedInNegativeResponse ? Conflict(new ConflictDetails(title: $"{DataObjectTypeName.SpaceCamelCase()} Delete Error - Data Conflict", detail: $"The {DataObjectTypeName.SpaceCamelCase()} record has a dependency that prevents it from being deleted; the dependency needs to be deleted first.")) : Conflict();
+            return IsDetailsIncludedInNegativeResponse ? Conflict(new ConflictDetails(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Delete Error - Data Conflict", detail: $"The {DataObjectTypeName.SpaceCapitalLetters()} record has a dependency that prevents it from being deleted; the dependency needs to be deleted first.")) : Conflict();
         }
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to delete the {ID} {Type}.", id.ToString(), DataObjectTypeName);
-            return IsDetailsIncludedInNegativeResponse ? Problem(title: $"{DataObjectTypeName.SpaceCamelCase()} Delete Error", detail: $"Failed to delete the {DataObjectTypeName.SpaceCamelCase()} record because of an error on the server.") : Problem();
+            return IsDetailsIncludedInNegativeResponse ? Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Delete Error", detail: $"Failed to delete the {DataObjectTypeName.SpaceCapitalLetters()} record because of an error on the server.") : Problem();
         }
     }
 
@@ -254,7 +254,7 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
             if (dataObject is null)
             {
                 Logger.LogWarning("The {ID} for the {Type} was not found so no delete occurred.", id, DataObjectTypeName);
-                return IsDetailsIncludedInNegativeResponse ? NotFound(new NotFoundDetails(title: $"{DataObjectTypeName.SpaceCamelCase()} Delete Error - Not Found", detail: $"The {DataObjectTypeName.SpaceCamelCase()} record was not found; please refresh the page because another user may have deleted it.")) : NotFound();
+                return IsDetailsIncludedInNegativeResponse ? NotFound(new NotFoundDetails(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Delete Error - Not Found", detail: $"The {DataObjectTypeName.SpaceCapitalLetters()} record was not found; please refresh the page because another user may have deleted it.")) : NotFound();
             }
 
             await DataLayer.DeleteAsync(dataObject);
@@ -272,12 +272,12 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
         catch (DataObjectDeleteConflictException ex)
         {
             Logger.LogError(ex, "Failed to delete the {ID} {Type} because of a data conflict.", id.ToString(), DataObjectTypeName);
-            return IsDetailsIncludedInNegativeResponse ? Conflict(new ConflictDetails(title: $"{DataObjectTypeName.SpaceCamelCase()} Delete Error - Data Conflict", detail: $"The {DataObjectTypeName.SpaceCamelCase()} record has a dependency that prevents it from being deleted; the dependency needs to be deleted first.")) : Conflict();
+            return IsDetailsIncludedInNegativeResponse ? Conflict(new ConflictDetails(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Delete Error - Data Conflict", detail: $"The {DataObjectTypeName.SpaceCapitalLetters()} record has a dependency that prevents it from being deleted; the dependency needs to be deleted first.")) : Conflict();
         }
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to delete the {ID} {Type}.", id.ToString(), DataObjectTypeName);
-            return IsDetailsIncludedInNegativeResponse ? Problem(title: $"{DataObjectTypeName.SpaceCamelCase()} Delete Error", detail: $"Failed to delete the {DataObjectTypeName.SpaceCamelCase()} record because of an error on the server.") : Problem();
+            return IsDetailsIncludedInNegativeResponse ? Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Delete Error", detail: $"Failed to delete the {DataObjectTypeName.SpaceCapitalLetters()} record because of an error on the server.") : Problem();
         }
     }
 
@@ -296,7 +296,7 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
             if (dataObject is null)
             {
                 Logger.LogError("Failed to find the {ID} when fetching the Delete Partial View for the {Type}.", id, DataObjectTypeName);
-                return IsDetailsIncludedInNegativeResponse ? NotFound(new NotFoundDetails(title: $"{DataObjectTypeName.SpaceCamelCase()} Delete Partial View Error - Not Found", detail: $"The {DataObjectTypeName.SpaceCamelCase()} record was not found; please refresh the page because another user may have deleted it.")) : NotFound();
+                return IsDetailsIncludedInNegativeResponse ? NotFound(new NotFoundDetails(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Delete Partial View Error - Not Found", detail: $"The {DataObjectTypeName.SpaceCapitalLetters()} record was not found; please refresh the page because another user may have deleted it.")) : NotFound();
             }
 
             return new PartialViewResult()
@@ -308,7 +308,7 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to return the Delete Partial View for the {Type}.", DataObjectTypeName);
-            return IsDetailsIncludedInNegativeResponse ? Problem(title: $"{DataObjectTypeName.SpaceCamelCase()} Delete Partial View Error", detail: $"Failed to find the {DataObjectTypeName.SpaceCamelCase()} Delete View because of an error on the server.") : Problem();
+            return IsDetailsIncludedInNegativeResponse ? Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Delete Partial View Error", detail: $"Failed to find the {DataObjectTypeName.SpaceCapitalLetters()} Delete View because of an error on the server.") : Problem();
         }
     }
 
@@ -327,7 +327,7 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
             if (dataObject is null)
             {
                 Logger.LogError("Failed to find the {ID} when fetching the Delete Partial View for the {Type}.", id, DataObjectTypeName);
-                return IsDetailsIncludedInNegativeResponse ? NotFound(new NotFoundDetails(title: $"{DataObjectTypeName.SpaceCamelCase()} Delete Partial View Error - Not Found", detail: $"The {DataObjectTypeName.SpaceCamelCase()} record was not found; please refresh the page because another user may have deleted it.")) : NotFound();
+                return IsDetailsIncludedInNegativeResponse ? NotFound(new NotFoundDetails(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Delete Partial View Error - Not Found", detail: $"The {DataObjectTypeName.SpaceCapitalLetters()} record was not found; please refresh the page because another user may have deleted it.")) : NotFound();
             }
 
             return new PartialViewResult()
@@ -339,7 +339,7 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to return the Delete Partial View for the {Type}.", DataObjectTypeName);
-            return IsDetailsIncludedInNegativeResponse ? Problem(title: $"{DataObjectTypeName.SpaceCamelCase()} Delete Partial View Error", detail: $"Failed to find the {DataObjectTypeName.SpaceCamelCase()} Delete View because of an error on the server.") : Problem();
+            return IsDetailsIncludedInNegativeResponse ? Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Delete Partial View Error", detail: $"Failed to find the {DataObjectTypeName.SpaceCapitalLetters()} Delete View because of an error on the server.") : Problem();
         }
     }
 
@@ -358,7 +358,7 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
             if (dataObject is null)
             {
                 Logger.LogError("Failed to find the {ID} when fetching the Delete View for the {Type}.", id, DataObjectTypeName);
-                return IsDetailsIncludedInNegativeResponse ? NotFound(new NotFoundDetails(title: $"{DataObjectTypeName.SpaceCamelCase()} Delete View Error - Not Found", detail: $"The {DataObjectTypeName.SpaceCamelCase()} record was not found; please refresh the page because another user may have deleted it.")) : NotFound();
+                return IsDetailsIncludedInNegativeResponse ? NotFound(new NotFoundDetails(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Delete View Error - Not Found", detail: $"The {DataObjectTypeName.SpaceCapitalLetters()} record was not found; please refresh the page because another user may have deleted it.")) : NotFound();
             }
 
             return View($"{DataObjectTypeName}Delete", dataObject);
@@ -366,7 +366,7 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to return the Delete View for the {Type} using the {ID} ID.", DataObjectTypeName, id);
-            return IsDetailsIncludedInNegativeResponse ? Problem(title: $"{DataObjectTypeName.SpaceCamelCase()} Delete View Error", detail: $"Failed to find the {DataObjectTypeName.SpaceCamelCase()} Delete View because of an error on the server.") : Problem();
+            return IsDetailsIncludedInNegativeResponse ? Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Delete View Error", detail: $"Failed to find the {DataObjectTypeName.SpaceCapitalLetters()} Delete View because of an error on the server.") : Problem();
         }
     }
 
@@ -385,7 +385,7 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
             if (dataObject == null)
             {
                 Logger.LogError("Failed to find the {ID} when fetching the Delete View for the {Type}.", id, DataObjectTypeName);
-                return IsDetailsIncludedInNegativeResponse ? NotFound(new NotFoundDetails(title: $"{DataObjectTypeName.SpaceCamelCase()} Delete View Error - Not Found", detail: $"The {DataObjectTypeName.SpaceCamelCase()} record was not found; please refresh the page because another user may have deleted it.")) : NotFound();
+                return IsDetailsIncludedInNegativeResponse ? NotFound(new NotFoundDetails(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Delete View Error - Not Found", detail: $"The {DataObjectTypeName.SpaceCapitalLetters()} record was not found; please refresh the page because another user may have deleted it.")) : NotFound();
             }
 
             return View($"{DataObjectTypeName}Delete", dataObject);
@@ -393,7 +393,7 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to return the Delete View for the {Type} using the {ID} ID.", DataObjectTypeName, id);
-            return IsDetailsIncludedInNegativeResponse ? Problem(title: $"{DataObjectTypeName.SpaceCamelCase()} Delete View Error", detail: $"Failed to find the {DataObjectTypeName.SpaceCamelCase()} Delete View because of an error on the server.") : Problem();
+            return IsDetailsIncludedInNegativeResponse ? Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Delete View Error", detail: $"Failed to find the {DataObjectTypeName.SpaceCapitalLetters()} Delete View because of an error on the server.") : Problem();
         }
     }
 
@@ -412,7 +412,7 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
             if (dataObject is null)
             {
                 Logger.LogError("Failed to find the {ID} when fetching the Edit Partial View for the {Type}.", id, DataObjectTypeName);
-                return IsDetailsIncludedInNegativeResponse ? NotFound(new NotFoundDetails(title: $"{DataObjectTypeName.SpaceCamelCase()} Edit Partial View Error - Not Found", detail: $"The {DataObjectTypeName.SpaceCamelCase()} record was not found; please refresh the page because another user may have deleted it.")) : NotFound();
+                return IsDetailsIncludedInNegativeResponse ? NotFound(new NotFoundDetails(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Edit Partial View Error - Not Found", detail: $"The {DataObjectTypeName.SpaceCapitalLetters()} record was not found; please refresh the page because another user may have deleted it.")) : NotFound();
             }
 
             return new PartialViewResult()
@@ -424,7 +424,7 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
         catch (Exception ex) 
         {
             Logger.LogError(ex, "Failed to return the Edit Partial View for the {Type}.", DataObjectTypeName);
-            return IsDetailsIncludedInNegativeResponse ? Problem(title: $"{DataObjectTypeName.SpaceCamelCase()} Edit Partial View Error", detail: $"Failed to find the {DataObjectTypeName.SpaceCamelCase()} Edit View because of an error on the server.") : Problem();
+            return IsDetailsIncludedInNegativeResponse ? Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Edit Partial View Error", detail: $"Failed to find the {DataObjectTypeName.SpaceCapitalLetters()} Edit View because of an error on the server.") : Problem();
         }
     }
 
@@ -443,7 +443,7 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
             if (dataObject is null)
             {
                 Logger.LogError("Failed to find the {ID} when fetching the Edit Partial View for the {Type}.", id, DataObjectTypeName);
-                return IsDetailsIncludedInNegativeResponse ? NotFound(new NotFoundDetails(title: $"{DataObjectTypeName.SpaceCamelCase()} Edit Partial View Error - Not Found", detail: $"The {DataObjectTypeName.SpaceCamelCase()} record was not found; please refresh the page because another user may have deleted it.")) : NotFound();
+                return IsDetailsIncludedInNegativeResponse ? NotFound(new NotFoundDetails(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Edit Partial View Error - Not Found", detail: $"The {DataObjectTypeName.SpaceCapitalLetters()} record was not found; please refresh the page because another user may have deleted it.")) : NotFound();
             }
 
             return new PartialViewResult()
@@ -455,7 +455,7 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to return the Edit Partial View for the {Type}.", DataObjectTypeName);
-            return IsDetailsIncludedInNegativeResponse ? Problem(title: $"{DataObjectTypeName.SpaceCamelCase()} Edit Partial View Error", detail: $"Failed to find the {DataObjectTypeName.SpaceCamelCase()} Edit View because of an error on the server.") : Problem();
+            return IsDetailsIncludedInNegativeResponse ? Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Edit Partial View Error", detail: $"Failed to find the {DataObjectTypeName.SpaceCapitalLetters()} Edit View because of an error on the server.") : Problem();
         }
     }
 
@@ -474,7 +474,7 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
             if (dataObject is null)
             {
                 Logger.LogError("Failed to find the {ID} when fetching the Edit View for the {Type}.", id, DataObjectTypeName);
-                return IsDetailsIncludedInNegativeResponse ? NotFound(new NotFoundDetails(title: $"{DataObjectTypeName.SpaceCamelCase()} Edit View Error - Not Found", detail: $"The {DataObjectTypeName.SpaceCamelCase()} record was not found; please refresh the page because another user may have deleted it.")) : NotFound();
+                return IsDetailsIncludedInNegativeResponse ? NotFound(new NotFoundDetails(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Edit View Error - Not Found", detail: $"The {DataObjectTypeName.SpaceCapitalLetters()} record was not found; please refresh the page because another user may have deleted it.")) : NotFound();
             }
 
             return View($"{DataObjectTypeName}Edit", dataObject);
@@ -482,7 +482,7 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to return the Edit View for the {Type} using the {ID} ID.", DataObjectTypeName, id);
-            return IsDetailsIncludedInNegativeResponse ? Problem(title: $"{DataObjectTypeName.SpaceCamelCase()} Edit View Error", detail: $"Failed to find the {DataObjectTypeName.SpaceCamelCase()} Edit View because of an error on the server.") : Problem();
+            return IsDetailsIncludedInNegativeResponse ? Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Edit View Error", detail: $"Failed to find the {DataObjectTypeName.SpaceCapitalLetters()} Edit View because of an error on the server.") : Problem();
         }
     }
 
@@ -501,7 +501,7 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
             if (dataObject == null)
             {
                 Logger.LogError("Failed to find the {ID} when fetching the Edit View for the {Type}.", id, DataObjectTypeName);
-                return IsDetailsIncludedInNegativeResponse ? NotFound(new NotFoundDetails(title: $"{DataObjectTypeName.SpaceCamelCase()} Edit View Error - Not Found", detail: $"The {DataObjectTypeName.SpaceCamelCase()} record was not found; please refresh the page because another user may have deleted it.")) : NotFound();
+                return IsDetailsIncludedInNegativeResponse ? NotFound(new NotFoundDetails(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Edit View Error - Not Found", detail: $"The {DataObjectTypeName.SpaceCapitalLetters()} record was not found; please refresh the page because another user may have deleted it.")) : NotFound();
             }
 
             return View($"{DataObjectTypeName}Edit", dataObject);
@@ -509,7 +509,7 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to return the Edit View for the {Type} using the {ID} ID.", DataObjectTypeName, id);
-            return IsDetailsIncludedInNegativeResponse ? Problem(title: $"{DataObjectTypeName.SpaceCamelCase()} Edit View Error", detail: $"Failed to find the {DataObjectTypeName.SpaceCamelCase()} Edit View because of an error on the server.") : Problem();
+            return IsDetailsIncludedInNegativeResponse ? Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Edit View Error", detail: $"Failed to find the {DataObjectTypeName.SpaceCapitalLetters()} Edit View because of an error on the server.") : Problem();
         }
     }
 
@@ -527,7 +527,7 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to return the Index View for the {Type}.", DataObjectTypeName);
-            return IsDetailsIncludedInNegativeResponse ? Problem(title: $"{DataObjectTypeName.SpaceCamelCase()} Index View Error", detail: $"Failed to find the {DataObjectTypeName.SpaceCamelCase()} Index View because of an error on the server.") : Problem();
+            return IsDetailsIncludedInNegativeResponse ? Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Index View Error", detail: $"Failed to find the {DataObjectTypeName.SpaceCapitalLetters()} Index View because of an error on the server.") : Problem();
         }
     }
 
@@ -575,7 +575,7 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
         catch (DataObjectUpdateConflictException ex)
         {
             Logger.LogWarning(ex, "Failed to update {ID} {Type} because the data was considered old.", id, DataObjectTypeName);
-            return IsDetailsIncludedInNegativeResponse ? Conflict(new ConflictDetails(title: $"{DataObjectTypeName.SpaceCamelCase()} Update Error - Data Conflict", detail: $"The submitted {DataObjectTypeName.SpaceCamelCase()} data was detected to be out of date; please refresh the page and try again.")) : Conflict();
+            return IsDetailsIncludedInNegativeResponse ? Conflict(new ConflictDetails(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Update Error - Data Conflict", detail: $"The submitted {DataObjectTypeName.SpaceCapitalLetters()} data was detected to be out of date; please refresh the page and try again.")) : Conflict();
         }
         catch (DataObjectValidationException ex)
         {
@@ -595,12 +595,12 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
         catch (IDNotFoundException ex)
         {
             Logger.LogWarning(ex, "Failed to update the {ID} {Type} because it was not found.", id, DataObjectTypeName);
-            return IsDetailsIncludedInNegativeResponse ? NotFound(new NotFoundDetails(title: $"{DataObjectTypeName.SpaceCamelCase()} Update Error - Not Found", detail: $"The {DataObjectTypeName.SpaceCamelCase()} record was not found; please refresh the page because another user may have deleted it.")) : NotFound();
+            return IsDetailsIncludedInNegativeResponse ? NotFound(new NotFoundDetails(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Update Error - Not Found", detail: $"The {DataObjectTypeName.SpaceCapitalLetters()} record was not found; please refresh the page because another user may have deleted it.")) : NotFound();
         }
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to update the {Type} for {ID}.", DataObjectTypeName, id);
-            return IsDetailsIncludedInNegativeResponse ? Problem(title: $"{DataObjectTypeName.SpaceCamelCase()} Update Error", detail: $"Failed to update the {DataObjectTypeName.SpaceCamelCase()} record because of an error on the server.") : Problem();
+            return IsDetailsIncludedInNegativeResponse ? Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Update Error", detail: $"Failed to update the {DataObjectTypeName.SpaceCapitalLetters()} record because of an error on the server.") : Problem();
         }
     }
 }

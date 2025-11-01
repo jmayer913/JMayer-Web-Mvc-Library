@@ -65,7 +65,7 @@ public class StandardCRUDController<T, U> : ControllerBase
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to return the count for the {Type} data objects.", DataObjectTypeName);
-            return Problem(title: $"{DataObjectTypeName.SpaceCamelCase()} Count Error", detail: $"Failed to return the {DataObjectTypeName.SpaceCamelCase()} count because of an error on the server.");
+            return Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Count Error", detail: $"Failed to return the {DataObjectTypeName.SpaceCapitalLetters()} count because of an error on the server.");
         }
     }
 
@@ -92,7 +92,7 @@ public class StandardCRUDController<T, U> : ControllerBase
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to create the {Type}.", DataObjectTypeName);
-            return Problem(title: $"{DataObjectTypeName.SpaceCamelCase()} Create Error", detail: $"Failed to create the {DataObjectTypeName.SpaceCamelCase()} record because of an error on the server.");
+            return Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Create Error", detail: $"Failed to create the {DataObjectTypeName.SpaceCapitalLetters()} record because of an error on the server.");
         }
     }
 
@@ -111,7 +111,7 @@ public class StandardCRUDController<T, U> : ControllerBase
             if (dataObject is null)
             {
                 Logger.LogWarning("The {ID} for the {Type} was not found so no delete occurred.", id.ToString(), DataObjectTypeName);
-                return NotFound(new NotFoundDetails(title: $"{DataObjectTypeName.SpaceCamelCase()} Delete Error - Not Found", detail: $"The {DataObjectTypeName.SpaceCamelCase()} record was not found; please refresh the page because another user may have deleted it."));
+                return NotFound(new NotFoundDetails(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Delete Error - Not Found", detail: $"The {DataObjectTypeName.SpaceCapitalLetters()} record was not found; please refresh the page because another user may have deleted it."));
             }
 
             await DataLayer.DeleteAsync(dataObject);
@@ -121,12 +121,12 @@ public class StandardCRUDController<T, U> : ControllerBase
         catch (DataObjectDeleteConflictException ex)
         {
             Logger.LogError(ex, "Failed to delete the {ID} {Type} because of a data conflict.", id, DataObjectTypeName);
-            return Conflict(new ConflictDetails(title: $"{DataObjectTypeName.SpaceCamelCase()} Delete Error - Data Conflict", detail: $"The {DataObjectTypeName.SpaceCamelCase()} record has a dependency that prevents it from being deleted; the dependency needs to be deleted first."));
+            return Conflict(new ConflictDetails(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Delete Error - Data Conflict", detail: $"The {DataObjectTypeName.SpaceCapitalLetters()} record has a dependency that prevents it from being deleted; the dependency needs to be deleted first."));
         }
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to delete the {ID} {Type}.", id, DataObjectTypeName);
-            return Problem(title: $"{DataObjectTypeName.SpaceCamelCase()} Delete Error", detail: $"Failed to delete the {DataObjectTypeName.SpaceCamelCase()} record because of an error on the server.");
+            return Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Delete Error", detail: $"Failed to delete the {DataObjectTypeName.SpaceCapitalLetters()} record because of an error on the server.");
         }
     }
 
@@ -145,7 +145,7 @@ public class StandardCRUDController<T, U> : ControllerBase
             if (dataObject is null)
             {
                 Logger.LogWarning("The {ID} for the {Type} was not found so no delete occurred.", id.ToString(), DataObjectTypeName);
-                return NotFound(new NotFoundDetails(title: $"{DataObjectTypeName.SpaceCamelCase()} Delete Error - Not Found", detail: $"The {DataObjectTypeName.SpaceCamelCase()} record was not found; please refresh the page because another user may have deleted it."));
+                return NotFound(new NotFoundDetails(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Delete Error - Not Found", detail: $"The {DataObjectTypeName.SpaceCapitalLetters()} record was not found; please refresh the page because another user may have deleted it."));
             }
 
             await DataLayer.DeleteAsync(dataObject);
@@ -155,12 +155,12 @@ public class StandardCRUDController<T, U> : ControllerBase
         catch (DataObjectDeleteConflictException ex)
         {
             Logger.LogError(ex, "Failed to delete the {ID} {Type} because of a data conflict.", id, DataObjectTypeName);
-            return Conflict(new ConflictDetails(title: $"{DataObjectTypeName.SpaceCamelCase()} Delete Error - Data Conflict", detail: $"The {DataObjectTypeName.SpaceCamelCase()} record has a dependency that prevents it from being deleted; the dependency needs to be deleted first."));
+            return Conflict(new ConflictDetails(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Delete Error - Data Conflict", detail: $"The {DataObjectTypeName.SpaceCapitalLetters()} record has a dependency that prevents it from being deleted; the dependency needs to be deleted first."));
         }
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to delete the {ID} {Type}.", id, DataObjectTypeName);
-            return Problem(title: $"{DataObjectTypeName.SpaceCamelCase()} Delete Error", detail: $"Failed to delete the {DataObjectTypeName.SpaceCamelCase()} record because of an error on the server.");
+            return Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Delete Error", detail: $"Failed to delete the {DataObjectTypeName.SpaceCapitalLetters()} record because of an error on the server.");
         }
     }
 
@@ -179,7 +179,7 @@ public class StandardCRUDController<T, U> : ControllerBase
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to return all the {Type} data objects.", DataObjectTypeName);
-            return Problem(title: $"{DataObjectTypeName.SpaceCamelCase()} Get All Error", detail: $"Failed to return all the {DataObjectTypeName.SpaceCamelCase()} records because of an error on the server.");
+            return Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Get All Error", detail: $"Failed to return all the {DataObjectTypeName.SpaceCapitalLetters()} records because of an error on the server.");
         }
     }
 
@@ -198,7 +198,7 @@ public class StandardCRUDController<T, U> : ControllerBase
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to return all the {Type} data objects as list views.", DataObjectTypeName);
-            return Problem(title: $"{DataObjectTypeName.SpaceCamelCase()} Get All List View Error", detail: $"Failed to return all the {DataObjectTypeName.SpaceCamelCase()} records as list views because of an error on the server.");
+            return Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Get All List View Error", detail: $"Failed to return all the {DataObjectTypeName.SpaceCapitalLetters()} records as list views because of an error on the server.");
         }
     }
 
@@ -218,7 +218,7 @@ public class StandardCRUDController<T, U> : ControllerBase
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to return a page of {Type} data objects.", DataObjectTypeName);
-            return Problem(title: $"{DataObjectTypeName.SpaceCamelCase()} Get Page Error", detail: $"Failed to return a page of the {DataObjectTypeName.SpaceCamelCase()} records because of an error on the server.");
+            return Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Get Page Error", detail: $"Failed to return a page of the {DataObjectTypeName.SpaceCapitalLetters()} records because of an error on the server.");
         }
     }
 
@@ -238,7 +238,7 @@ public class StandardCRUDController<T, U> : ControllerBase
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to return a page of {Type} data objects as list views.", DataObjectTypeName);
-            return Problem(title: $"{DataObjectTypeName.SpaceCamelCase()} Get Page List View Error", detail: $"Failed to return a page of the {DataObjectTypeName.SpaceCamelCase()} records as list views because of an error on the server.");
+            return Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Get Page List View Error", detail: $"Failed to return a page of the {DataObjectTypeName.SpaceCapitalLetters()} records as list views because of an error on the server.");
         }
     }
 
@@ -257,7 +257,7 @@ public class StandardCRUDController<T, U> : ControllerBase
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to return the first {Type} data object.", DataObjectTypeName);
-            return Problem(title: $"{DataObjectTypeName.SpaceCamelCase()} Get Single Error", detail: $"Failed to return the {DataObjectTypeName.SpaceCamelCase()} record because of an error on the server.");
+            return Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Get Single Error", detail: $"Failed to return the {DataObjectTypeName.SpaceCapitalLetters()} record because of an error on the server.");
         }
     }
 
@@ -277,7 +277,7 @@ public class StandardCRUDController<T, U> : ControllerBase
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to return the {ID} {Type} data object.", integerID, DataObjectTypeName);
-            return Problem(title: $"{DataObjectTypeName.SpaceCamelCase()} Get Single Error", detail: $"Failed to return the {DataObjectTypeName.SpaceCamelCase()} record because of an error on the server.");
+            return Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Get Single Error", detail: $"Failed to return the {DataObjectTypeName.SpaceCapitalLetters()} record because of an error on the server.");
         }
     }
 
@@ -297,7 +297,7 @@ public class StandardCRUDController<T, U> : ControllerBase
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to return the {ID} {Type} data object.", stringID, DataObjectTypeName);
-            return Problem(title: $"{DataObjectTypeName.SpaceCamelCase()} Get Single Error", detail: $"Failed to return the {DataObjectTypeName.SpaceCamelCase()} record because of an error on the server.");
+            return Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Get Single Error", detail: $"Failed to return the {DataObjectTypeName.SpaceCapitalLetters()} record because of an error on the server.");
         }
     }
 
@@ -320,7 +320,7 @@ public class StandardCRUDController<T, U> : ControllerBase
         catch (DataObjectUpdateConflictException ex)
         {
             Logger.LogWarning(ex, "Failed to update {ID} {Type} because the data was considered old.", id, DataObjectTypeName);
-            return Conflict(new ConflictDetails(title: $"{DataObjectTypeName.SpaceCamelCase()} Update Error - Data Conflict", detail: $"The submitted {DataObjectTypeName.SpaceCamelCase()} data was detected to be out of date; please refresh the page and try again."));
+            return Conflict(new ConflictDetails(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Update Error - Data Conflict", detail: $"The submitted {DataObjectTypeName.SpaceCapitalLetters()} data was detected to be out of date; please refresh the page and try again."));
         }
         catch (DataObjectValidationException ex)
         {
@@ -331,12 +331,12 @@ public class StandardCRUDController<T, U> : ControllerBase
         catch (IDNotFoundException ex)
         {
             Logger.LogWarning(ex, "Failed to update the {ID} {Type} because it was not found.", id, DataObjectTypeName);
-            return NotFound(new NotFoundDetails(title: $"{DataObjectTypeName.SpaceCamelCase()} Update Error - Not Found", detail: $"The {DataObjectTypeName.SpaceCamelCase()} record was not found; please refresh the page because another user may have deleted it."));
+            return NotFound(new NotFoundDetails(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Update Error - Not Found", detail: $"The {DataObjectTypeName.SpaceCapitalLetters()} record was not found; please refresh the page because another user may have deleted it."));
         }
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to update the {Type} for {ID}.", DataObjectTypeName , id);
-            return Problem(title: $"{DataObjectTypeName.SpaceCamelCase()} Update Error", detail: $"Failed to update the {DataObjectTypeName.SpaceCamelCase()} record because of an error on the server.");
+            return Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Update Error", detail: $"Failed to update the {DataObjectTypeName.SpaceCapitalLetters()} record because of an error on the server.");
         }
     }
 
