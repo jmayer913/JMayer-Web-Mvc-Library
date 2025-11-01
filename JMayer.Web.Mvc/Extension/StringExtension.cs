@@ -5,7 +5,7 @@ namespace JMayer.Web.Mvc.Extension;
 /// <summary>
 /// The static class has methods that extend the functionality of the string class.
 /// </summary>
-internal static class StringExtension
+public static class StringExtension
 {
     /// <summary>
     /// The method spaces the words in a camel case string.
