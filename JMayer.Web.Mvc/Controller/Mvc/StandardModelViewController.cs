@@ -148,32 +148,32 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
     {
         try
         {
-            if (ModelState.IsValid)
+            if (ModelState.IsValid is false)
             {
-                await DataLayer.CreateAsync(dataObject);
-                Logger.LogInformation("The {Type} was successfully created.", DataObjectTypeName);
-
-                if (IsCUDActionRedirectedOnSuccess)
+                Logger.LogWarning("Failed to create the {Type} because of a model validation error.", DataObjectTypeName);
+                return ValidationFailedAction switch
                 {
-                    return RedirectToAction(nameof(Index));
-                }
-                else
-                {
-                    return Json(dataObject);
-                }
+                    ValidationFailedAction.ReturnView => View($"{DataObjectTypeName}Add", dataObject),
+                    ValidationFailedAction.ReturnPartialView => new PartialViewResult()
+                    {
+                        ViewData = new ViewDataDictionary<T>(ViewData, dataObject),
+                        ViewName = $"_{DataObjectTypeName}AddPartial",
+                    },
+                    _ => ValidationProblem(ModelState)
+                };
             }
 
-            Logger.LogWarning("Failed to create the {Type} because of a model validation error.", DataObjectTypeName);
-            return ValidationFailedAction switch
+            await DataLayer.CreateAsync(dataObject);
+            Logger.LogInformation("The {Type} was successfully created.", DataObjectTypeName);
+
+            if (IsCUDActionRedirectedOnSuccess)
             {
-                ValidationFailedAction.ReturnView => View($"{DataObjectTypeName}Add", dataObject),
-                ValidationFailedAction.ReturnPartialView => new PartialViewResult()
-                {
-                    ViewData = new ViewDataDictionary<T>(ViewData, dataObject),
-                    ViewName = $"_{DataObjectTypeName}AddPartial",
-                },
-                _ => ValidationProblem(ModelState)
-            };
+                return RedirectToAction(nameof(Index));
+            }
+            else
+            {
+                return Json(dataObject);
+            }
         }
         catch (DataObjectValidationException ex)
         {
@@ -545,32 +545,32 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
         {
             id = string.IsNullOrEmpty(dataObject.StringID) ? dataObject.Integer64ID.ToString() : dataObject.StringID;
 
-            if (ModelState.IsValid)
+            if (ModelState.IsValid is false)
             {
-                dataObject = await DataLayer.UpdateAsync(dataObject);
-                Logger.LogInformation("The {ID} for the {Type} was successfully updated.", id, DataObjectTypeName);
-
-                if (IsCUDActionRedirectedOnSuccess)
+                Logger.LogWarning("Failed to update the {ID} {Type} because of a model validation error.", id, DataObjectTypeName);
+                return ValidationFailedAction switch
                 {
-                    return RedirectToAction(nameof(Index));
-                }
-                else
-                {
-                    return Json(dataObject);
-                }
+                    ValidationFailedAction.ReturnView => View($"{DataObjectTypeName}Edit", dataObject),
+                    ValidationFailedAction.ReturnPartialView => new PartialViewResult()
+                    {
+                        ViewData = new ViewDataDictionary<T>(ViewData, dataObject),
+                        ViewName = $"_{DataObjectTypeName}EditPartial",
+                    },
+                    _ => ValidationProblem(ModelState)
+                };
             }
 
-            Logger.LogWarning("Failed to update the {ID} {Type} because of a model validation error.", id, DataObjectTypeName);
-            return ValidationFailedAction switch
+            dataObject = await DataLayer.UpdateAsync(dataObject);
+            Logger.LogInformation("The {ID} for the {Type} was successfully updated.", id, DataObjectTypeName);
+
+            if (IsCUDActionRedirectedOnSuccess)
             {
-                ValidationFailedAction.ReturnView => View($"{DataObjectTypeName}Edit", dataObject),
-                ValidationFailedAction.ReturnPartialView => new PartialViewResult()
-                {
-                    ViewData = new ViewDataDictionary<T>(ViewData, dataObject),
-                    ViewName = $"_{DataObjectTypeName}EditPartial",
-                },
-                _ => ValidationProblem(ModelState)
-            };
+                return RedirectToAction(nameof(Index));
+            }
+            else
+            {
+                return Json(dataObject);
+            }
         }
         catch (DataObjectUpdateConflictException ex)
         {

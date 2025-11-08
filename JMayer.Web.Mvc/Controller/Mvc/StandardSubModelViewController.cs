@@ -153,19 +153,17 @@ public class StandardSubModelViewController<T, U> : StandardModelViewController<
                 Logger.LogWarning("The {ID} for the {Type} was not found so no delete occurred.", id.ToString(), DataObjectTypeName);
                 return IsDetailsIncludedInNegativeResponse ? NotFound(new NotFoundDetails(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Delete Error - Not Found", detail: $"The {DataObjectTypeName.SpaceCapitalLetters()} record was not found; please refresh the page because another user may have deleted it.")) : NotFound();
             }
+
+            await DataLayer.DeleteAsync(dataObject);
+            Logger.LogInformation("The {ID} for the {Type} was successfully deleted.", id.ToString(), DataObjectTypeName);
+
+            if (IsCUDActionRedirectedOnSuccess)
+            {
+                return RedirectToAction(nameof(Index), new { id = dataObject.OwnerInteger64ID });
+            }
             else
             {
-                await DataLayer.DeleteAsync(dataObject);
-                Logger.LogInformation("The {ID} for the {Type} was successfully deleted.", id.ToString(), DataObjectTypeName);
-
-                if (IsCUDActionRedirectedOnSuccess)
-                {
-                    return RedirectToAction(nameof(Index), new { id = dataObject.OwnerInteger64ID });
-                }
-                else
-                {
-                    return Json(dataObject);
-                }
+                return Json(dataObject);
             }
         }
         catch (DataObjectDeleteConflictException ex)
@@ -194,19 +192,17 @@ public class StandardSubModelViewController<T, U> : StandardModelViewController<
                 Logger.LogWarning("The {ID} for the {Type} was not found so no delete occurred.", id, DataObjectTypeName);
                 return IsDetailsIncludedInNegativeResponse ? NotFound(new NotFoundDetails(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Delete Error - Not Found", detail: $"The {DataObjectTypeName.SpaceCapitalLetters()} record was not found; please refresh the page because another user may have deleted it.")) : NotFound();
             }
+
+            await DataLayer.DeleteAsync(dataObject);
+            Logger.LogInformation("The {ID} for the {Type} was successfully deleted.", id, DataObjectTypeName);
+
+            if (IsCUDActionRedirectedOnSuccess)
+            {
+                return RedirectToAction(nameof(Index), new { id = dataObject.OwnerStringID });
+            }
             else
             {
-                await DataLayer.DeleteAsync(dataObject);
-                Logger.LogInformation("The {ID} for the {Type} was successfully deleted.", id, DataObjectTypeName);
-
-                if (IsCUDActionRedirectedOnSuccess)
-                {
-                    return RedirectToAction(nameof(Index), new { id = dataObject.OwnerStringID });
-                }
-                else
-                {
-                    return Json(dataObject);
-                }
+                return Json(dataObject);
             }
         }
         catch (DataObjectDeleteConflictException ex)
