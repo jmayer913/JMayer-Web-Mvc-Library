@@ -5,7 +5,6 @@ using JMayer.Data.HTTP.Details;
 using JMayer.Web.Mvc.Extension;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using System.ComponentModel.DataAnnotations;
 
 namespace JMayer.Web.Mvc.Controller.Api;
 
@@ -339,27 +338,4 @@ public class StandardCRUDController<T, U> : ControllerBase
             return Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Update Error", detail: $"Failed to update the {DataObjectTypeName.SpaceCapitalLetters()} record because of an error on the server.");
         }
     }
-
-#warning For Validate(), I need to figure out what is returned since ServerSideValidationResult will be removed.
-    /// <summary>
-    /// The method validates a data object using the data layer.
-    /// </summary>
-    /// <param name="dataObject">The data object to validated.</param>
-    /// <returns>The validation result.</returns>
-    //    [HttpPost("Validate")]
-    //    public virtual async Task<IActionResult> ValidateAsync([FromBody] T dataObject)
-    //    {
-    //        try
-    //        {
-    //            List<ValidationResult> validationResults = await DataLayer.ValidateAsync(dataObject);
-    //            ServerSideValidationResult serverSideValidationResult = new(validationResults);
-    //            Logger.LogInformation("The {Type} was successfully validated.", DataObjectTypeName);
-    //            return Ok(serverSideValidationResult);
-    //        }
-    //        catch (Exception ex)
-    //        {
-    //            Logger.LogError(ex, "Failed to validate the {Type}.", DataObjectTypeName);
-    //            return Problem(detail: $"Failed to validate the {DataObjectTypeName.SpaceCamelCase()} record because of an error on the server.");
-    //        }
-    //    }
 }
