@@ -5,6 +5,7 @@ using JMayer.Data.HTTP.Details;
 using JMayer.Web.Mvc.Extension;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using System.Text.Json;
 
 namespace JMayer.Web.Mvc.Controller.Api;
 
@@ -58,7 +59,12 @@ public class StandardCRUDController<T, U> : ControllerBase
     {
         try
         {
+            Logger.LogInformation("Attempting to retrieve the {Type} data object count.", DataObjectTypeName);
+
             long count = await DataLayer.CountAsync();
+
+            Logger.LogInformation("The {Type} data object count was successfully retrieved.", DataObjectTypeName);
+
             return Ok(count);
         }
         catch (Exception ex)
@@ -78,19 +84,24 @@ public class StandardCRUDController<T, U> : ControllerBase
     {
         try
         {
+            Logger.LogInformation("Attempting to create a {Type} data object.\n{DataObject}", DataObjectTypeName, dataObject.ToJson());
+
             dataObject = await DataLayer.CreateAsync(dataObject);
-            Logger.LogInformation("The {Type} was successfully created.", DataObjectTypeName);
+
+            Logger.LogInformation("The {Type} data object was successfully created.\n{DataObject}", DataObjectTypeName, dataObject.ToJson());
+
             return Ok(dataObject);
         }
         catch (DataObjectValidationException ex)
         {
-            Logger.LogWarning(ex, "Failed to create the {Type} because of a server-side validation error.", DataObjectTypeName);
+#warning Do I serialize the contents of the exception?
+            Logger.LogWarning(ex, "Failed to create the {Type} data object because of a server-side validation error.", DataObjectTypeName);
             ex.CopyToModelState(ModelState);
             return base.ValidationProblem(ModelState);
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Failed to create the {Type}.", DataObjectTypeName);
+            Logger.LogError(ex, "Failed to create the {Type} data object.\n{DataObject}", DataObjectTypeName, dataObject.ToJson());
             return Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Create Error", detail: $"Failed to create the {DataObjectTypeName.SpaceCapitalLetters()} record because of an error on the server.");
         }
     }
@@ -105,26 +116,28 @@ public class StandardCRUDController<T, U> : ControllerBase
     {
         try
         {
+            Logger.LogInformation("Attempting to delete a {Type} data object for {ID}.", DataObjectTypeName, id);
+
             T? dataObject = await DataLayer.GetSingleAsync(obj => obj.Integer64ID == id);
 
             if (dataObject is null)
             {
-                Logger.LogWarning("The {ID} for the {Type} was not found so no delete occurred.", id.ToString(), DataObjectTypeName);
+                Logger.LogWarning("The {Type} data object for {ID} was not found so no delete occurred.", DataObjectTypeName, id);
                 return NotFound(new NotFoundDetails(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Delete Error - Not Found", detail: $"The {DataObjectTypeName.SpaceCapitalLetters()} record was not found; please refresh the page because another user may have deleted it."));
             }
 
             await DataLayer.DeleteAsync(dataObject);
-            Logger.LogInformation("The {ID} for the {Type} was successfully deleted.", id, DataObjectTypeName);
+            Logger.LogInformation("The {Type} data object for {ID} was successfully deleted.\n{DataObject}", DataObjectTypeName, id, dataObject.ToJson());
             return Ok();
         }
         catch (DataObjectDeleteConflictException ex)
         {
-            Logger.LogError(ex, "Failed to delete the {ID} {Type} because of a data conflict.", id, DataObjectTypeName);
+            Logger.LogError(ex, "Failed to delete the {Type} data object for {ID} because of a data conflict.", DataObjectTypeName, id);
             return Conflict(new ConflictDetails(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Delete Error - Data Conflict", detail: $"The {DataObjectTypeName.SpaceCapitalLetters()} record has a dependency that prevents it from being deleted; the dependency needs to be deleted first."));
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Failed to delete the {ID} {Type}.", id, DataObjectTypeName);
+            Logger.LogError(ex, "Failed to delete the {Type} data object for {ID}.", DataObjectTypeName, id);
             return Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Delete Error", detail: $"Failed to delete the {DataObjectTypeName.SpaceCapitalLetters()} record because of an error on the server.");
         }
     }
@@ -139,26 +152,28 @@ public class StandardCRUDController<T, U> : ControllerBase
     {
         try
         {
+            Logger.LogInformation("Attempting to delete a {Type} data object for {ID}.", DataObjectTypeName, id);
+
             T? dataObject = await DataLayer.GetSingleAsync(obj => obj.StringID == id);
 
             if (dataObject is null)
             {
-                Logger.LogWarning("The {ID} for the {Type} was not found so no delete occurred.", id.ToString(), DataObjectTypeName);
+                Logger.LogWarning("The {Type} data object for {ID} was not found so no delete occurred.", DataObjectTypeName, id);
                 return NotFound(new NotFoundDetails(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Delete Error - Not Found", detail: $"The {DataObjectTypeName.SpaceCapitalLetters()} record was not found; please refresh the page because another user may have deleted it."));
             }
 
             await DataLayer.DeleteAsync(dataObject);
-            Logger.LogInformation("The {ID} for the {Type} was successfully deleted.", id, DataObjectTypeName);
+            Logger.LogInformation("The {Type} data object for {ID} was successfully deleted.\n{DataObject}", DataObjectTypeName, id, dataObject.ToJson());
             return Ok();
         }
         catch (DataObjectDeleteConflictException ex)
         {
-            Logger.LogError(ex, "Failed to delete the {ID} {Type} because of a data conflict.", id, DataObjectTypeName);
+            Logger.LogError(ex, "Failed to delete the {Type} data object for {ID} because of a data conflict.", DataObjectTypeName, id);
             return Conflict(new ConflictDetails(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Delete Error - Data Conflict", detail: $"The {DataObjectTypeName.SpaceCapitalLetters()} record has a dependency that prevents it from being deleted; the dependency needs to be deleted first."));
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Failed to delete the {ID} {Type}.", id, DataObjectTypeName);
+            Logger.LogError(ex, "Failed to delete the {Type} data object for {ID}.", DataObjectTypeName, id);
             return Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Delete Error", detail: $"Failed to delete the {DataObjectTypeName.SpaceCapitalLetters()} record because of an error on the server.");
         }
     }
@@ -172,7 +187,12 @@ public class StandardCRUDController<T, U> : ControllerBase
     {
         try
         {
+            Logger.LogInformation("Attempting to retrieve all the {Type} data objects.", DataObjectTypeName);
+
             List<T> dataObjects = await DataLayer.GetAllAsync();
+
+            Logger.LogInformation("All the {Type} data objects were successfully retrieved.", DataObjectTypeName);
+
             return Ok(dataObjects);
         }
         catch (Exception ex)
@@ -191,7 +211,12 @@ public class StandardCRUDController<T, U> : ControllerBase
     {
         try
         {
+            Logger.LogInformation("Attempting to retrieve all the {Type} data objects as list views.", DataObjectTypeName);
+
             List<ListView> listViews = await DataLayer.GetAllListViewAsync();
+
+            Logger.LogInformation("All the {Type} data objects as list views were successfully retrieved.", DataObjectTypeName);
+
             return Ok(listViews);
         }
         catch (Exception ex)
@@ -211,12 +236,17 @@ public class StandardCRUDController<T, U> : ControllerBase
     {
         try
         {
+            Logger.LogInformation("Attempting to retrieve a page of {Type} data objects.\n{QueryDefinition}", DataObjectTypeName, queryDefinition.ToJson());
+
             PagedList<T> dataObjects = await DataLayer.GetPageAsync(queryDefinition);
+
+            Logger.LogInformation("A page of {Type} data objects were successfully retrieved.\n{QueryDefinition}", DataObjectTypeName, queryDefinition.ToJson());
+
             return Ok(dataObjects);
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Failed to return a page of {Type} data objects.", DataObjectTypeName);
+            Logger.LogError(ex, "Failed to return a page of {Type} data objects.\n{QueryDefinition}", DataObjectTypeName, queryDefinition.ToJson());
             return Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Get Page Error", detail: $"Failed to return a page of the {DataObjectTypeName.SpaceCapitalLetters()} records because of an error on the server.");
         }
     }
@@ -231,12 +261,17 @@ public class StandardCRUDController<T, U> : ControllerBase
     {
         try
         {
+            Logger.LogInformation("Attempting to retrieve a page of {Type} data objects as list views.\n{QueryDefinition}", DataObjectTypeName, queryDefinition.ToJson());
+
             PagedList<ListView> listViews = await DataLayer.GetPageListViewAsync(queryDefinition);
+
+            Logger.LogInformation("A page of {Type} data objects as list views were successfully retrieved.\n{QueryDefinition}", DataObjectTypeName, queryDefinition.ToJson());
+
             return Ok(listViews);
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Failed to return a page of {Type} data objects as list views.", DataObjectTypeName);
+            Logger.LogError(ex, "Failed to return a page of {Type} data objects as list views.\n{QueryDefinition}", DataObjectTypeName, queryDefinition.ToJson());
             return Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Get Page List View Error", detail: $"Failed to return a page of the {DataObjectTypeName.SpaceCapitalLetters()} records as list views because of an error on the server.");
         }
     }
@@ -250,7 +285,12 @@ public class StandardCRUDController<T, U> : ControllerBase
     {
         try
         {
+            Logger.LogInformation("Attempting to retrieve the first {Type} data object.", DataObjectTypeName);
+
             T? dataObject = await DataLayer.GetSingleAsync();
+
+            Logger.LogInformation("The first {Type} data object was successfully retrieved.", DataObjectTypeName);
+
             return Ok(dataObject);
         }
         catch (Exception ex)
@@ -263,19 +303,24 @@ public class StandardCRUDController<T, U> : ControllerBase
     /// <summary>
     /// The method returns a data object based on the ID using the data layer.
     /// </summary>
-    /// <param name="integerID">The id to search for.</param>
+    /// <param name="id">The id to search for.</param>
     /// <returns>A data object.</returns>
-    [HttpGet("Single/{integerID:long}")]
-    public virtual async Task<IActionResult> GetSingleAsync(long integerID)
+    [HttpGet("Single/{id:long}")]
+    public virtual async Task<IActionResult> GetSingleAsync(long id)
     {
         try
         {
-            T? dataObject = await DataLayer.GetSingleAsync(obj => obj.Integer64ID == integerID);
+            Logger.LogInformation("Attempting to retrieve the {Type} data object for {ID}.", DataObjectTypeName, id);
+
+            T? dataObject = await DataLayer.GetSingleAsync(obj => obj.Integer64ID == id);
+
+            Logger.LogInformation("The {Type} data object for {ID} was successfully retrieved.", DataObjectTypeName, id);
+
             return Ok(dataObject);
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Failed to return the {ID} {Type} data object.", integerID, DataObjectTypeName);
+            Logger.LogError(ex, "Failed to return the {Type} data object for {ID}.", DataObjectTypeName, id);
             return Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Get Single Error", detail: $"Failed to return the {DataObjectTypeName.SpaceCapitalLetters()} record because of an error on the server.");
         }
     }
@@ -283,19 +328,24 @@ public class StandardCRUDController<T, U> : ControllerBase
     /// <summary>
     /// The method returns a data object based on the ID using the data layer.
     /// </summary>
-    /// <param name="stringID">The id to search for.</param>
+    /// <param name="id">The id to search for.</param>
     /// <returns>A data object.</returns>
-    [HttpGet("Single/{stringID}")]
-    public virtual async Task<IActionResult> GetSingleAsync(string stringID)
+    [HttpGet("Single/{id}")]
+    public virtual async Task<IActionResult> GetSingleAsync(string id)
     {
         try
         {
-            T? dataObject = await DataLayer.GetSingleAsync(obj => obj.StringID == stringID);
+            Logger.LogInformation("Attempting to retrieve the {Type} data object for {ID}.", DataObjectTypeName, id);
+
+            T? dataObject = await DataLayer.GetSingleAsync(obj => obj.StringID == id);
+
+            Logger.LogInformation("The {Type} data object for {ID} was successfully retrieved.", DataObjectTypeName, id);
+
             return Ok(dataObject);
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Failed to return the {ID} {Type} data object.", stringID, DataObjectTypeName);
+            Logger.LogError(ex, "Failed to return the {Type} data object for {ID}.", DataObjectTypeName, id);
             return Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Get Single Error", detail: $"Failed to return the {DataObjectTypeName.SpaceCapitalLetters()} record because of an error on the server.");
         }
     }
@@ -308,33 +358,40 @@ public class StandardCRUDController<T, U> : ControllerBase
     [HttpPut]
     public virtual async Task<IActionResult> UpdateAsync([FromBody] T dataObject)
     {
-        string id = string.IsNullOrEmpty(dataObject.StringID) ? dataObject.Integer64ID.ToString() : dataObject.StringID;
+        string id = string.Empty;
 
         try
         {
+            id = string.IsNullOrEmpty(dataObject.StringID) ? dataObject.Integer64ID.ToString() : dataObject.StringID;
+
+            Logger.LogInformation("Attempting to update the {Type} data object for {ID}\n{DataObject}.", DataObjectTypeName, id, dataObject.ToJson());
+
             dataObject = await DataLayer.UpdateAsync(dataObject);
-            Logger.LogInformation("The {Type} was successfully updated.", DataObjectTypeName);
+
+            Logger.LogInformation("The {Type} data object for {ID} was successfully updated.\n{DataObject}", DataObjectTypeName, id, dataObject.ToJson());
+
             return Ok(dataObject);
         }
         catch (DataObjectUpdateConflictException ex)
         {
-            Logger.LogWarning(ex, "Failed to update {ID} {Type} because the data was considered old.", id, DataObjectTypeName);
+            Logger.LogWarning(ex, "Failed to update {Type} data object for {ID} because it was considered old.\n{DataObject}", DataObjectTypeName, id, dataObject.ToJson());
             return Conflict(new ConflictDetails(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Update Error - Data Conflict", detail: $"The submitted {DataObjectTypeName.SpaceCapitalLetters()} data was detected to be out of date; please refresh the page and try again."));
         }
         catch (DataObjectValidationException ex)
         {
-            Logger.LogWarning(ex, "Failed to update the {ID} {Type} because of a server-side validation error.", id, DataObjectTypeName);
+#warning Do I serialize the contents of the exception?
+            Logger.LogWarning(ex, "Failed to update the {Type} data object for {ID} because of a server-side validation error.", DataObjectTypeName, id);
             ex.CopyToModelState(ModelState);
             return base.ValidationProblem(ModelState);
         }
         catch (IDNotFoundException ex)
         {
-            Logger.LogWarning(ex, "Failed to update the {ID} {Type} because it was not found.", id, DataObjectTypeName);
+            Logger.LogWarning(ex, "Failed to update the {Type} data object for {ID} because it was not found.\n{DataObject}", DataObjectTypeName, id, dataObject.ToJson());
             return NotFound(new NotFoundDetails(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Update Error - Not Found", detail: $"The {DataObjectTypeName.SpaceCapitalLetters()} record was not found; please refresh the page because another user may have deleted it."));
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Failed to update the {Type} for {ID}.", DataObjectTypeName , id);
+            Logger.LogError(ex, "Failed to update the {Type} data object for {ID}.\n{DataObject}", DataObjectTypeName , id, dataObject.ToJson());
             return Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Update Error", detail: $"Failed to update the {DataObjectTypeName.SpaceCapitalLetters()} record because of an error on the server.");
         }
     }

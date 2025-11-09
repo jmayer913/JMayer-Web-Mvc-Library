@@ -110,6 +110,7 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
     {
         try
         {
+            Logger.LogInformation("Returning the Add Partial View for the {Type} data object.", DataObjectTypeName);
             PartialViewResult partialViewResult = PartialView($"_{DataObjectTypeName}AddPartial");
             return await Task.FromResult(partialViewResult);
         }
@@ -128,6 +129,7 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
     {
         try
         {
+            Logger.LogInformation("Returning the Add View for the {Type} data object.", DataObjectTypeName);
             ViewResult viewResult = View($"{DataObjectTypeName}Add");
             return await Task.FromResult(viewResult);
         }
@@ -148,9 +150,12 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
     {
         try
         {
+            Logger.LogInformation("Attempting to create a {Type} data object.\n{DataObject}", DataObjectTypeName, dataObject.ToJson());
+
             if (ModelState.IsValid is false)
             {
-                Logger.LogWarning("Failed to create the {Type} because of a model validation error.", DataObjectTypeName);
+#warning For invalid model state, I should serialize the model state.
+                Logger.LogWarning("Failed to create the {Type} data object because of a model validation error.", DataObjectTypeName);
                 return ValidationFailedAction switch
                 {
                     ValidationFailedAction.ReturnView => View($"{DataObjectTypeName}Add", dataObject),
@@ -164,7 +169,7 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
             }
 
             await DataLayer.CreateAsync(dataObject);
-            Logger.LogInformation("The {Type} was successfully created.", DataObjectTypeName);
+            Logger.LogInformation("The {Type} data object was successfully created.\n{DataObject}", DataObjectTypeName, dataObject.ToJson());
 
             if (IsCUDActionRedirectedOnSuccess)
             {
@@ -177,7 +182,8 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
         }
         catch (DataObjectValidationException ex)
         {
-            Logger.LogWarning(ex, "Failed to create the {Type} because of a server-side validation error.", DataObjectTypeName);
+#warning Do I serialize the contents of the exception?
+            Logger.LogWarning(ex, "Failed to create the {Type} data object because of a server-side validation error.", DataObjectTypeName);
             ex.CopyToModelState(ModelState);
             return ValidationFailedAction switch
             {
@@ -192,7 +198,7 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Failed to create the {Type}.", DataObjectTypeName);
+            Logger.LogError(ex, "Failed to create the {Type} data object.\n{DataObject}", DataObjectTypeName, dataObject.ToJson());
             return IsDetailsIncludedInNegativeResponse ? Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Create Error", detail: $"Failed to create the {DataObjectTypeName.SpaceCapitalLetters()} record because of an error on the server.") : Problem();
         }
     }
@@ -207,16 +213,18 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
     {
         try
         {
+            Logger.LogInformation("Attempting to delete the {Type} data object for {ID}.", DataObjectTypeName, id);
+
             T? dataObject = await DataLayer.GetSingleAsync(obj => obj.Integer64ID == id);
 
             if (dataObject is null)
             {
-                Logger.LogWarning("The {ID} for the {Type} was not found so no delete occurred.", id.ToString(), DataObjectTypeName);
+                Logger.LogWarning("The {Type} data object for {ID} was not found so no delete occurred.", DataObjectTypeName, id);
                 return IsDetailsIncludedInNegativeResponse ? NotFound(new NotFoundDetails(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Delete Error - Not Found", detail: $"The {DataObjectTypeName.SpaceCapitalLetters()} record was not found; please refresh the page because another user may have deleted it.")) : NotFound();
             }
 
             await DataLayer.DeleteAsync(dataObject);
-            Logger.LogInformation("The {ID} for the {Type} was successfully deleted.", id.ToString(), DataObjectTypeName);
+            Logger.LogInformation("The {Type} data object for {ID} was successfully deleted.\n{DataObject}", DataObjectTypeName, id, dataObject.ToJson());
 
             if (IsCUDActionRedirectedOnSuccess)
             {
@@ -229,12 +237,12 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
         }
         catch (DataObjectDeleteConflictException ex)
         {
-            Logger.LogError(ex, "Failed to delete the {ID} {Type} because of a data conflict.", id.ToString(), DataObjectTypeName);
+            Logger.LogError(ex, "Failed to delete the {Type} data object for {ID} because of a data conflict.", DataObjectTypeName, id);
             return IsDetailsIncludedInNegativeResponse ? Conflict(new ConflictDetails(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Delete Error - Data Conflict", detail: $"The {DataObjectTypeName.SpaceCapitalLetters()} record has a dependency that prevents it from being deleted; the dependency needs to be deleted first.")) : Conflict();
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Failed to delete the {ID} {Type}.", id.ToString(), DataObjectTypeName);
+            Logger.LogError(ex, "Failed to delete the {Type} data object for {ID}.", DataObjectTypeName, id);
             return IsDetailsIncludedInNegativeResponse ? Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Delete Error", detail: $"Failed to delete the {DataObjectTypeName.SpaceCapitalLetters()} record because of an error on the server.") : Problem();
         }
     }
@@ -249,16 +257,18 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
     {
         try
         {
+            Logger.LogInformation("Attempting to delete the {Type} data object for {ID}.", DataObjectTypeName, id);
+
             T? dataObject = await DataLayer.GetSingleAsync(obj => obj.StringID == id);
 
             if (dataObject is null)
             {
-                Logger.LogWarning("The {ID} for the {Type} was not found so no delete occurred.", id, DataObjectTypeName);
+                Logger.LogWarning("The {Type} data object for {ID} was not found so no delete occurred.", DataObjectTypeName, id);
                 return IsDetailsIncludedInNegativeResponse ? NotFound(new NotFoundDetails(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Delete Error - Not Found", detail: $"The {DataObjectTypeName.SpaceCapitalLetters()} record was not found; please refresh the page because another user may have deleted it.")) : NotFound();
             }
 
             await DataLayer.DeleteAsync(dataObject);
-            Logger.LogInformation("The {ID} for the {Type} was successfully deleted.", id, DataObjectTypeName);
+            Logger.LogInformation("The {Type} data object for {ID} was successfully deleted.\n{DataObject}", DataObjectTypeName, id, dataObject.ToJson());
 
             if (IsCUDActionRedirectedOnSuccess)
             {
@@ -271,12 +281,12 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
         }
         catch (DataObjectDeleteConflictException ex)
         {
-            Logger.LogError(ex, "Failed to delete the {ID} {Type} because of a data conflict.", id.ToString(), DataObjectTypeName);
+            Logger.LogError(ex, "Failed to delete the {Type} data object for {ID} because of a data conflict.", DataObjectTypeName, id);
             return IsDetailsIncludedInNegativeResponse ? Conflict(new ConflictDetails(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Delete Error - Data Conflict", detail: $"The {DataObjectTypeName.SpaceCapitalLetters()} record has a dependency that prevents it from being deleted; the dependency needs to be deleted first.")) : Conflict();
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Failed to delete the {ID} {Type}.", id.ToString(), DataObjectTypeName);
+            Logger.LogError(ex, "Failed to delete the {Type} data object for {ID}.", DataObjectTypeName, id);
             return IsDetailsIncludedInNegativeResponse ? Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Delete Error", detail: $"Failed to delete the {DataObjectTypeName.SpaceCapitalLetters()} record because of an error on the server.") : Problem();
         }
     }
@@ -291,13 +301,17 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
     {
         try
         {
+            Logger.LogInformation("Attempting to retrieve the {Type} data object for {ID} for the Delete Partial View.", DataObjectTypeName, id);
+
             T? dataObject = await DataLayer.GetSingleAsync(obj => obj.Integer64ID == id);
 
             if (dataObject is null)
             {
-                Logger.LogError("Failed to find the {ID} when fetching the Delete Partial View for the {Type}.", id, DataObjectTypeName);
+                Logger.LogError("The {Type} data object for {ID} was not found so the Delete Partial View could not be returned.", DataObjectTypeName, id);
                 return IsDetailsIncludedInNegativeResponse ? NotFound(new NotFoundDetails(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Delete Partial View Error - Not Found", detail: $"The {DataObjectTypeName.SpaceCapitalLetters()} record was not found; please refresh the page because another user may have deleted it.")) : NotFound();
             }
+
+            Logger.LogInformation("The {Type} data object for {ID} for the Delete Partial View was successfully retrieved; returning the partial view.", DataObjectTypeName, id);
 
             return new PartialViewResult()
             {
@@ -307,7 +321,7 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Failed to return the Delete Partial View for the {Type}.", DataObjectTypeName);
+            Logger.LogError(ex, "Failed to return the Delete Partial View for the {Type} data object for {ID}.", DataObjectTypeName, id);
             return IsDetailsIncludedInNegativeResponse ? Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Delete Partial View Error", detail: $"Failed to find the {DataObjectTypeName.SpaceCapitalLetters()} Delete View because of an error on the server.") : Problem();
         }
     }
@@ -322,13 +336,17 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
     {
         try
         {
+            Logger.LogInformation("Attempting to retrieve the {Type} data object for {ID} for the Delete Partial View.", DataObjectTypeName, id);
+
             T? dataObject = await DataLayer.GetSingleAsync(obj => obj.StringID == id);
 
             if (dataObject is null)
             {
-                Logger.LogError("Failed to find the {ID} when fetching the Delete Partial View for the {Type}.", id, DataObjectTypeName);
+                Logger.LogError("The {Type} data object for {ID} was not found so the Delete Partial View could not be returned.", DataObjectTypeName, id);
                 return IsDetailsIncludedInNegativeResponse ? NotFound(new NotFoundDetails(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Delete Partial View Error - Not Found", detail: $"The {DataObjectTypeName.SpaceCapitalLetters()} record was not found; please refresh the page because another user may have deleted it.")) : NotFound();
             }
+
+            Logger.LogInformation("The {Type} data object for {ID} for the Delete Partial View was successfully retrieved; returning the partial view.", DataObjectTypeName, id);
 
             return new PartialViewResult()
             {
@@ -338,7 +356,7 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Failed to return the Delete Partial View for the {Type}.", DataObjectTypeName);
+            Logger.LogError(ex, "Failed to return the Delete Partial View for the {Type} data object for {ID}.", DataObjectTypeName, id);
             return IsDetailsIncludedInNegativeResponse ? Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Delete Partial View Error", detail: $"Failed to find the {DataObjectTypeName.SpaceCapitalLetters()} Delete View because of an error on the server.") : Problem();
         }
     }
@@ -353,19 +371,22 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
     {
         try
         {
+            Logger.LogInformation("Attempting to retrieve the {Type} data object for {ID} for the Delete View.", DataObjectTypeName, id);
+
             T? dataObject = await DataLayer.GetSingleAsync(obj => obj.Integer64ID == id);
 
             if (dataObject is null)
             {
-                Logger.LogError("Failed to find the {ID} when fetching the Delete View for the {Type}.", id, DataObjectTypeName);
+                Logger.LogError("The {Type} data object for {ID} was not found so the Delete View could not be returned.", DataObjectTypeName, id);
                 return IsDetailsIncludedInNegativeResponse ? NotFound(new NotFoundDetails(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Delete View Error - Not Found", detail: $"The {DataObjectTypeName.SpaceCapitalLetters()} record was not found; please refresh the page because another user may have deleted it.")) : NotFound();
             }
 
+            Logger.LogInformation("The {Type} data object for {ID} for the Delete View was successfully retrieved; returning the view.", DataObjectTypeName, id);
             return View($"{DataObjectTypeName}Delete", dataObject);
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Failed to return the Delete View for the {Type} using the {ID} ID.", DataObjectTypeName, id);
+            Logger.LogError(ex, "Failed to return the Delete View for the {Type} data object for {ID}.", DataObjectTypeName, id);
             return IsDetailsIncludedInNegativeResponse ? Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Delete View Error", detail: $"Failed to find the {DataObjectTypeName.SpaceCapitalLetters()} Delete View because of an error on the server.") : Problem();
         }
     }
@@ -380,19 +401,22 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
     {
         try
         {
+            Logger.LogInformation("Attempting to retrieve the {Type} data object for {ID} for the Delete View.", DataObjectTypeName, id);
+
             T? dataObject = await DataLayer.GetSingleAsync(obj => obj.StringID == id);
 
             if (dataObject == null)
             {
-                Logger.LogError("Failed to find the {ID} when fetching the Delete View for the {Type}.", id, DataObjectTypeName);
+                Logger.LogError("The {Type} data object for {ID} was not found so the Delete View could not be returned.", DataObjectTypeName, id);
                 return IsDetailsIncludedInNegativeResponse ? NotFound(new NotFoundDetails(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Delete View Error - Not Found", detail: $"The {DataObjectTypeName.SpaceCapitalLetters()} record was not found; please refresh the page because another user may have deleted it.")) : NotFound();
             }
 
+            Logger.LogInformation("The {Type} data object for {ID} for the Delete View was successfully retrieved; returning the view.", DataObjectTypeName, id);
             return View($"{DataObjectTypeName}Delete", dataObject);
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Failed to return the Delete View for the {Type} using the {ID} ID.", DataObjectTypeName, id);
+            Logger.LogError(ex, "Failed to return the Delete View for the {Type} data object for {ID}.", DataObjectTypeName, id);
             return IsDetailsIncludedInNegativeResponse ? Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Delete View Error", detail: $"Failed to find the {DataObjectTypeName.SpaceCapitalLetters()} Delete View because of an error on the server.") : Problem();
         }
     }
@@ -407,13 +431,17 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
     {
         try
         {
+            Logger.LogInformation("Attempting to retrieve the {Type} data object for {ID} for the Edit Partial View.", DataObjectTypeName, id);
+
             T? dataObject = await DataLayer.GetSingleAsync(obj => obj.Integer64ID == id);
 
             if (dataObject is null)
             {
-                Logger.LogError("Failed to find the {ID} when fetching the Edit Partial View for the {Type}.", id, DataObjectTypeName);
+                Logger.LogError("The {Type} data object for {ID} was not found so the Edit Partial View could not be returned.", DataObjectTypeName, id);
                 return IsDetailsIncludedInNegativeResponse ? NotFound(new NotFoundDetails(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Edit Partial View Error - Not Found", detail: $"The {DataObjectTypeName.SpaceCapitalLetters()} record was not found; please refresh the page because another user may have deleted it.")) : NotFound();
             }
+
+            Logger.LogInformation("The {Type} data object for {ID} for the Edit Partial View was successfully retrieved; returning the partial view.", DataObjectTypeName, id);
 
             return new PartialViewResult()
             {
@@ -423,7 +451,7 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
         }
         catch (Exception ex) 
         {
-            Logger.LogError(ex, "Failed to return the Edit Partial View for the {Type}.", DataObjectTypeName);
+            Logger.LogError(ex, "Failed to return the Edit Partial View for the {Type} data object for {ID}.", DataObjectTypeName, id);
             return IsDetailsIncludedInNegativeResponse ? Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Edit Partial View Error", detail: $"Failed to find the {DataObjectTypeName.SpaceCapitalLetters()} Edit View because of an error on the server.") : Problem();
         }
     }
@@ -438,13 +466,17 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
     {
         try
         {
+            Logger.LogInformation("Attempting to retrieve the {Type} data object for {ID} for the Edit Partial View.", DataObjectTypeName, id);
+
             T? dataObject = await DataLayer.GetSingleAsync(obj => obj.StringID == id);
 
             if (dataObject is null)
             {
-                Logger.LogError("Failed to find the {ID} when fetching the Edit Partial View for the {Type}.", id, DataObjectTypeName);
+                Logger.LogError("The {Type} data object for {ID} was not found so the Edit Partial View could not be returned.", DataObjectTypeName, id);
                 return IsDetailsIncludedInNegativeResponse ? NotFound(new NotFoundDetails(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Edit Partial View Error - Not Found", detail: $"The {DataObjectTypeName.SpaceCapitalLetters()} record was not found; please refresh the page because another user may have deleted it.")) : NotFound();
             }
+
+            Logger.LogInformation("The {Type} data object for {ID} for the Edit Partial View was successfully retrieved; returning the partial view.", DataObjectTypeName, id);
 
             return new PartialViewResult()
             {
@@ -454,7 +486,7 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Failed to return the Edit Partial View for the {Type}.", DataObjectTypeName);
+            Logger.LogError(ex, "Failed to return the Edit Partial View for the {Type} data object for {ID}.", DataObjectTypeName, id);
             return IsDetailsIncludedInNegativeResponse ? Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Edit Partial View Error", detail: $"Failed to find the {DataObjectTypeName.SpaceCapitalLetters()} Edit View because of an error on the server.") : Problem();
         }
     }
@@ -469,19 +501,22 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
     {
         try
         {
+            Logger.LogInformation("Attempting to retrieve the {Type} data object for {ID} for the Edit View.", DataObjectTypeName, id);
+
             T? dataObject = await DataLayer.GetSingleAsync(obj => obj.Integer64ID == id);
 
             if (dataObject is null)
             {
-                Logger.LogError("Failed to find the {ID} when fetching the Edit View for the {Type}.", id, DataObjectTypeName);
+                Logger.LogError("The {Type} data object for {ID} was not found so the Edit View could not be returned.", DataObjectTypeName, id);
                 return IsDetailsIncludedInNegativeResponse ? NotFound(new NotFoundDetails(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Edit View Error - Not Found", detail: $"The {DataObjectTypeName.SpaceCapitalLetters()} record was not found; please refresh the page because another user may have deleted it.")) : NotFound();
             }
 
+            Logger.LogInformation("The {Type} data object for {ID} for the Edit View was successfully retrieved; returning the view.", DataObjectTypeName, id);
             return View($"{DataObjectTypeName}Edit", dataObject);
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Failed to return the Edit View for the {Type} using the {ID} ID.", DataObjectTypeName, id);
+            Logger.LogError(ex, "Failed to return the Edit View for the {Type} data object for {ID}.", DataObjectTypeName, id);
             return IsDetailsIncludedInNegativeResponse ? Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Edit View Error", detail: $"Failed to find the {DataObjectTypeName.SpaceCapitalLetters()} Edit View because of an error on the server.") : Problem();
         }
     }
@@ -496,19 +531,22 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
     {
         try
         {
+            Logger.LogInformation("Attempting to retrieve the {Type} data object for {ID} for the Edit View.", DataObjectTypeName, id);
+
             T? dataObject = await DataLayer.GetSingleAsync(obj => obj.StringID == id);
 
             if (dataObject is null)
             {
-                Logger.LogError("Failed to find the {ID} when fetching the Edit View for the {Type}.", id, DataObjectTypeName);
+                Logger.LogError("The {Type} data object for {ID} was not found so the Edit View could not be returned.", DataObjectTypeName, id);
                 return IsDetailsIncludedInNegativeResponse ? NotFound(new NotFoundDetails(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Edit View Error - Not Found", detail: $"The {DataObjectTypeName.SpaceCapitalLetters()} record was not found; please refresh the page because another user may have deleted it.")) : NotFound();
             }
 
+            Logger.LogInformation("The {Type} data object for {ID} for the Edit View was successfully retrieved; returning the view.", DataObjectTypeName, id);
             return View($"{DataObjectTypeName}Edit", dataObject);
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Failed to return the Edit View for the {Type} using the {ID} ID.", DataObjectTypeName, id);
+            Logger.LogError(ex, "Failed to return the Edit View for the {Type} data object for {ID}.", DataObjectTypeName, id);
             return IsDetailsIncludedInNegativeResponse ? Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Edit View Error", detail: $"Failed to find the {DataObjectTypeName.SpaceCapitalLetters()} Edit View because of an error on the server.") : Problem();
         }
     }
@@ -521,12 +559,17 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
     {
         try
         {
+            Logger.LogInformation("Attempting to retrieve the {Type} data objects for the Index View.", DataObjectTypeName);
+
             List<T>? dataObjects = await DataLayer.GetAllAsync();
+
+            Logger.LogInformation("All the {Type} data objects for the Index View were successfully retrieved; returning the view.", DataObjectTypeName);
+
             return View($"{DataObjectTypeName}{nameof(Index)}", dataObjects);
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Failed to return the Index View for the {Type}.", DataObjectTypeName);
+            Logger.LogError(ex, "Failed to return the Index View for the {Type} data objects.", DataObjectTypeName);
             return IsDetailsIncludedInNegativeResponse ? Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Index View Error", detail: $"Failed to find the {DataObjectTypeName.SpaceCapitalLetters()} Index View because of an error on the server.") : Problem();
         }
     }
@@ -545,9 +588,12 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
         {
             id = string.IsNullOrEmpty(dataObject.StringID) ? dataObject.Integer64ID.ToString() : dataObject.StringID;
 
+            Logger.LogInformation("Attempting to update the {Type} data object for {ID}\n{DataObject}.", DataObjectTypeName, id, dataObject.ToJson());
+
             if (ModelState.IsValid is false)
             {
-                Logger.LogWarning("Failed to update the {ID} {Type} because of a model validation error.", id, DataObjectTypeName);
+#warning For invalid model state, I should serialize the model state.
+                Logger.LogWarning("Failed to update the {Type} data object for {ID} because of a model validation error.", DataObjectTypeName, id);
                 return ValidationFailedAction switch
                 {
                     ValidationFailedAction.ReturnView => View($"{DataObjectTypeName}Edit", dataObject),
@@ -561,7 +607,7 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
             }
 
             dataObject = await DataLayer.UpdateAsync(dataObject);
-            Logger.LogInformation("The {ID} for the {Type} was successfully updated.", id, DataObjectTypeName);
+            Logger.LogInformation("The {Type} data object for {ID} was successfully updated.\n{DataObject}", DataObjectTypeName, id, dataObject.ToJson());
 
             if (IsCUDActionRedirectedOnSuccess)
             {
@@ -574,12 +620,13 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
         }
         catch (DataObjectUpdateConflictException ex)
         {
-            Logger.LogWarning(ex, "Failed to update {ID} {Type} because the data was considered old.", id, DataObjectTypeName);
+            Logger.LogWarning(ex, "Failed to update {Type} data object for {ID} because the data was considered old.\n{DataObject}", DataObjectTypeName, id, dataObject.ToJson());
             return IsDetailsIncludedInNegativeResponse ? Conflict(new ConflictDetails(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Update Error - Data Conflict", detail: $"The submitted {DataObjectTypeName.SpaceCapitalLetters()} data was detected to be out of date; please refresh the page and try again.")) : Conflict();
         }
         catch (DataObjectValidationException ex)
         {
-            Logger.LogWarning(ex, "Failed to update the {ID} {Type} because of a server-side validation error.", id, DataObjectTypeName);
+#warning Do I serialize the contents of the exception?
+            Logger.LogWarning(ex, "Failed to update the {Type} data object for {ID} because of a server-side validation error.", DataObjectTypeName, id);
             ex.CopyToModelState(ModelState);
             return ValidationFailedAction switch
             {
@@ -594,12 +641,12 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
         }
         catch (IDNotFoundException ex)
         {
-            Logger.LogWarning(ex, "Failed to update the {ID} {Type} because it was not found.", id, DataObjectTypeName);
+            Logger.LogWarning(ex, "Failed to update the {Type} data object for {ID} because it was not found.\n{DataObject}", DataObjectTypeName, id, dataObject.ToJson());
             return IsDetailsIncludedInNegativeResponse ? NotFound(new NotFoundDetails(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Update Error - Not Found", detail: $"The {DataObjectTypeName.SpaceCapitalLetters()} record was not found; please refresh the page because another user may have deleted it.")) : NotFound();
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Failed to update the {Type} for {ID}.", DataObjectTypeName, id);
+            Logger.LogError(ex, "Failed to update the {Type} data object for {ID}.\n{DataObject}", DataObjectTypeName, id, dataObject.ToJson());
             return IsDetailsIncludedInNegativeResponse ? Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Update Error", detail: $"Failed to update the {DataObjectTypeName.SpaceCapitalLetters()} record because of an error on the server.") : Problem();
         }
     }
