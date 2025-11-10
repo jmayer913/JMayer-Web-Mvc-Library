@@ -150,12 +150,11 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
     {
         try
         {
-            Logger.LogInformation("Attempting to create a {Type} data object.\n{DataObject}", DataObjectTypeName, dataObject.ToJson());
+            Logger.LogInformation("Attempting to create a {Type} data object.\n{DataObject}", DataObjectTypeName, dataObject.ToJson<T>());
 
             if (ModelState.IsValid is false)
             {
-#warning For invalid model state, I should serialize the model state.
-                Logger.LogWarning("Failed to create the {Type} data object because of a model validation error.", DataObjectTypeName);
+                Logger.LogWarning("Failed to create the {Type} data object because of a model validation error.\n{DataObject}\n{ModelStateErrors}", DataObjectTypeName, dataObject.ToJson<T>(), ModelState.ErrorsToJson());
                 return ValidationFailedAction switch
                 {
                     ValidationFailedAction.ReturnView => View($"{DataObjectTypeName}Add", dataObject),
@@ -169,7 +168,7 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
             }
 
             await DataLayer.CreateAsync(dataObject);
-            Logger.LogInformation("The {Type} data object was successfully created.\n{DataObject}", DataObjectTypeName, dataObject.ToJson());
+            Logger.LogInformation("The {Type} data object was successfully created.\n{DataObject}", DataObjectTypeName, dataObject.ToJson<T>());
 
             if (IsCUDActionRedirectedOnSuccess)
             {
@@ -182,9 +181,8 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
         }
         catch (DataObjectValidationException ex)
         {
-#warning Do I serialize the contents of the exception?
-            Logger.LogWarning(ex, "Failed to create the {Type} data object because of a server-side validation error.", DataObjectTypeName);
             ex.CopyToModelState(ModelState);
+            Logger.LogWarning(ex, "Failed to create the {Type} data object because of a server-side validation error.\n{DataObject}\n{ModelStateErrors}", DataObjectTypeName, dataObject.ToJson<T>(), ModelState.ErrorsToJson());
             return ValidationFailedAction switch
             {
                 ValidationFailedAction.ReturnView => View($"{DataObjectTypeName}Add", dataObject),
@@ -198,7 +196,7 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Failed to create the {Type} data object.\n{DataObject}", DataObjectTypeName, dataObject.ToJson());
+            Logger.LogError(ex, "Failed to create the {Type} data object.\n{DataObject}", DataObjectTypeName, dataObject.ToJson<T>());
             return IsDetailsIncludedInNegativeResponse ? Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Create Error", detail: $"Failed to create the {DataObjectTypeName.SpaceCapitalLetters()} record because of an error on the server.") : Problem();
         }
     }
@@ -224,7 +222,7 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
             }
 
             await DataLayer.DeleteAsync(dataObject);
-            Logger.LogInformation("The {Type} data object for {ID} was successfully deleted.\n{DataObject}", DataObjectTypeName, id, dataObject.ToJson());
+            Logger.LogInformation("The {Type} data object for {ID} was successfully deleted.\n{DataObject}", DataObjectTypeName, id, dataObject.ToJson<T>());
 
             if (IsCUDActionRedirectedOnSuccess)
             {
@@ -268,7 +266,7 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
             }
 
             await DataLayer.DeleteAsync(dataObject);
-            Logger.LogInformation("The {Type} data object for {ID} was successfully deleted.\n{DataObject}", DataObjectTypeName, id, dataObject.ToJson());
+            Logger.LogInformation("The {Type} data object for {ID} was successfully deleted.\n{DataObject}", DataObjectTypeName, id, dataObject.ToJson<T>());
 
             if (IsCUDActionRedirectedOnSuccess)
             {
@@ -588,12 +586,11 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
         {
             id = string.IsNullOrEmpty(dataObject.StringID) ? dataObject.Integer64ID.ToString() : dataObject.StringID;
 
-            Logger.LogInformation("Attempting to update the {Type} data object for {ID}\n{DataObject}.", DataObjectTypeName, id, dataObject.ToJson());
+            Logger.LogInformation("Attempting to update the {Type} data object for {ID}\n{DataObject}.", DataObjectTypeName, id, dataObject.ToJson<T>());
 
             if (ModelState.IsValid is false)
             {
-#warning For invalid model state, I should serialize the model state.
-                Logger.LogWarning("Failed to update the {Type} data object for {ID} because of a model validation error.", DataObjectTypeName, id);
+                Logger.LogWarning("Failed to update the {Type} data object for {ID} because of a model validation error.\n{DataObject}\n{ModelStateErrors}", DataObjectTypeName, id, dataObject.ToJson<T>(), ModelState.ErrorsToJson());
                 return ValidationFailedAction switch
                 {
                     ValidationFailedAction.ReturnView => View($"{DataObjectTypeName}Edit", dataObject),
@@ -607,7 +604,7 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
             }
 
             dataObject = await DataLayer.UpdateAsync(dataObject);
-            Logger.LogInformation("The {Type} data object for {ID} was successfully updated.\n{DataObject}", DataObjectTypeName, id, dataObject.ToJson());
+            Logger.LogInformation("The {Type} data object for {ID} was successfully updated.\n{DataObject}", DataObjectTypeName, id, dataObject.ToJson<T>());
 
             if (IsCUDActionRedirectedOnSuccess)
             {
@@ -620,14 +617,13 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
         }
         catch (DataObjectUpdateConflictException ex)
         {
-            Logger.LogWarning(ex, "Failed to update {Type} data object for {ID} because the data was considered old.\n{DataObject}", DataObjectTypeName, id, dataObject.ToJson());
+            Logger.LogWarning(ex, "Failed to update {Type} data object for {ID} because the data was considered old.\n{DataObject}", DataObjectTypeName, id, dataObject.ToJson<T>());
             return IsDetailsIncludedInNegativeResponse ? Conflict(new ConflictDetails(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Update Error - Data Conflict", detail: $"The submitted {DataObjectTypeName.SpaceCapitalLetters()} data was detected to be out of date; please refresh the page and try again.")) : Conflict();
         }
         catch (DataObjectValidationException ex)
         {
-#warning Do I serialize the contents of the exception?
-            Logger.LogWarning(ex, "Failed to update the {Type} data object for {ID} because of a server-side validation error.", DataObjectTypeName, id);
             ex.CopyToModelState(ModelState);
+            Logger.LogWarning(ex, "Failed to update the {Type} data object for {ID} because of a server-side validation error.\n{DataObject}\n{ModelStateErrors}", DataObjectTypeName, id, dataObject.ToJson<T>(), ModelState.ErrorsToJson());
             return ValidationFailedAction switch
             {
                 ValidationFailedAction.ReturnView => View($"{DataObjectTypeName}Edit", dataObject),
@@ -641,12 +637,12 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
         }
         catch (IDNotFoundException ex)
         {
-            Logger.LogWarning(ex, "Failed to update the {Type} data object for {ID} because it was not found.\n{DataObject}", DataObjectTypeName, id, dataObject.ToJson());
+            Logger.LogWarning(ex, "Failed to update the {Type} data object for {ID} because it was not found.\n{DataObject}", DataObjectTypeName, id, dataObject.ToJson<T>());
             return IsDetailsIncludedInNegativeResponse ? NotFound(new NotFoundDetails(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Update Error - Not Found", detail: $"The {DataObjectTypeName.SpaceCapitalLetters()} record was not found; please refresh the page because another user may have deleted it.")) : NotFound();
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Failed to update the {Type} data object for {ID}.\n{DataObject}", DataObjectTypeName, id, dataObject.ToJson());
+            Logger.LogError(ex, "Failed to update the {Type} data object for {ID}.\n{DataObject}", DataObjectTypeName, id, dataObject.ToJson<T>());
             return IsDetailsIncludedInNegativeResponse ? Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Update Error", detail: $"Failed to update the {DataObjectTypeName.SpaceCapitalLetters()} record because of an error on the server.") : Problem();
         }
     }

@@ -108,7 +108,7 @@ public class StandardCRUDControllerUnitTest
         IActionResult actionResult = await simpleCRUDController.CreateAsync(null);
 
         Assert.IsType<ObjectResult>(actionResult); //Confirm the correct action is returned.
-        Assert.IsType< Microsoft.AspNetCore.Mvc.ProblemDetails >(((ObjectResult)actionResult).Value); //Confirm the action is responding with problem details.
+        Assert.IsType<Microsoft.AspNetCore.Mvc.ProblemDetails>(((ObjectResult)actionResult).Value); //Confirm the action is responding with problem details.
         Assert.Equal((int)HttpStatusCode.InternalServerError, ((Microsoft.AspNetCore.Mvc.ProblemDetails)((ObjectResult)actionResult).Value).Status); //Confirm the correct HTTP status code is returned.
         Assert.NotEmpty(((Microsoft.AspNetCore.Mvc.ProblemDetails)((ObjectResult)actionResult).Value).Detail); //Confirm a detail is set.
         Assert.NotEmpty(((Microsoft.AspNetCore.Mvc.ProblemDetails)((ObjectResult)actionResult).Value).Title); //Confirm a title is set.
