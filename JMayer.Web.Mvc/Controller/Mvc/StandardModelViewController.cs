@@ -635,7 +635,7 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
                 _ => ValidationProblem(ModelState)
             };
         }
-        catch (IDNotFoundException ex)
+        catch (DataObjectIDNotFoundException ex)
         {
             Logger.LogWarning(ex, "Failed to update the {Type} data object for {ID} because it was not found.\n{DataObject}", DataObjectTypeName, id, dataObject.ToJson<T>());
             return IsDetailsIncludedInNegativeResponse ? NotFound(new NotFoundDetails(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Update Error - Not Found", detail: $"The {DataObjectTypeName.SpaceCapitalLetters()} record was not found; please refresh the page because another user may have deleted it.")) : NotFound();

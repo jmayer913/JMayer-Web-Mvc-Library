@@ -382,7 +382,7 @@ public class StandardCRUDController<T, U> : ControllerBase
             Logger.LogWarning(ex, "Failed to update the {Type} data object for {ID} because of a server-side validation error.\n{DataObject}\n{ModelStateErrors}", DataObjectTypeName, id, dataObject.ToJson<T>(), ModelState.ErrorsToJson());
             return base.ValidationProblem(ModelState);
         }
-        catch (IDNotFoundException ex)
+        catch (DataObjectIDNotFoundException ex)
         {
             Logger.LogWarning(ex, "Failed to update the {Type} data object for {ID} because it was not found.\n{DataObject}", DataObjectTypeName, id, dataObject.ToJson<T>());
             return NotFound(new NotFoundDetails(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Update Error - Not Found", detail: $"The {DataObjectTypeName.SpaceCapitalLetters()} record was not found; please refresh the page because another user may have deleted it."));
