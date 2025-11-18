@@ -106,7 +106,7 @@ The StandardModelViewController and StandardSubModelViewController will accept a
 * If a IDNotFoundException is thrown, a 404 (Not Found) response will be returned by the controller. The IsDetailsIncludedInNegativeResponse property controls if a ProblemDetails object is returned or not.
 * If any other exception is thrown, a 500 (Internal Server Error) response will be returned by the controller. The IsDetailsIncludedInNegativeResponse property controls if a ProblemDetails object is returned or not.
 
-#### How to Expand Your Controller
+### How to Expand Your Controller
 Now, let's say you need to add additional functionality to the controller and you can easy do so by adding a new method to your controller.
 ```
 public AccountController : StandardModelViewController<Account, IAccountDataLayer>
@@ -244,7 +244,7 @@ The StandardCRUDController and StandardSubCRUDController will accept a PUT api/A
 * If a DataObjectDeleteConflictException is thrown, a 409 (Conflict) response will be returned by the controller. A ProblemDetails object will be returned in the body as json.
 * If any other exception is thrown, a 500 (Internal Server Error) response will be returned by the controller. A ProblemDetails object will be returned in the body as json.
 
-#### How to Expand Your Controller
+### How to Expand Your Controller
 Now, let's say you need to add additional functionality to the controller and you can easy do so by adding a new method to your controller.
 ```
 public AccountController : StandardCRUDController<Account, IAccountDataLayer>
