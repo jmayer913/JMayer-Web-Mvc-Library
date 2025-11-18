@@ -41,70 +41,104 @@ UseStatusCodePagesWithRedirects(), do not set IsDetailsIncludedInNegativeRespons
 The StandardModelViewController and StandardSubModelViewController will accept a GET /Account/Index web request. The standard is to return a view named "AccountIndex". The view should have UI that displays a list of accounts.
 
 * A ViewResult object is returned by the controller with the account objects; empty list if nothing is found.
-* If any exception is thrown, a 500 (Internal Server Error) response will be returned by the controller. The IsDetailsIncludedInNegativeResponse property controls if a detail object is returned or not.
+* If any exception is thrown, a 500 (Internal Server Error) response will be returned by the controller. The IsDetailsIncludedInNegativeResponse property controls if a ProblemDetails object is returned or not.
 
 ### GET Add View
 The StandardModelViewController will accept a GET /Account/AddView web request. The standard is to return a view named "AccountAdd". The view should have UI for creating a new account and it should utilize the POST Create action.
 * A ViewResult object is returned by the controller. No model is included.
-* If any exception is thrown, a 500 (Internal Server Error) response will be returned by the controller. The IsDetailsIncludedInNegativeResponse property controls if a detail object is returned or not.
+* If any exception is thrown, a 500 (Internal Server Error) response will be returned by the controller. The IsDetailsIncludedInNegativeResponse property controls if a ProblemDetails object is returned or not.
 
 ### GET Add Partial View
 The StandardModelViewController will accept a GET /Account/AddPartialView web request. The standard is to return a partial view named "_AccountAddPartial". The view should have UI for creating a new account and it should utilize the POST Create action.
 
 * A PartialViewResult object is returned by the controller. No model is included.
-* If any exception is thrown, a 500 (Internal Server Error) response will be returned by the controller. The IsDetailsIncludedInNegativeResponse property controls if a detail object is returned or not.
+* If any exception is thrown, a 500 (Internal Server Error) response will be returned by the controller. The IsDetailsIncludedInNegativeResponse property controls if a ProblemDetails object is returned or not.
 
 ### POST Create
 The StandardModelViewController and StandardSubModelViewController will accept a POST /Account/Create web request; the body must contain an Account object. The standard is to call the IAccountDataLayer.CreateAsync() method.
 
 * If the data object creation is successful, a 302 (Redirect) to Index will be returned by the controller or json of the Account object will be returned by the controller. The return action is controlled by the IsCUDActionRedirectedOnSuccess property.
-* If the model state is invalid or a DataObjectValidationException is thrown, a ViewResult or PartialViewResult object is returned by the controller or a 400 (Bad Request) response is returned by the controller. The return action is controlled by the ValidationFailedAction property.
-* If any other exception is thrown, a 500 (Internal Server Error) response will be returned by the controller. The IsDetailsIncludedInNegativeResponse property controls if a detail object is returned or not.
+* If the model state is invalid or a DataObjectValidationException is thrown, a ViewResult or PartialViewResult object is returned by the controller or a 400 (Bad Request) response is returned by the controller with a ValidationProblemDetails object. The return action is controlled by the ValidationFailedAction property.
+* If any other exception is thrown, a 500 (Internal Server Error) response will be returned by the controller. The IsDetailsIncludedInNegativeResponse property controls if a ProblemDetails object is returned or not.
 
 ### GET Delete View
 The StandardModelViewController and StandardSubModelViewController will accept a GET /Account/DeleteView/*id* web request; id will be DataObject.Integer64ID or DataObject.StringID. The standard is to return a view named "AccountDelete". The view should have UI for deleting an account and it should utilize the POST Delete action.
 
 * When the data object is found using the id, a ViewResult object is returned by the controller with an account object.
-* When the data object is not found using the id, a 404 (Not Found) response will be returned by the controller. The IsDetailsIncludedInNegativeResponse property controls if a detail object is returned or not.
-* On any exception thrown, a 500 (Internal Server Error) response will be returned by the controller. The IsDetailsIncludedInNegativeResponse property controls if a detail object is returned or not.
+* When the data object is not found using the id, a 404 (Not Found) response will be returned by the controller. The IsDetailsIncludedInNegativeResponse property controls if a ProblemDetails object is returned or not.
+* On any exception thrown, a 500 (Internal Server Error) response will be returned by the controller. The IsDetailsIncludedInNegativeResponse property controls if a ProblemDetails object is returned or not.
 
 ### GET Delete Partial View
 The StandardModelViewController and StandardSubModelViewController will accept a GET /Account/DeletePartialView/*id* web request; id will be DataObject.Integer64ID or DataObject.StringID. The standard is to return a partial view named "_AccountDeletePartial". The view should have UI for deleting an account and it should utilize the POST Delete action.
 
 * When the data object is found, a PartialViewResult object is returned by the controller with an account object.
 * When the data object is not found, a 404 (Not Found) response will be returned by the controller.
-* On any exception thrown, a 500 (Internal Server Error) response will be returned by the controller. The IsDetailsIncludedInNegativeResponse property controls if a detail object is returned or not.
+* On any exception thrown, a 500 (Internal Server Error) response will be returned by the controller. The IsDetailsIncludedInNegativeResponse property controls if a ProblemDetails object is returned or not.
 
 ### POST Delete
 The StandardModelViewController and StandardSubModelViewController will accept a POST /Account/Delete web request; the body must contain an Account object. The standard is to call the IAccountDataLayer.DeleteAsync() method.
 
 * If the data object deletion is successful, a 302 (Redirect) to Index will be returned by the controller or json of the Account object will be returned by the controller. The return action is controlled by the IsCUDActionRedirectedOnSuccess property.
-* If a DataObjectUpdateConflictException is thrown, a 409 (Conflict) response will be returned by the controller. The IsDetailsIncludedInNegativeResponse property controls if a detail object is returned or not.
-* If a IDNotFoundException is thrown, a 404 (Not Found) response will be returned by the controller. The IsDetailsIncludedInNegativeResponse property controls if a detail object is returned or not.
-* If any other exception is thrown, a 500 (Internal Server Error) response will be returned by the controller. The IsDetailsIncludedInNegativeResponse property controls if a detail object is returned or not.
+* If a DataObjectUpdateConflictException is thrown, a 409 (Conflict) response will be returned by the controller. The IsDetailsIncludedInNegativeResponse property controls if a ProblemDetails object is returned or not.
+* If a IDNotFoundException is thrown, a 404 (Not Found) response will be returned by the controller. The IsDetailsIncludedInNegativeResponse property controls if a ProblemDetails object is returned or not.
+* If any other exception is thrown, a 500 (Internal Server Error) response will be returned by the controller. The IsDetailsIncludedInNegativeResponse property controls if a ProblemDetails object is returned or not.
 
 ### GET Edit View
 The StandardModelViewController and StandardSubModelViewController will accept a GET /Account/EditView/*id* web request; id will be DataObject.Integer64ID or DataObject.StringID. The standard is to return a view named "AccountEdit". The view should have UI for editing an account and it should utilize the POST Update action.
 
 * When the data object is found using the id, a ViewResult object is returned by the controller with an account object.
-* When the data object is not found using the id, a 404 (Not Found) response will be returned by the controller. The IsDetailsIncludedInNegativeResponse property controls if a detail object is returned or not.
-* On any exception thrown, a 500 (Internal Server Error) response will be returned by the controller. The IsDetailsIncludedInNegativeResponse property controls if a detail object is returned or not.
+* When the data object is not found using the id, a 404 (Not Found) response will be returned by the controller. The IsDetailsIncludedInNegativeResponse property controls if a ProblemDetails object is returned or not.
+* On any exception thrown, a 500 (Internal Server Error) response will be returned by the controller. The IsDetailsIncludedInNegativeResponse property controls if a ProblemDetails object is returned or not.
 
 ### GET Edit Partial View
 The StandardModelViewController and StandardSubModelViewController will accept a GET /Account/EditPartialView/*id* web request; id will be DataObject.Integer64ID or DataObject.StringID. The standard is to return a partial view named "_AccountEditPartial". The view should have UI for editing an account and it should utilize the POST Update action.
 
 * When the data object is found, a PartialViewResult object is returned by the controller with an account object.
-* When the data object is not found, a 404 (Not Found) response will be returned by the controller. The IsDetailsIncludedInNegativeResponse property controls if a detail object is returned or not.
-* On any exception thrown, a 500 (Internal Server Error) response will be returned by the controller. The IsDetailsIncludedInNegativeResponse property controls if a detail object is returned or not.
+* When the data object is not found, a 404 (Not Found) response will be returned by the controller. The IsDetailsIncludedInNegativeResponse property controls if a ProblemDetails object is returned or not.
+* On any exception thrown, a 500 (Internal Server Error) response will be returned by the controller. The IsDetailsIncludedInNegativeResponse property controls if a ProblemDetails object is returned or not.
 
 ### POST Update
 The StandardModelViewController and StandardSubModelViewController will accept a POST /Account/Update web request; the body must contain an Account object. The standard is to call the IAccountDataLayer.UpdateAsync() method.
 
 * If the data object update is successful, a 302 (Redirect) to Index will be returned by the controller or json of the Account object will be returned by the controller. The return action is controlled by the IsCUDActionRedirectedOnSuccess property.
-* If the model state is invalid or a DataObjectValidationException is thrown, a ViewResult or PartialViewResult object is returned by the controller or a 400 (Bad Request) response is returned by the controller. The return action is controlled by the ValidationFailedAction property.
-* If a DataObjectUpdateConflictException is thrown, a 409 (Conflict) response will be returned by the controller. The IsDetailsIncludedInNegativeResponse property controls if a detail object is returned or not.
-* If a IDNotFoundException is thrown, a 404 (Not Found) response will be returned by the controller. The IsDetailsIncludedInNegativeResponse property controls if a detail object is returned or not.
-* If any other exception is thrown, a 500 (Internal Server Error) response will be returned by the controller. The IsDetailsIncludedInNegativeResponse property controls if a detail object is returned or not.
+* If the model state is invalid or a DataObjectValidationException is thrown, a ViewResult or PartialViewResult object is returned by the controller or a 400 (Bad Request) response is returned by the controller with a ValidationProblemDetails object. The return action is controlled by the ValidationFailedAction property.
+* If a DataObjectUpdateConflictException is thrown, a 409 (Conflict) response will be returned by the controller. The IsDetailsIncludedInNegativeResponse property controls if a ProblemDetails object is returned or not.
+* If a IDNotFoundException is thrown, a 404 (Not Found) response will be returned by the controller. The IsDetailsIncludedInNegativeResponse property controls if a ProblemDetails object is returned or not.
+* If any other exception is thrown, a 500 (Internal Server Error) response will be returned by the controller. The IsDetailsIncludedInNegativeResponse property controls if a ProblemDetails object is returned or not.
+
+#### How to Expand Your Controller
+Now, let's say you need to add additional functionality to the controller and you can easy do so by adding a new method to your controller.
+```
+public AccountController : StandardModelViewController<Account, IAccountDataLayer>
+{
+  public AccountController(IAccountDataLayer dataLayer, ILogger<AccountController> logger) : base(dataLayer, logger) { }
+  
+  public async Task<IActionResult> DetailViewAsync(long id)
+  {
+    try
+    {
+        base.Logger.LogInformation("Attempting to retrieve the {Type} data object for {ID} for the Detial View.", base.DataObjectTypeName, id);
+
+        var dataObject = await base.DataLayer.GetSingleAsync(obj => obj.Integer64ID == id);
+
+        if (dataObject is null)
+        {
+            base.Logger.LogError("The {Type} data object for {ID} was not found so the Detail View could not be returned.", base.DataObjectTypeName, id);
+            return base.IsDetailsIncludedInNegativeResponse ? NotFound(new NotFoundDetails(title: $"{base.DataObjectTypeName.SpaceCapitalLetters()} Detail View Error - Not Found", detail: $"The {base.DataObjectTypeName.SpaceCapitalLetters()} record was not found; please refresh the page because another user may have deleted it.")) : NotFound();
+        }
+
+        base.Logger.LogInformation("The {Type} data object for {ID} for the Detail View was successfully retrieved; returning the view.", base.DataObjectTypeName, id);
+        return View($"{base.DataObjectTypeName}Detail", dataObject);
+    }
+    catch (Exception ex)
+    {
+        base.Logger.LogError(ex, "Failed to return the Edit View for the {Type} data object for {ID}.", base.DataObjectTypeName, id);
+        return IsDetailsIncludedInNegativeResponse ? Problem(title: $"{base.DataObjectTypeName.SpaceCapitalLetters()} Detail View Error", detail: $"Failed to find the {base.DataObjectTypeName.SpaceCapitalLetters()} Detail View because of an error on the server.") : Problem();
+    }
+  }
+}
+```
+The same can be done when using the StandardSubModelViewController.
 
 ### How to Override Base Functionality in Your Controller
 Let's say you need to check the amount before the account is created. It's easy because the methods are virtual so you can override them.
@@ -127,8 +161,7 @@ public AccountController : StandardModelViewController<Account, IAccountDataLaye
 The same can be done when using the StandardSubModelViewController.
 
 ### The Sub Controller
-The StandardSubModelViewController is designed to return a subset of data objects for an owner data object so transactions for an account. The IndexAsync() uses the default pattern mapping to accept an owner id and return the subset. The owner id will be stored in the ViewBag and you can use it in the MVC pattern when navigating to an add page. The AddViewAsync() and 
-AddPartialViewAsync() also uses the default pattern mapping to accept an owner id. The owner id will be stored in the ViewBag and when using the MVC pattern, it can be stored in a hidden input in the form so the owner id is added to the data object when posted to the Create action. When using the MVC pattern, the CUD actions, on success, will redirect back 
+The StandardSubModelViewController is designed to return a subset of data objects for an owner data object so transactions for an account. The IndexAsync() uses the default pattern mapping to accept an owner id and return the subset. The owner id will be stored in the ViewBag and you can use it in the MVC pattern when navigating to an add page. The AddViewAsync() and AddPartialViewAsync() also uses the default pattern mapping to accept an owner id. The owner id will be stored in the ViewBag and when using the MVC pattern, it can be stored in a hidden input in the form so the owner id is added to the data object when posted to the Create action. When using the MVC pattern, the CUD actions, on success, will redirect back 
 to the Index page and the id will be set to the owner id.
 
 ## Web API
@@ -144,78 +177,102 @@ public AccountController : StandardCRUDController<Account, IAccountDataLayer>
   public AccountController(IAccountDataLayer dataLayer, ILogger<AccountController> logger) : base(dataLayer, logger) { }
 }
 ```
-You now have a web API controller for Account data and your ASP.NET Core application will automatically expose that. It will accept GET, POST, PUT & DELETE calls for /api/Account. The same can be done when using the UserEditableController and SubUserEditableController.
+You now have a web API controller for Account data and your ASP.NET Core application will automatically expose that. It will accept GET, POST, PUT & DELETE calls for /api/Account. The same can be done when using the StandardSubCRUDController.
 
 ### GET Count
-The StandardCRUDController, UserEditableController and SubUserEditableController will accept a GET api/Account/Count web request. The standard is to call the IAccountDataLayer.CountAsync() method and a web response will be return based on success or failure.
+The StandardCRUDController and StandardSubCRUDController will accept a GET api/Account/Count web request. The standard is to call the IAccountDataLayer.CountAsync() method and a web response will be return based on success or failure.
 * If querying the count is successful, a 200 (OK) response will be returned by the controller. The count will be returned in the body as an integer.
-* If any exception is thrown, a 500 (Internal Server Error) response will be returned by the controller. No body.
+* If any exception is thrown, a 500 (Internal Server Error) response will be returned by the controller. A ProblemDetails object will be returned in the body as json.
 
 ### GET All
-The StandardCRUDController, UserEditableController and SubUserEditableController will accept a GET api/Account/All web request. The standard is to call the IAccountDataLayer.GetAllAsync() method and a web response will be return based on success or failure.
+The StandardCRUDController and StandardSubCRUDController will accept a GET api/Account/All web request. The standard is to call the IAccountDataLayer.GetAllAsync() method and a web response will be return based on success or failure.
 
 * If querying the data objects is successful, a 200 (OK) response will be returned by the controller. A list of Account objects will be returned in the body as json.
-* If any exception is thrown, a 500 (Internal Server Error) response will be returned by the controller. No body.
+* If any exception is thrown, a 500 (Internal Server Error) response will be returned by the controller. A ProblemDetails object will be returned in the body as json.
 
-The SubUserEditableController will accept an owner id parameter and it'll return a subset of data objects using the owner id.
+The StandardSubCRUDController will accept an owner id parameter and it'll return a subset of data objects using the owner id.
 
 ### GET All List View
-The UserEditableController and SubUserEditableController will accept a GET api/Account/All/ListView web request. The standard is to call the IAccountDataLayer.GetAllListViewAsync() method and a web response will be return based on success or failure.
+The StandardCRUDController and StandardSubCRUDController will accept a GET api/Account/All/ListView web request. The standard is to call the IAccountDataLayer.GetAllListViewAsync() method and a web response will be return based on success or failure.
 
 * If querying the data object is successful, a 200 (OK) response will be returned by the controller. A list of ListView objects will be returned in the body as json.
-* If any exception is thrown, a 500 (Internal Server Error) response will be returned by the controller. No body.
+* If any exception is thrown, a 500 (Internal Server Error) response will be returned by the controller. A ProblemDetails object will be returned in the body as json.
 
-The SubUserEditableController will accept an owner id parameter and it'll return a subset of data objects using the owner id.
+The StandardSubCRUDController will accept an owner id parameter and it'll return a subset of data objects using the owner id.
 
 ### GET Page
-The StandardCRUDController, UserEditableController and SubUserEditableController will accept a GET api/Account/Page web request; the query string will be used to build the QueryDefinition object. The standard is to call the IAccountDataLayer.GetPageAsync() method and a web response will be return based on success or failure.
+The StandardCRUDController and StandardSubCRUDController will accept a GET api/Account/Page web request; the query string will be used to build the QueryDefinition object. The standard is to call the IAccountDataLayer.GetPageAsync() method and a web response will be return based on success or failure.
 
 * If querying the page is successful, a 200 (OK) response will be returned by the controller. A PagedList object with Account objects will be returned in the body as json.
-* If any exception is thrown, a 500 (Internal Server Error) response will be returned by the controller. No body.
+* If any exception is thrown, a 500 (Internal Server Error) response will be returned by the controller. A ProblemDetails object will be returned in the body as json.
 
-The SubUserEditableController will accept an owner id parameter and it'll return a subset of data objects using the owner id.
+The StandardSubCRUDController will accept an owner id parameter and it'll return a subset of data objects using the owner id.
 
 ### GET Page List View
-The UserEditableController and SubUserEditableController will accept a GET api/Account/Page/ListView web request; the query string will be used to build the QueryDefinition object. The standard is to call the IAccountDataLayer.GetPageListViewAsync() method and a web response will be return based on success or failure.
+The StandardCRUDController and StandardSubCRUDController will accept a GET api/Account/Page/ListView web request; the query string will be used to build the QueryDefinition object. The standard is to call the IAccountDataLayer.GetPageListViewAsync() method and a web response will be return based on success or failure.
 
 * If querying the page is successful, a 200 (OK) response will be returned by the controller. A PagedList object with ListView objects will be returned in the body as json.
-* If any exception is thrown, a 500 (Internal Server Error) response will be returned by the controller. No body.
+* If any exception is thrown, a 500 (Internal Server Error) response will be returned by the controller. A ProblemDetails object will be returned in the body as json.
 
-The SubUserEditableController will accept an owner id parameter and it'll return a subset of data objects using the owner id.
+The StandardSubCRUDController will accept an owner id parameter and it'll return a subset of data objects using the owner id.
 
 ### Get Single
-The StandardCRUDController, UserEditableController and SubUserEditableController will accept a GET api/Account/Single or GET api/Account/Single/*id* web request; id will be DataObject.Integer64ID or DataObject.StringID. The standard is to call the IAccountDataLayer.GetSingleAsync() method and a web response will be return based on success or failure.
+The StandardCRUDController and StandardSubCRUDController will accept a GET api/Account/Single or GET api/Account/Single/*id* web request; id will be DataObject.Integer64ID or DataObject.StringID. The standard is to call the IAccountDataLayer.GetSingleAsync() method and a web response will be return based on success or failure.
 
 * If querying the data object is successful, a 200 (OK) response will be returned by the controller. If found, an Account object will be returned in the body as json else nothing is returned.
-* If any exception is thrown, a 500 (Internal Server Error) response will be returned by the controller. No body.
+* If any exception is thrown, a 500 (Internal Server Error) response will be returned by the controller. A ProblemDetails object will be returned in the body as json.
 
 ### POST
-The StandardCRUDController, UserEditableController and SubUserEditableController will accept a POST api/Account web request; the body must contain an Account object as json. The standard is to call the IAccountDataLayer.CreateAsync() method and a web response will be return based on success or failure.
+The StandardCRUDController and StandardSubCRUDController will accept a POST api/Account web request; the body must contain an Account object as json. The standard is to call the IAccountDataLayer.CreateAsync() method and a web response will be return based on success or failure.
 
 * If the data object creation is successful, a 200 (OK) response will be returned by the controller. The Account object will be returned in the body as json.
-* If a DataObjectValidationException is thrown, a 400 (Bad Request) response will be returned by the controller. The ServerSideValidationResult object will be returned in the body as json.
-* If any other exception is thrown, a 500 (Internal Server Error) response will be returned by the controller. No body.
+* If a DataObjectValidationException is thrown, a 400 (Bad Request) response will be returned by the controller. A ValidationProblemDetails object will be returned in the body as json.
+* If any other exception is thrown, a 500 (Internal Server Error) response will be returned by the controller. A ProblemDetails object will be returned in the body as json.
 
 ### DELETE
-The StandardCRUDController, UserEditableController and SubUserEditableController will accept a DELETE api/Account/*id* web request; id will be DataObject.Integer64ID or DataObject.StringID. The standard is to call the IAccountDataLayer.DeleteAsync() method and a web response will be return based on success or failure.
+The StandardCRUDController and StandardSubCRUDController will accept a DELETE api/Account/*id* web request; id will be DataObject.Integer64ID or DataObject.StringID. The standard is to call the IAccountDataLayer.DeleteAsync() method and a web response will be return based on success or failure.
 
 * If the data object deletion is successful, a 200 (OK) response will be returned by the controller. No body.
-* If a DataObjectDeleteConflictException is thrown, a 409 (Conflict) response will be returned by the controller. No body.
-* If any other exception is thrown, a 500 (Internal Server Error) response will be returned by the controller. No body.
+* If a DataObjectDeleteConflictException is thrown, a 409 (Conflict) response will be returned by the controller. A ProblemDetails object will be returned in the body as json.
+* If any other exception is thrown, a 500 (Internal Server Error) response will be returned by the controller. A ProblemDetails object will be returned in the body as json.
 
 ### PUT
-The StandardCRUDController, UserEditableController and SubUserEditableController will accept a PUT api/Account web request; the body must contain an Account object as json. The standard is to call the IAccountDataLayer.UpdateAsync() method and a web response will be return based on success or failure.
+The StandardCRUDController and StandardSubCRUDController will accept a PUT api/Account web request; the body must contain an Account object as json. The standard is to call the IAccountDataLayer.UpdateAsync() method and a web response will be return based on success or failure.
 
 * If the data object update is successful, a 200 (OK) response will be returned by the controller. The Account object will be returned in the body as json.
-* If a DataObjectValidationException is thrown, a 400 (Bad Request) response will be returned by the controller. The ServerSideValidationResult object will be returned in the body as json.
-* If a DataObjectDeleteConflictException is thrown, a 409 (Conflict) response will be returned by the controller. No body.
-* If any other exception is thrown, a 500 (Internal Server Error) response will be returned by the controller. No body.
+* If a DataObjectValidationException is thrown, a 400 (Bad Request) response will be returned by the controller. A ValidationProblemDetails object will be returned in the body as json.
+* If a DataObjectDeleteConflictException is thrown, a 409 (Conflict) response will be returned by the controller. A ProblemDetails object will be returned in the body as json.
+* If any other exception is thrown, a 500 (Internal Server Error) response will be returned by the controller. A ProblemDetails object will be returned in the body as json.
 
-### POST Validate
-The StandardCRUDController, UserEditableController and SubUserEditableController will accept a POST api/Account/Validate web request; the body must contain an Account object as json. The standard is to call the IAccountDataLayer.ValidateAsync() method and a web response will be return based on success or failure.
+#### How to Expand Your Controller
+Now, let's say you need to add additional functionality to the controller and you can easy do so by adding a new method to your controller.
+```
+public AccountController : StandardCRUDController<Account, IAccountDataLayer>
+{
+  public AccountController(IAccountDataLayer dataLayer, ILogger<AccountController> logger) : base(dataLayer, logger) { }
 
-* If the data object validation is successful, a 200 (OK) response will be returned by the controller. The ServerSideValidationResult object will be returned in the body as json.
-* If any exception is thrown, a 500 (Internal Server Error) response will be returned by the controller. No body.
+  [HttpGet("All/Accounts")]
+  public async Task<IActionResult> GetSavingAccountsAsync()
+  {
+    try
+    {
+      base.Logger.LogInformation("Attempting to retrieve all the saving {Type} data objects.", base.DataObjectTypeName);
+      
+      var accounts = await base.DataLayer.GetSavingAccountsAsync();
+      
+      base.Logger.LogInformation("All the saving {Type} data objects were successfully retrieved.", base.DataObjectTypeName);
+      
+      return Ok(accounts);
+    }
+    catch (Exception ex)
+    {
+      base.Logger.LogError(ex, "Failed to return all the saving {Type} data objects.", base.DataObjectTypeName);
+      return Problem(title: $"{base.DataObjectTypeName.SpaceCapitalLetters()} Get Saving Accounts Error", detail: $"Failed to return all the saving {base.DataObjectTypeName.SpaceCapitalLetters()} records because of an error on the server.");
+    }
+  }
+}
+```
+The same can be done when using the StandardSubCRUDController.
 
 ### How to Override Base Functionality in Your Controller
 Let's say you need to check the amount before the account is created. It's easy because the methods are virtual so you can override them.
@@ -237,4 +294,4 @@ public AccountController : StandardCRUDController<Account, IAccountDataLayer>
   }
 }
 ```
-The same can be done when using the UserEditableController and SubUserEditableController.
+The same can be done when using the StandardSubCRUDController.
