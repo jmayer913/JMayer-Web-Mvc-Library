@@ -80,7 +80,7 @@ The StandardModelViewController and StandardSubModelViewController will accept a
 
 * If the data object deletion is successful, a 302 (Redirect) to Index will be returned by the controller or json of the Account object will be returned by the controller. The return action is controlled by the IsCUDActionRedirectedOnSuccess property.
 * If a DataObjectUpdateConflictException is thrown, a 409 (Conflict) response will be returned by the controller. The IsDetailsIncludedInNegativeResponse property controls if a ProblemDetails object is returned or not.
-* If a IDNotFoundException is thrown, a 404 (Not Found) response will be returned by the controller. The IsDetailsIncludedInNegativeResponse property controls if a ProblemDetails object is returned or not.
+* If a DataObjectIDNotFoundException is thrown, a 404 (Not Found) response will be returned by the controller. The IsDetailsIncludedInNegativeResponse property controls if a ProblemDetails object is returned or not.
 * If any other exception is thrown, a 500 (Internal Server Error) response will be returned by the controller. The IsDetailsIncludedInNegativeResponse property controls if a ProblemDetails object is returned or not.
 
 ### GET Edit View
@@ -103,7 +103,7 @@ The StandardModelViewController and StandardSubModelViewController will accept a
 * If the data object update is successful, a 302 (Redirect) to Index will be returned by the controller or json of the Account object will be returned by the controller. The return action is controlled by the IsCUDActionRedirectedOnSuccess property.
 * If the model state is invalid or a DataObjectValidationException is thrown, a ViewResult or PartialViewResult object is returned by the controller or a 400 (Bad Request) response is returned by the controller with a ValidationProblemDetails object. The return action is controlled by the ValidationFailedAction property.
 * If a DataObjectUpdateConflictException is thrown, a 409 (Conflict) response will be returned by the controller. The IsDetailsIncludedInNegativeResponse property controls if a ProblemDetails object is returned or not.
-* If a IDNotFoundException is thrown, a 404 (Not Found) response will be returned by the controller. The IsDetailsIncludedInNegativeResponse property controls if a ProblemDetails object is returned or not.
+* If a DataObjectIDNotFoundException is thrown, a 404 (Not Found) response will be returned by the controller. The IsDetailsIncludedInNegativeResponse property controls if a ProblemDetails object is returned or not.
 * If any other exception is thrown, a 500 (Internal Server Error) response will be returned by the controller. The IsDetailsIncludedInNegativeResponse property controls if a ProblemDetails object is returned or not.
 
 ### How to Expand Your Controller
@@ -242,6 +242,7 @@ The StandardCRUDController and StandardSubCRUDController will accept a PUT api/A
 * If the data object update is successful, a 200 (OK) response will be returned by the controller. The Account object will be returned in the body as json.
 * If a DataObjectValidationException is thrown, a 400 (Bad Request) response will be returned by the controller. A ValidationProblemDetails object will be returned in the body as json.
 * If a DataObjectDeleteConflictException is thrown, a 409 (Conflict) response will be returned by the controller. A ProblemDetails object will be returned in the body as json.
+* If a DataObjectIDNotFoundException is thrown, a 404 (Not Found) response will be returned by the controller. A ProblemDetails object will be returned in the body as json.
 * If any other exception is thrown, a 500 (Internal Server Error) response will be returned by the controller. A ProblemDetails object will be returned in the body as json.
 
 ### How to Expand Your Controller
