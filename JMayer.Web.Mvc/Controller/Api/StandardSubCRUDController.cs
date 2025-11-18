@@ -7,8 +7,6 @@ using Microsoft.Extensions.Logging;
 
 namespace JMayer.Web.Mvc.Controller.Api;
 
-#warning I need to decide if the non-owner Get methods should have NoAction.
-
 /// <summary>
 /// The class manages HTTP requests for CRUD operations associated with a sub data object and a data layer.
 /// </summary>
