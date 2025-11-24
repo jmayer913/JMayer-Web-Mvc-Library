@@ -361,7 +361,10 @@ public class StandardCRUDControllerUnitTest
     [Fact]
     public async Task VerifyUpdateConflictResponse()
     {
-        SimpleStandardCRUDDataLayer dataLayer = new();
+        SimpleStandardCRUDDataLayer dataLayer = new()
+        {
+            IsOldDataObjectDetectionEnabled = true,
+        };
         SimpleDataObject dataObject = await dataLayer.CreateAsync(new SimpleDataObject() { Name = "10", Value = 10 });
         await dataLayer.UpdateAsync(new SimpleDataObject(dataObject)
         {

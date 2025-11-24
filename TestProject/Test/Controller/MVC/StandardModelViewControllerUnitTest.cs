@@ -623,7 +623,10 @@ public class StandardModelViewControllerUnitTest
     [InlineData(false)]
     public async Task VerifyUpdateReturnConflict(bool details)
     {
-        SimpleStandardCRUDDataLayer dataLayer = new();
+        SimpleStandardCRUDDataLayer dataLayer = new()
+        {
+            IsOldDataObjectDetectionEnabled = true,
+        };
         SimpleDataObject dataObject = await dataLayer.CreateAsync(new SimpleDataObject() { Name = "Update Conflict Test", Value = DefaultValue });
         SimpleStandardModelViewController controller = new(dataLayer, CreateConsoleLogger())
         {
