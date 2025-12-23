@@ -312,4 +312,3 @@ The same can be done when using the StandardSubCRUDController.
 * [ASP.NET Core MVC with Syncfusion Example Project](https://github.com/jmayer913/JMayer-Example-ASPSyncfusionMVC)
 * [ASP.NET Core / React Example Project](https://github.com/jmayer913/JMayer-Example-ASPReact)
 * [Blazor WebAssembly Example Project](https://github.com/jmayer913/JMayer-Example-WebAssemblyBlazor)
----
