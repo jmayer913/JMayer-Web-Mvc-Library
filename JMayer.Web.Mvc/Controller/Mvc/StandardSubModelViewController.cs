@@ -1,5 +1,6 @@
 ﻿using JMayer.Data.Data;
 using JMayer.Data.Database.DataLayer;
+using JMayer.Data.HTTP.Details;
 using JMayer.Web.Mvc.Extension;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -26,31 +27,31 @@ namespace JMayer.Web.Mvc.Controller.Mvc;
 /// <br/>
 /// <br/>
 /// When a model is not found, a 404 not found will be returned. With the Ajax pattern, javascript needs to be able to 
-/// handle this type of response. You can set the IsDetailsIncludedInNegativeResponse property to true and an object will
-/// be returned with a UserMessage field. With the MVC pattern, you need to setup the middleware so a user friendly page
-/// is displayed. The suggested way is to register UseStatusCodePagesWithRedirects() with the middleware; the
-/// IsDetailsIncludedInNegativeResponse property must be set to false else redirects won't work.
+/// handle this type of response. You can set the IsDetailsIncludedInNegativeResponse property to true and a problem details
+/// will be returned; the title and detail fields will be set. With the MVC pattern, you need to setup the middleware so a 
+/// user friendly page is displayed. The suggested way is to register UseStatusCodePagesWithRedirects() with the middleware; 
+/// the IsDetailsIncludedInNegativeResponse property must be set to false else redirects won't work.
 /// <br/>
 /// <br/>
 /// If the data layer has old data object detection enabled or the data layer checks for dependencies before a delete 
 /// (a DataObjectDeleteConflictException is thrown), a 409 conflict can be returned. With the Ajax pattern, javascript 
 /// needs to be able to handle this type of response. You can set the IsDetailsIncludedInNegativeResponse property to true 
-/// and an object will be returned with a UserMessage field. With the MVC pattern, you need to setup the middleware so 
-/// a user friendly page is displayed. The suggested way is to register UseStatusCodePagesWithRedirects() with the 
-/// middleware; the IsDetailsIncludedInNegativeResponse property must be set to false else redirects won't work.
+/// and a problem details will be returned; the title and detail fields will be set. With the MVC pattern, you need to setup 
+/// the middleware so a user friendly page is displayed. The suggested way is to register UseStatusCodePagesWithRedirects() 
+/// with the middleware; the IsDetailsIncludedInNegativeResponse property must be set to false else redirects won't work.
 /// <br/>
 /// <br/>
 /// If an unexpected exception occurs, a 500 internal server error will be returned. With the Ajax pattern, javascript needs to 
-/// be able to handle this type of response. You can set the IsDetailsIncludedInNegativeResponse property to true and an object will
-/// be returned with a UserMessage field. With the MVC pattern, you need to setup the middleware so a user friendly page
-/// is displayed. The suggested way is to register UseStatusCodePagesWithRedirects() with the middleware; the
+/// be able to handle this type of response. You can set the IsDetailsIncludedInNegativeResponse property to true and a problem 
+/// details will be returned; the title and detail fields will be set. With the MVC pattern, you need to setup the middleware so 
+/// a user friendly page is displayed. The suggested way is to register UseStatusCodePagesWithRedirects() with the middleware; the
 /// IsDetailsIncludedInNegativeResponse property must be set to false else redirects won't work.
 /// </summary>
 /// <typeparam name="T">Must be a SubUserEditableDataObject since the data layer requires this.</typeparam>
 /// <typeparam name="U">Must be an IUserEditableDataLayer so the controller can interact with the collection/table associated with it.</typeparam>
 public class StandardSubModelViewController<T, U> : StandardModelViewController<T, U>
-    where T : SubUserEditableDataObject
-    where U : IUserEditableDataLayer<T>
+    where T : SubDataObject
+    where U : IStandardSubCRUDDataLayer<T>
 {
     /// <summary>
     /// The dependency injection constructor.
@@ -145,37 +146,31 @@ public class StandardSubModelViewController<T, U> : StandardModelViewController<
     {
         try
         {
-            T? dataObject = await DataLayer.GetSingleAsync(obj => obj.Integer64ID == id);
+            T? dataObject = null;
 
-            if (dataObject is null)
+            //In order to inject the owner id into the redirect, I need the data object.
+            //I don't want to copy & paste the parent's DeleteAsync() but instead override
+            //and only do the injection. This means I need to query the data object
+            //twice (once here and once in the parent) which sucks but it is what it is.
+            if (IsCUDActionRedirectedOnSuccess)
             {
-                Logger.LogWarning("The {ID} for the {Type} was not found so no delete occurred.", id.ToString(), DataObjectTypeName);
-                return IsDetailsIncludedInNegativeResponse ? NotFound(new { UserMessage = $"The {DataObjectTypeName.SpaceCamelCase()} record was not found; please refresh the page because another user may have deleted it." }) : NotFound();
+                dataObject = await DataLayer.GetSingleAsync(obj => obj.Integer64ID == id);
             }
-            else
-            {
-                await DataLayer.DeleteAsync(dataObject);
-                Logger.LogInformation("The {ID} for the {Type} was successfully deleted.", id.ToString(), DataObjectTypeName);
 
-                if (IsCUDActionRedirectedOnSuccess)
-                {
-                    return RedirectToAction(nameof(Index), new { id = dataObject.OwnerInteger64ID });
-                }
-                else
-                {
-                    return Json(dataObject);
-                }
+            IActionResult actionResult = await base.DeleteAsync(id);
+
+            if (dataObject is not null && actionResult is RedirectToActionResult redirectToActionResult && redirectToActionResult.ActionName is not null && redirectToActionResult.ActionName is nameof(Index))
+            {
+                redirectToActionResult.RouteValues ??= [];
+                redirectToActionResult.RouteValues.Add("Id", dataObject.OwnerInteger64ID);
             }
-        }
-        catch (DataObjectDeleteConflictException ex)
-        {
-            Logger.LogError(ex, "Failed to delete the {ID} {Type} because of a data conflict.", id.ToString(), DataObjectTypeName);
-            return IsDetailsIncludedInNegativeResponse ? Conflict(new { UserMessage = "The record has a dependency that prevents it from being deleted; the dependency needs to be deleted first." }) : Conflict();
+
+            return actionResult;
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Failed to delete the {ID} {Type}.", id.ToString(), DataObjectTypeName);
-            return IsDetailsIncludedInNegativeResponse ? Problem(detail: "Failed to delete the record because of an error on the server.") : Problem();
+            Logger.LogError(ex, "Failed to delete the {Type} data object for {ID}.", DataObjectTypeName, id);
+            return IsDetailsIncludedInNegativeResponse ? Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Delete Error", detail: "Failed to delete the record because of an error on the server.") : Problem();
         }
     }
 
@@ -186,37 +181,31 @@ public class StandardSubModelViewController<T, U> : StandardModelViewController<
     {
         try
         {
-            T? dataObject = await DataLayer.GetSingleAsync(obj => obj.StringID == id);
+            T? dataObject = null;
 
-            if (dataObject is null)
+            //In order to inject the owner id into the redirect, I need the data object.
+            //I don't want to copy & paste the parent's DeleteAsync() but instead override
+            //and only do the injection. This means I need to query the data object
+            //twice (once here and once in the parent) which sucks but it is what it is.
+            if (IsCUDActionRedirectedOnSuccess)
             {
-                Logger.LogWarning("The {ID} for the {Type} was not found so no delete occurred.", id, DataObjectTypeName);
-                return IsDetailsIncludedInNegativeResponse ? NotFound(new { UserMessage = $"The {DataObjectTypeName.SpaceCamelCase()} record was not found; please refresh the page because another user may have deleted it." }) : NotFound();
+                dataObject = await DataLayer.GetSingleAsync(obj => obj.StringID == id);
             }
-            else
-            {
-                await DataLayer.DeleteAsync(dataObject);
-                Logger.LogInformation("The {ID} for the {Type} was successfully deleted.", id, DataObjectTypeName);
 
-                if (IsCUDActionRedirectedOnSuccess)
-                {
-                    return RedirectToAction(nameof(Index), new { id = dataObject.OwnerStringID });
-                }
-                else
-                {
-                    return Json(dataObject);
-                }
+            IActionResult actionResult = await base.DeleteAsync(id);
+
+            if (dataObject is not null && actionResult is RedirectToActionResult redirectToActionResult && redirectToActionResult.ActionName is not null && redirectToActionResult.ActionName is nameof(Index))
+            {
+                redirectToActionResult.RouteValues ??= [];
+                redirectToActionResult.RouteValues.Add("Id", dataObject.OwnerInteger64ID);
             }
-        }
-        catch (DataObjectDeleteConflictException ex)
-        {
-            Logger.LogError(ex, "Failed to delete the {ID} {Type} because of a data conflict.", id.ToString(), DataObjectTypeName);
-            return IsDetailsIncludedInNegativeResponse ? Conflict(new { UserMessage = "The record has a dependency that prevents it from being deleted; the dependency needs to be deleted first." }) : Conflict();
+
+            return actionResult;
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Failed to delete the {ID} {Type}.", id.ToString(), DataObjectTypeName);
-            return IsDetailsIncludedInNegativeResponse ? Problem(detail: "Failed to delete the record because of an error on the server.") : Problem();
+            Logger.LogError(ex, "Failed to delete the {Type} data object for {ID}.", DataObjectTypeName, id);
+            return IsDetailsIncludedInNegativeResponse ? Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Delete Error", detail: "Failed to delete the record because of an error on the server.") : Problem();
         }
     }
 
@@ -230,14 +219,19 @@ public class StandardSubModelViewController<T, U> : StandardModelViewController<
     {
         try
         {
+            Logger.LogInformation("Attempting to retrieve the {Type} data objects for owner {ID} for the Index View.", DataObjectTypeName, ownerId);
+
             ViewBag.OwnerId = ownerId;
             List<T>? dataObjects = await DataLayer.GetAllAsync(obj => obj.OwnerInteger64ID == ownerId);
+
+            Logger.LogInformation("All the {Type} data objects for owner {ID} for the Index View were successfully retrieved; returning the view.", DataObjectTypeName, ownerId);
+
             return View($"{DataObjectTypeName}{nameof(Index)}", dataObjects);
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Failed to return the Index View for the {Type}.", DataObjectTypeName);
-            return IsDetailsIncludedInNegativeResponse ? Problem(detail: "Failed to find the Index View because of an error on the server.") : Problem();
+            Logger.LogError(ex, "Failed to return the Index View for the {Type} data objects for owner {ID}.", DataObjectTypeName, ownerId);
+            return IsDetailsIncludedInNegativeResponse ? Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Index View Error", detail: "Failed to find the Index View because of an error on the server.") : Problem();
         }
     }
 
@@ -251,14 +245,19 @@ public class StandardSubModelViewController<T, U> : StandardModelViewController<
     {
         try
         {
+            Logger.LogInformation("Attempting to retrieve the {Type} data objects for owner {ID} for the Index View.", DataObjectTypeName, ownerId);
+
             ViewBag.OwnerId = ownerId;
             List<T>? dataObjects = await DataLayer.GetAllAsync(obj => obj.OwnerStringID == ownerId);
+
+            Logger.LogInformation("All the {Type} data objects for owner {ID} for the Index View were successfully retrieved; returning the view.", DataObjectTypeName, ownerId);
+
             return View($"{DataObjectTypeName}{nameof(Index)}", dataObjects);
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Failed to return the Index View for the {Type}.", DataObjectTypeName);
-            return IsDetailsIncludedInNegativeResponse ? Problem(detail: "Failed to find the Index View because of an error on the server.") : Problem();
+            Logger.LogError(ex, "Failed to return the Index View for the {Type} data objects for owner {ID}.", DataObjectTypeName, ownerId);
+            return IsDetailsIncludedInNegativeResponse ? Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Index View Error", detail: "Failed to find the Index View because of an error on the server.") : Problem();
         }
     }
 
