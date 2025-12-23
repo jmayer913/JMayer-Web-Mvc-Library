@@ -147,7 +147,7 @@ public AccountController : StandardModelViewController<Account, IAccountDataLaye
 {
   public AccountController(IAccountDataLayer dataLayer, ILogger<AccountController> logger) : base(dataLayer, logger) { }
 
-  public override async Task<IActionResult> CreateAsync([FromBody] Account dataObject)
+  public override async Task<IActionResult> CreateAsync(Account dataObject)
   {
     if (dataObject.TotalAmount < 100)
     {
@@ -298,7 +298,6 @@ public AccountController : StandardCRUDController<Account, IAccountDataLayer>
 The same can be done when using the StandardSubCRUDController.
 
 # v9.0.0 Change Log
----
 * Updated to .NET9.
 * **Breaking Change:** Merged the UserEditableController into the StandardCRUDController and moved it into the Api namespace.
 * **Breaking Change:** Renamed the SubUserEditableController to the StandardSubCRUDController and moved it into the Api namespace.
