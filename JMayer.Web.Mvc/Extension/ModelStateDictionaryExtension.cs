@@ -27,7 +27,7 @@ public static class ModelStateDictionaryExtension
 
         foreach (var keyValuePair in modelStateDictionary)
         {
-            if (keyValuePair.Value.Errors.Count is 0)
+            if (keyValuePair.Value.Errors.Count == 1)
             {
                 dictionary.Add(keyValuePair.Key, [keyValuePair.Value.Errors[0].ErrorMessage]);
             }
