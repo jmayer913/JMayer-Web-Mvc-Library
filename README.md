@@ -297,16 +297,8 @@ public AccountController : StandardCRUDController<Account, IAccountDataLayer>
 ```
 The same can be done when using the StandardSubCRUDController.
 
-# v9.0.0 Change Log
-* Updated to .NET9.
-* **Breaking Change:** Merged the UserEditableController into the StandardCRUDController and moved it into the Api namespace.
-* **Breaking Change:** Renamed the SubUserEditableController to the StandardSubCRUDController and moved it into the Api namespace.
-* **Breaking Change:** Removed ValidateAsync() from the StandardCRUDController.
-* Added a title and detail when Api controllers return a ProblemDetails.
-* **Breaking Change:** Switch Api controllers to return a ValidationProblemDetails when a validation issue occurs.
-* Added a title when the MVC controllers return a ProblemDetails.
-* **Breaking Change:** Switched MVC controllers from returning a dynamic object for non-500 errors to a ProblemDetails.
-* Additional logging and changes to existing logging messages for all controllers.
+# v9.0.1 Change Log
+* Fixed exception thrown when ModelState.ErrorsToJson() is called when logging validation errors.
 ---
 * [ASP.NET Core MVC with Syncfusion Example Project](https://github.com/jmayer913/JMayer-Example-ASPSyncfusionMVC)
 * [ASP.NET Core / React Example Project](https://github.com/jmayer913/JMayer-Example-ASPReact)
