@@ -1,7 +1,7 @@
 ﻿using JMayer.Data.Data;
 using JMayer.Data.Database.DataLayer;
-using JMayer.Data.HTTP.Details;
 using JMayer.Web.Mvc.Extension;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
@@ -170,7 +170,7 @@ public class StandardSubModelViewController<T, U> : StandardModelViewController<
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to delete the {Type} data object for {ID}.", DataObjectTypeName, id);
-            return IsDetailsIncludedInNegativeResponse ? Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Delete Error", detail: "Failed to delete the record because of an error on the server.") : Problem();
+            return IsDetailsIncludedInNegativeResponse ? Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Delete Error", detail: "Failed to delete the record because of an error on the server.") : StatusCode(StatusCodes.Status500InternalServerError);
         }
     }
 
@@ -205,7 +205,7 @@ public class StandardSubModelViewController<T, U> : StandardModelViewController<
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to delete the {Type} data object for {ID}.", DataObjectTypeName, id);
-            return IsDetailsIncludedInNegativeResponse ? Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Delete Error", detail: "Failed to delete the record because of an error on the server.") : Problem();
+            return IsDetailsIncludedInNegativeResponse ? Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Delete Error", detail: "Failed to delete the record because of an error on the server.") : StatusCode(StatusCodes.Status500InternalServerError);
         }
     }
 
@@ -231,7 +231,7 @@ public class StandardSubModelViewController<T, U> : StandardModelViewController<
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to return the Index View for the {Type} data objects for owner {ID}.", DataObjectTypeName, ownerId);
-            return IsDetailsIncludedInNegativeResponse ? Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Index View Error", detail: "Failed to find the Index View because of an error on the server.") : Problem();
+            return IsDetailsIncludedInNegativeResponse ? Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Index View Error", detail: "Failed to find the Index View because of an error on the server.") : StatusCode(StatusCodes.Status500InternalServerError);
         }
     }
 
@@ -257,7 +257,7 @@ public class StandardSubModelViewController<T, U> : StandardModelViewController<
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to return the Index View for the {Type} data objects for owner {ID}.", DataObjectTypeName, ownerId);
-            return IsDetailsIncludedInNegativeResponse ? Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Index View Error", detail: "Failed to find the Index View because of an error on the server.") : Problem();
+            return IsDetailsIncludedInNegativeResponse ? Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Index View Error", detail: "Failed to find the Index View because of an error on the server.") : StatusCode(StatusCodes.Status500InternalServerError);
         }
     }
 
