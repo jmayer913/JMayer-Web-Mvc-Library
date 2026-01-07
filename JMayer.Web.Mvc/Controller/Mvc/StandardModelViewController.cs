@@ -2,6 +2,7 @@
 using JMayer.Data.Database.DataLayer;
 using JMayer.Data.HTTP.Details;
 using JMayer.Web.Mvc.Extension;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.Extensions.Logging;
@@ -117,7 +118,7 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to return the Add Partial View for the {Type}.", DataObjectTypeName);
-            return IsDetailsIncludedInNegativeResponse ? Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Add Partial View Error", detail: $"Failed to find the {DataObjectTypeName.SpaceCapitalLetters()} Add Partial View because of an error on the server.") : Problem();
+            return IsDetailsIncludedInNegativeResponse ? Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Add Partial View Error", detail: $"Failed to find the {DataObjectTypeName.SpaceCapitalLetters()} Add Partial View because of an error on the server.") : StatusCode(StatusCodes.Status500InternalServerError);
         }
     }
 
@@ -136,7 +137,7 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to return the Add View for the {Type}.", DataObjectTypeName);
-            return IsDetailsIncludedInNegativeResponse ? Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Add View Error", detail: $"Failed to find the {DataObjectTypeName.SpaceCapitalLetters()} Add View because of an error on the server.") : Problem();
+            return IsDetailsIncludedInNegativeResponse ? Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Add View Error", detail: $"Failed to find the {DataObjectTypeName.SpaceCapitalLetters()} Add View because of an error on the server.") : StatusCode(StatusCodes.Status500InternalServerError);
         }
     }
 
@@ -197,7 +198,7 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to create the {Type} data object.\n{DataObject}", DataObjectTypeName, dataObject.ToJson<T>());
-            return IsDetailsIncludedInNegativeResponse ? Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Create Error", detail: $"Failed to create the {DataObjectTypeName.SpaceCapitalLetters()} record because of an error on the server.") : Problem();
+            return IsDetailsIncludedInNegativeResponse ? Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Create Error", detail: $"Failed to create the {DataObjectTypeName.SpaceCapitalLetters()} record because of an error on the server.") : StatusCode(StatusCodes.Status500InternalServerError);
         }
     }
 
@@ -241,7 +242,7 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to delete the {Type} data object for {ID}.", DataObjectTypeName, id);
-            return IsDetailsIncludedInNegativeResponse ? Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Delete Error", detail: $"Failed to delete the {DataObjectTypeName.SpaceCapitalLetters()} record because of an error on the server.") : Problem();
+            return IsDetailsIncludedInNegativeResponse ? Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Delete Error", detail: $"Failed to delete the {DataObjectTypeName.SpaceCapitalLetters()} record because of an error on the server.") : StatusCode(StatusCodes.Status500InternalServerError);
         }
     }
 
@@ -285,7 +286,7 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to delete the {Type} data object for {ID}.", DataObjectTypeName, id);
-            return IsDetailsIncludedInNegativeResponse ? Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Delete Error", detail: $"Failed to delete the {DataObjectTypeName.SpaceCapitalLetters()} record because of an error on the server.") : Problem();
+            return IsDetailsIncludedInNegativeResponse ? Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Delete Error", detail: $"Failed to delete the {DataObjectTypeName.SpaceCapitalLetters()} record because of an error on the server.") : StatusCode(StatusCodes.Status500InternalServerError);
         }
     }
 
@@ -320,7 +321,7 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to return the Delete Partial View for the {Type} data object for {ID}.", DataObjectTypeName, id);
-            return IsDetailsIncludedInNegativeResponse ? Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Delete Partial View Error", detail: $"Failed to find the {DataObjectTypeName.SpaceCapitalLetters()} Delete View because of an error on the server.") : Problem();
+            return IsDetailsIncludedInNegativeResponse ? Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Delete Partial View Error", detail: $"Failed to find the {DataObjectTypeName.SpaceCapitalLetters()} Delete View because of an error on the server.") : StatusCode(StatusCodes.Status500InternalServerError);
         }
     }
 
@@ -355,7 +356,7 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to return the Delete Partial View for the {Type} data object for {ID}.", DataObjectTypeName, id);
-            return IsDetailsIncludedInNegativeResponse ? Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Delete Partial View Error", detail: $"Failed to find the {DataObjectTypeName.SpaceCapitalLetters()} Delete View because of an error on the server.") : Problem();
+            return IsDetailsIncludedInNegativeResponse ? Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Delete Partial View Error", detail: $"Failed to find the {DataObjectTypeName.SpaceCapitalLetters()} Delete View because of an error on the server.") : StatusCode(StatusCodes.Status500InternalServerError);
         }
     }
 
@@ -385,7 +386,7 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to return the Delete View for the {Type} data object for {ID}.", DataObjectTypeName, id);
-            return IsDetailsIncludedInNegativeResponse ? Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Delete View Error", detail: $"Failed to find the {DataObjectTypeName.SpaceCapitalLetters()} Delete View because of an error on the server.") : Problem();
+            return IsDetailsIncludedInNegativeResponse ? Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Delete View Error", detail: $"Failed to find the {DataObjectTypeName.SpaceCapitalLetters()} Delete View because of an error on the server.") : StatusCode(StatusCodes.Status500InternalServerError);
         }
     }
 
@@ -415,7 +416,7 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to return the Delete View for the {Type} data object for {ID}.", DataObjectTypeName, id);
-            return IsDetailsIncludedInNegativeResponse ? Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Delete View Error", detail: $"Failed to find the {DataObjectTypeName.SpaceCapitalLetters()} Delete View because of an error on the server.") : Problem();
+            return IsDetailsIncludedInNegativeResponse ? Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Delete View Error", detail: $"Failed to find the {DataObjectTypeName.SpaceCapitalLetters()} Delete View because of an error on the server.") : StatusCode(StatusCodes.Status500InternalServerError);
         }
     }
 
@@ -450,7 +451,7 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
         catch (Exception ex) 
         {
             Logger.LogError(ex, "Failed to return the Edit Partial View for the {Type} data object for {ID}.", DataObjectTypeName, id);
-            return IsDetailsIncludedInNegativeResponse ? Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Edit Partial View Error", detail: $"Failed to find the {DataObjectTypeName.SpaceCapitalLetters()} Edit View because of an error on the server.") : Problem();
+            return IsDetailsIncludedInNegativeResponse ? Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Edit Partial View Error", detail: $"Failed to find the {DataObjectTypeName.SpaceCapitalLetters()} Edit View because of an error on the server.") : StatusCode(StatusCodes.Status500InternalServerError);
         }
     }
 
@@ -485,7 +486,7 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to return the Edit Partial View for the {Type} data object for {ID}.", DataObjectTypeName, id);
-            return IsDetailsIncludedInNegativeResponse ? Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Edit Partial View Error", detail: $"Failed to find the {DataObjectTypeName.SpaceCapitalLetters()} Edit View because of an error on the server.") : Problem();
+            return IsDetailsIncludedInNegativeResponse ? Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Edit Partial View Error", detail: $"Failed to find the {DataObjectTypeName.SpaceCapitalLetters()} Edit View because of an error on the server.") : StatusCode(StatusCodes.Status500InternalServerError);
         }
     }
 
@@ -515,7 +516,7 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to return the Edit View for the {Type} data object for {ID}.", DataObjectTypeName, id);
-            return IsDetailsIncludedInNegativeResponse ? Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Edit View Error", detail: $"Failed to find the {DataObjectTypeName.SpaceCapitalLetters()} Edit View because of an error on the server.") : Problem();
+            return IsDetailsIncludedInNegativeResponse ? Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Edit View Error", detail: $"Failed to find the {DataObjectTypeName.SpaceCapitalLetters()} Edit View because of an error on the server.") : StatusCode(StatusCodes.Status500InternalServerError);
         }
     }
 
@@ -545,7 +546,7 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to return the Edit View for the {Type} data object for {ID}.", DataObjectTypeName, id);
-            return IsDetailsIncludedInNegativeResponse ? Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Edit View Error", detail: $"Failed to find the {DataObjectTypeName.SpaceCapitalLetters()} Edit View because of an error on the server.") : Problem();
+            return IsDetailsIncludedInNegativeResponse ? Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Edit View Error", detail: $"Failed to find the {DataObjectTypeName.SpaceCapitalLetters()} Edit View because of an error on the server.") : StatusCode(StatusCodes.Status500InternalServerError);
         }
     }
 
@@ -568,7 +569,7 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to return the Index View for the {Type} data objects.", DataObjectTypeName);
-            return IsDetailsIncludedInNegativeResponse ? Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Index View Error", detail: $"Failed to find the {DataObjectTypeName.SpaceCapitalLetters()} Index View because of an error on the server.") : Problem();
+            return IsDetailsIncludedInNegativeResponse ? Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Index View Error", detail: $"Failed to find the {DataObjectTypeName.SpaceCapitalLetters()} Index View because of an error on the server.") : StatusCode(StatusCodes.Status500InternalServerError);
         }
     }
 
@@ -643,7 +644,7 @@ public class StandardModelViewController<T, U> : Microsoft.AspNetCore.Mvc.Contro
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to update the {Type} data object for {ID}.\n{DataObject}", DataObjectTypeName, id, dataObject.ToJson<T>());
-            return IsDetailsIncludedInNegativeResponse ? Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Update Error", detail: $"Failed to update the {DataObjectTypeName.SpaceCapitalLetters()} record because of an error on the server.") : Problem();
+            return IsDetailsIncludedInNegativeResponse ? Problem(title: $"{DataObjectTypeName.SpaceCapitalLetters()} Update Error", detail: $"Failed to update the {DataObjectTypeName.SpaceCapitalLetters()} record because of an error on the server.") : StatusCode(StatusCodes.Status500InternalServerError);
         }
     }
 }

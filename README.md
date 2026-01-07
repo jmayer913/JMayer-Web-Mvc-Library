@@ -297,8 +297,8 @@ public AccountController : StandardCRUDController<Account, IAccountDataLayer>
 ```
 The same can be done when using the StandardSubCRUDController.
 
-# v9.0.1 Change Log
-* Fixed exception thrown when ModelState.ErrorsToJson() is called when logging validation errors.
+# v9.0.2 Change Log
+* For the MVC controllers, when an exception occurs and details aren't returned, switched Problem() to StatusCode(StatusCodes.Status500InternalServerError); the middleware UseStatusCodePagesWithRedirects() does not work with Problem().
 ---
 * [ASP.NET Core MVC with Syncfusion Example Project](https://github.com/jmayer913/JMayer-Example-ASPSyncfusionMVC)
 * [ASP.NET Core / React Example Project](https://github.com/jmayer913/JMayer-Example-ASPReact)
