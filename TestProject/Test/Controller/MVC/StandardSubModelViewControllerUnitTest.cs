@@ -142,7 +142,7 @@ public class StandardSubModelViewControllerUnitTest
     public async Task VerifyDeleteReturnRedirectOnSuccess()
     {
         SimpleStandardSubCRUDDataLayer dataLayer = new();
-        _ = await dataLayer.CreateAsync(new SimpleSubDataObject() { Name = DefaultName });
+        _ = await dataLayer.CreateAsync(new SimpleSubDataObject() { Name = DefaultName }, TestContext.Current.CancellationToken);
         SimpleStandardSubModelViewController controller = new(dataLayer, CreateConsoleLogger());
         IActionResult actionResult = await controller.DeleteAsync(DefaultId);
 
@@ -181,7 +181,7 @@ public class StandardSubModelViewControllerUnitTest
     public async Task VerifyUpdateReturnRedirectOnSuccess()
     {
         SimpleStandardSubCRUDDataLayer dataLayer = new();
-        SimpleSubDataObject dataObject = await dataLayer.CreateAsync(new SimpleSubDataObject() { Name = DefaultName });
+        SimpleSubDataObject dataObject = await dataLayer.CreateAsync(new SimpleSubDataObject() { Name = DefaultName }, TestContext.Current.CancellationToken);
         SimpleStandardSubModelViewController controller = new(dataLayer, CreateConsoleLogger());
 
         dataObject.Value += 1;

@@ -74,7 +74,7 @@ public class StandardCRUDControllerUnitTest
     public async Task VerifyCountOkResponse()
     {
         SimpleStandardCRUDDataLayer dataLayer = new();
-        _ = await dataLayer.CreateAsync(new SimpleDataObject());
+        _ = await dataLayer.CreateAsync(new SimpleDataObject(), TestContext.Current.CancellationToken);
 
         SimpleStandardCRUDController simpleCRUDController = new(dataLayer, CreateConsoleLogger());
         IActionResult actionResult = await simpleCRUDController.CountAsync();
@@ -180,7 +180,7 @@ public class StandardCRUDControllerUnitTest
     public async Task VerifyDeleteOkResponse()
     {
         SimpleStandardCRUDDataLayer dataLayer = new();
-        SimpleDataObject dataObject = await dataLayer.CreateAsync(new SimpleDataObject());
+        SimpleDataObject dataObject = await dataLayer.CreateAsync(new SimpleDataObject(), TestContext.Current.CancellationToken);
 
         SimpleStandardCRUDController simpleCRUDController = new(dataLayer, CreateConsoleLogger());
         IActionResult actionResult = await simpleCRUDController.DeleteAsync(dataObject.Integer64ID);
@@ -310,7 +310,7 @@ public class StandardCRUDControllerUnitTest
     public async Task VerifyGetSingleOkResponse()
     {
         SimpleStandardCRUDDataLayer dataLayer = new();
-        _ = await dataLayer.CreateAsync(new SimpleDataObject());
+        _ = await dataLayer.CreateAsync(new SimpleDataObject(), TestContext.Current.CancellationToken);
 
         SimpleStandardCRUDController simpleCRUDController = new(dataLayer, CreateConsoleLogger());
         IActionResult actionResult = await simpleCRUDController.GetSingleAsync();
@@ -327,7 +327,7 @@ public class StandardCRUDControllerUnitTest
     public async Task VerifyGetSingleOkResponseForId()
     {
         SimpleStandardCRUDDataLayer dataLayer = new();
-        _ = await dataLayer.CreateAsync([ new SimpleDataObject(), new SimpleDataObject() ]);
+        _ = await dataLayer.CreateAsync([ new SimpleDataObject(), new SimpleDataObject() ], TestContext.Current.CancellationToken);
 
         SimpleStandardCRUDController simpleCRUDController = new(dataLayer, CreateConsoleLogger());
         IActionResult actionResult = await simpleCRUDController.GetSingleAsync(2);
@@ -344,7 +344,7 @@ public class StandardCRUDControllerUnitTest
     public async Task VerifyUpdateBadRequestResponse()
     {
         SimpleStandardCRUDDataLayer dataLayer = new();
-        SimpleDataObject originalDataObject = await dataLayer.CreateAsync(new SimpleDataObject());
+        SimpleDataObject originalDataObject = await dataLayer.CreateAsync(new SimpleDataObject(), TestContext.Current.CancellationToken);
 
         originalDataObject.Value = InvalidValue;
 
@@ -366,11 +366,11 @@ public class StandardCRUDControllerUnitTest
         {
             IsOldDataObjectDetectionEnabled = true,
         };
-        SimpleDataObject dataObject = await dataLayer.CreateAsync(new SimpleDataObject() { Name = "10", Value = 10 });
+        SimpleDataObject dataObject = await dataLayer.CreateAsync(new SimpleDataObject() { Name = "10", Value = 10 }, TestContext.Current.CancellationToken);
         await dataLayer.UpdateAsync(new SimpleDataObject(dataObject)
         {
             Value = 20,
-        });
+        }, TestContext.Current.CancellationToken);
 
         dataObject.Value = 30;
         SimpleStandardCRUDController controller = new(dataLayer, CreateConsoleLogger());
@@ -407,7 +407,7 @@ public class StandardCRUDControllerUnitTest
     public async Task VerifyUpdateNotFoundResponse()
     {
         SimpleStandardCRUDDataLayer dataLayer = new();
-        SimpleDataObject dataObject = await dataLayer.CreateAsync(new SimpleDataObject() { Name = "10", Value = 10 });
+        SimpleDataObject dataObject = await dataLayer.CreateAsync(new SimpleDataObject() { Name = "10", Value = 10 }, TestContext.Current.CancellationToken);
 
         dataObject.Integer64ID = dataObject.Integer64ID + 1;
         dataObject.Value += 1;
@@ -429,7 +429,7 @@ public class StandardCRUDControllerUnitTest
     public async Task VerifyUpdateOkResponse()
     {
         SimpleStandardCRUDDataLayer dataLayer = new();
-        SimpleDataObject originalDataObject = await dataLayer.CreateAsync(new SimpleDataObject());
+        SimpleDataObject originalDataObject = await dataLayer.CreateAsync(new SimpleDataObject(), TestContext.Current.CancellationToken);
 
         originalDataObject.Value = DefaultValue;
 
