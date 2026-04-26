@@ -35,7 +35,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="JMayer.Data" Version="9.0.0" />
+    <PackageReference Include="JMayer.Data" Version="9.1.0" />
   </ItemGroup>
 
 </Project>
