@@ -297,9 +297,12 @@ public AccountController : StandardCRUDController<Account, IAccountDataLayer>
 ```
 The same can be done when using the StandardSubCRUDController.
 
-# v9.0.2 Change Log
-* For the MVC controllers, when an exception occurs and details aren't returned, switched Problem() to StatusCode(StatusCodes.Status500InternalServerError); the middleware UseStatusCodePagesWithRedirects() does not work with Problem().
+# v9.1.0 Change Log
 ---
+* Updated JMayer.Data package to v9.1.0
+---
+* [ASP.NET Core MVC Example Project](https://github.com/jmayer913/JMayer-Example-ASPVanillaMVC)
 * [ASP.NET Core MVC with Syncfusion Example Project](https://github.com/jmayer913/JMayer-Example-ASPSyncfusionMVC)
 * [ASP.NET Core / React Example Project](https://github.com/jmayer913/JMayer-Example-ASPReact)
 * [Blazor WebAssembly Example Project](https://github.com/jmayer913/JMayer-Example-WebAssemblyBlazor)
+---
