@@ -298,7 +298,7 @@ public class StandardModelViewControllerUnitTest
     public async Task VerifyDeletePartialView()
     {
         SimpleStandardCRUDDataLayer dataLayer = new();
-        _ = await dataLayer.CreateAsync(new SimpleDataObject());
+        _ = await dataLayer.CreateAsync(new SimpleDataObject(), TestContext.Current.CancellationToken);
 
         SimpleStandardModelViewController controller = new(dataLayer, CreateConsoleLogger());
         IActionResult actionResult = await controller.DeletePartialViewAsync(DefaultId);
@@ -318,7 +318,7 @@ public class StandardModelViewControllerUnitTest
     public async Task VerifyDeletePartialViewReturnNotFound(bool details)
     {
         SimpleStandardCRUDDataLayer dataLayer = new();
-        _ = await dataLayer.CreateAsync(new SimpleDataObject());
+        _ = await dataLayer.CreateAsync(new SimpleDataObject(), TestContext.Current.CancellationToken);
 
         SimpleStandardModelViewController controller = new(dataLayer, CreateConsoleLogger())
         {
@@ -384,7 +384,7 @@ public class StandardModelViewControllerUnitTest
     public async Task VerifyDeleteReturnJsonOnSuccess()
     {
         SimpleStandardCRUDDataLayer dataLayer = new();
-        _ = dataLayer.CreateAsync(new SimpleDataObject() { Value = DefaultValue });
+        _ = dataLayer.CreateAsync(new SimpleDataObject() { Value = DefaultValue }, TestContext.Current.CancellationToken);
         SimpleStandardModelViewController controller = new(dataLayer, CreateConsoleLogger())
         {
             IsCUDActionRedirectedOnSuccess = false,
@@ -405,7 +405,7 @@ public class StandardModelViewControllerUnitTest
     public async Task VerifyDeleteReturnNotFound(bool details)
     {
         SimpleStandardCRUDDataLayer dataLayer = new();
-        _ = await dataLayer.CreateAsync(new SimpleDataObject());
+        _ = await dataLayer.CreateAsync(new SimpleDataObject(), TestContext.Current.CancellationToken);
 
         SimpleStandardModelViewController controller = new(dataLayer, CreateConsoleLogger())
         {
@@ -435,7 +435,7 @@ public class StandardModelViewControllerUnitTest
     public async Task VerifyDeleteReturnRedirectSuccess()
     {
         SimpleStandardCRUDDataLayer dataLayer = new();
-        _ = dataLayer.CreateAsync(new SimpleDataObject() { Value = DefaultValue });
+        _ = dataLayer.CreateAsync(new SimpleDataObject() { Value = DefaultValue }, TestContext.Current.CancellationToken);
         SimpleStandardModelViewController controller = new(dataLayer, CreateConsoleLogger());
         IActionResult actionResult = await controller.DeleteAsync(DefaultId);
 
@@ -455,7 +455,7 @@ public class StandardModelViewControllerUnitTest
     public async Task VerifyDeleteView()
     {
         SimpleStandardCRUDDataLayer dataLayer = new();
-        _ = await dataLayer.CreateAsync(new SimpleDataObject());
+        _ = await dataLayer.CreateAsync(new SimpleDataObject(), TestContext.Current.CancellationToken);
 
         SimpleStandardModelViewController controller = new(dataLayer, CreateConsoleLogger());
         IActionResult actionResult = await controller.DeleteViewAsync(DefaultId);
@@ -475,7 +475,7 @@ public class StandardModelViewControllerUnitTest
     public async Task VerifyDeleteViewReturnNotFound(bool details)
     {
         SimpleStandardCRUDDataLayer dataLayer = new();
-        _ = await dataLayer.CreateAsync(new SimpleDataObject());
+        _ = await dataLayer.CreateAsync(new SimpleDataObject(), TestContext.Current.CancellationToken);
 
         SimpleStandardModelViewController controller = new(dataLayer, CreateConsoleLogger())
         {
@@ -505,7 +505,7 @@ public class StandardModelViewControllerUnitTest
     public async Task VerifyEditPartialView()
     {
         SimpleStandardCRUDDataLayer dataLayer = new();
-        _ = await dataLayer.CreateAsync(new SimpleDataObject());
+        _ = await dataLayer.CreateAsync(new SimpleDataObject(), TestContext.Current.CancellationToken);
 
         SimpleStandardModelViewController controller = new(dataLayer, CreateConsoleLogger());
         IActionResult actionResult = await controller.EditPartialViewAsync(DefaultId);
@@ -525,7 +525,7 @@ public class StandardModelViewControllerUnitTest
     public async Task VerifyEditPartialViewReturnNotFound(bool details)
     {
         SimpleStandardCRUDDataLayer dataLayer = new();
-        _ = await dataLayer.CreateAsync(new SimpleDataObject());
+        _ = await dataLayer.CreateAsync(new SimpleDataObject(), TestContext.Current.CancellationToken);
 
         SimpleStandardModelViewController controller = new(dataLayer, CreateConsoleLogger())
         {
@@ -555,7 +555,7 @@ public class StandardModelViewControllerUnitTest
     public async Task VerifyEditView()
     {
         SimpleStandardCRUDDataLayer dataLayer = new();
-        _ = await dataLayer.CreateAsync(new SimpleDataObject());
+        _ = await dataLayer.CreateAsync(new SimpleDataObject(), TestContext.Current.CancellationToken);
 
         SimpleStandardModelViewController controller = new(dataLayer, CreateConsoleLogger());
         IActionResult actionResult = await controller.EditViewAsync(DefaultId);
@@ -575,7 +575,7 @@ public class StandardModelViewControllerUnitTest
     public async Task VerifyEditViewReturnNotFound(bool details)
     {
         SimpleStandardCRUDDataLayer dataLayer = new();
-        _ = await dataLayer.CreateAsync(new SimpleDataObject());
+        _ = await dataLayer.CreateAsync(new SimpleDataObject(), TestContext.Current.CancellationToken);
 
         SimpleStandardModelViewController controller = new(dataLayer, CreateConsoleLogger())
         {
@@ -628,7 +628,7 @@ public class StandardModelViewControllerUnitTest
         {
             IsOldDataObjectDetectionEnabled = true,
         };
-        SimpleDataObject dataObject = await dataLayer.CreateAsync(new SimpleDataObject() { Name = "Update Conflict Test", Value = DefaultValue });
+        SimpleDataObject dataObject = await dataLayer.CreateAsync(new SimpleDataObject() { Name = "Update Conflict Test", Value = DefaultValue }, TestContext.Current.CancellationToken);
         SimpleStandardModelViewController controller = new(dataLayer, CreateConsoleLogger())
         {
             IsCUDActionRedirectedOnSuccess = false,
@@ -663,7 +663,7 @@ public class StandardModelViewControllerUnitTest
     public async Task VerifyUpdateReturnJsonOnSuccess()
     {
         SimpleStandardCRUDDataLayer dataLayer = new();
-        SimpleDataObject dataObject = await dataLayer.CreateAsync(new SimpleDataObject() { Value = DefaultValue });
+        SimpleDataObject dataObject = await dataLayer.CreateAsync(new SimpleDataObject() { Value = DefaultValue }, TestContext.Current.CancellationToken);
         SimpleStandardModelViewController controller = new(dataLayer, CreateConsoleLogger())
         {
             IsCUDActionRedirectedOnSuccess = false,
@@ -684,7 +684,7 @@ public class StandardModelViewControllerUnitTest
     public async Task VerifyUpdateReturnJsonOnDataLayerValidationError()
     {
         SimpleStandardCRUDDataLayer dataLayer = new();
-        SimpleDataObject dataObject = await dataLayer.CreateAsync(new SimpleDataObject() { Value = DefaultValue });
+        SimpleDataObject dataObject = await dataLayer.CreateAsync(new SimpleDataObject() { Value = DefaultValue }, TestContext.Current.CancellationToken);
         SimpleStandardModelViewController controller = new(dataLayer, CreateConsoleLogger())
         {
             ValidationFailedAction = ValidationFailedAction.ReturnJson,
@@ -706,7 +706,7 @@ public class StandardModelViewControllerUnitTest
     public async Task VerifyUpdateReturnJsonOnInvalidModel()
     {
         SimpleStandardCRUDDataLayer dataLayer = new();
-        SimpleDataObject dataObject = await dataLayer.CreateAsync(new SimpleDataObject() { Value = DefaultValue });
+        SimpleDataObject dataObject = await dataLayer.CreateAsync(new SimpleDataObject() { Value = DefaultValue }, TestContext.Current.CancellationToken);
         SimpleStandardModelViewController controller = new(dataLayer, CreateConsoleLogger())
         {
             ValidationFailedAction = ValidationFailedAction.ReturnJson,
@@ -759,7 +759,7 @@ public class StandardModelViewControllerUnitTest
     public async Task VerifyUpdateReturnNotFound(bool details)
     {
         SimpleStandardCRUDDataLayer dataLayer = new();
-        _ = await dataLayer.CreateAsync(new SimpleDataObject());
+        _ = await dataLayer.CreateAsync(new SimpleDataObject(), TestContext.Current.CancellationToken);
 
         SimpleStandardModelViewController controller = new(dataLayer, CreateConsoleLogger())
         {
@@ -789,7 +789,7 @@ public class StandardModelViewControllerUnitTest
     public async Task VerifyUpdateReturnPartialViewOnDataLayerValidationError()
     {
         SimpleStandardCRUDDataLayer dataLayer = new();
-        SimpleDataObject dataObject = await dataLayer.CreateAsync(new SimpleDataObject() { Value = DefaultValue });
+        SimpleDataObject dataObject = await dataLayer.CreateAsync(new SimpleDataObject() { Value = DefaultValue }, TestContext.Current.CancellationToken);
         SimpleStandardModelViewController controller = new(dataLayer, CreateConsoleLogger())
         {
             ValidationFailedAction = ValidationFailedAction.ReturnPartialView,
@@ -811,7 +811,7 @@ public class StandardModelViewControllerUnitTest
     public async Task VerifyUpdateReturnPartialViewOnInvalidModel()
     {
         SimpleStandardCRUDDataLayer dataLayer = new();
-        SimpleDataObject dataObject = await dataLayer.CreateAsync(new SimpleDataObject() { Value = DefaultValue });
+        SimpleDataObject dataObject = await dataLayer.CreateAsync(new SimpleDataObject() { Value = DefaultValue }, TestContext.Current.CancellationToken);
         SimpleStandardModelViewController controller = new(dataLayer, CreateConsoleLogger())
         {
             ValidationFailedAction = ValidationFailedAction.ReturnPartialView,
@@ -835,7 +835,7 @@ public class StandardModelViewControllerUnitTest
     public async Task VerifyUpdateReturnRedirectOnSuccess()
     {
         SimpleStandardCRUDDataLayer dataLayer = new();
-        SimpleDataObject dataObject = await dataLayer.CreateAsync(new SimpleDataObject() { Value = DefaultValue });
+        SimpleDataObject dataObject = await dataLayer.CreateAsync(new SimpleDataObject() { Value = DefaultValue }, TestContext.Current.CancellationToken);
         SimpleStandardModelViewController controller = new(dataLayer, CreateConsoleLogger());
 
         dataObject.Value += 1;
@@ -857,7 +857,7 @@ public class StandardModelViewControllerUnitTest
     public async Task VerifyUpdateReturnViewOnDataLayerValidationError()
     {
         SimpleStandardCRUDDataLayer dataLayer = new();
-        SimpleDataObject dataObject = await dataLayer.CreateAsync(new SimpleDataObject() { Value = DefaultValue });
+        SimpleDataObject dataObject = await dataLayer.CreateAsync(new SimpleDataObject() { Value = DefaultValue }, TestContext.Current.CancellationToken);
         SimpleStandardModelViewController controller = new(dataLayer, CreateConsoleLogger());
 
         dataObject.Value = InvalidValue;
@@ -876,7 +876,7 @@ public class StandardModelViewControllerUnitTest
     public async Task VerifyUpdateReturnViewOnInvalidModel()
     {
         SimpleStandardCRUDDataLayer dataLayer = new();
-        SimpleDataObject dataObject = await dataLayer.CreateAsync(new SimpleDataObject() { Value = DefaultValue });
+        SimpleDataObject dataObject = await dataLayer.CreateAsync(new SimpleDataObject() { Value = DefaultValue }, TestContext.Current.CancellationToken);
         SimpleStandardModelViewController controller = new(dataLayer, CreateConsoleLogger());
 
         dataObject.Value = InvalidValue;
